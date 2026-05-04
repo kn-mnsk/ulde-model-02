@@ -1,1 +1,465 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+// @include mat.core();
+
+// @import 'tailwindcss/base';
+// @import 'tailwindcss/components';
+// @import 'tailwindcss/utilities';
+// @import 'tailwindcss/variants';
+
+/* ---------------------------------------------------------
+   Common
+--------------------------------------------------------- */
+
+html,
+body {
+  height: 100%;
+  // overflow: hidden; // add this
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  // overflow: hidden; // ensure only the docs-viewer_content scrolls
+  transition: background-color 0.7s ease-in-out, color 0.7s ease-in-out;
+}
+
+
+// add more natural easing curve
+/*
+Adds a subtle size change to prevent the transition from feeling static. ✅ Creates a more natural fade effect instead of a hard opacity shift.
+*/
+@keyframes fade-in {
+  // from {
+  //   opacity: 0;
+  // }
+  // to {
+  //   opacity: 1;
+  // }
+
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+    /* Slight shrink effect */
+  }
+
+  60% {
+    opacity: 0.5;
+    transform: scale(1.01);
+    /* Brief slight expansion */
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    /* Back to normal */
+  }
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+// Apply the variables to links
+a {
+  color: var(--link-color);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   Angular materials
+--------------------------------------------------------- */
+
+.mat-button,
+.mat-raised-button {
+  display: inline-block !important;
+}
+
+.mat-button {
+  animation: fade-in 0.4s ease-in-out;
+}
+
+.mat-icon {
+  // more interactive, and subtle animation effect when toggling themes:
+  // transform: rotate(180deg);
+  transition: color 0.4s ease-in-out opacity 0.4s ease-in-out;
+}
+
+
+// Improve Button Responsiveness with Hover Effects
+.mat-button:hover,
+.mat-raised-button:hover {
+  background-color: red !important;
+  transform: scale(1.1);
+  // transition: transform 0.3s ease-in-out;
+
+  box-shadow: 0px 0px 20px rgba(255, 0, 0, 0.5);
+}
+
+@include mat.core();
+
+
+/* ---------------------------------------------------------
+   Thema drak and light
+--------------------------------------------------------- */
+
+.theme-transition-overlay {
+  background: rgba(0, 0, 0, 0.4);
+  transition: background-color 0.8s ease-in-out;
+}
+
+/* Thema*/
+$dark-primary-text: white;
+$dark-theme: mat.m2-define-dark-theme((color: (primary: mat.m2-define-palette(mat.$m2-blue-palette, 700), accent: mat.m2-define-palette(mat.$m2-pink-palette, A200))));
+
+$light-primary-text: rgba(black, 0.87);
+$light-primary: mat.m2-define-palette(mat.$m2-pink-palette, 500);
+$light-accent: mat.m2-define-palette(mat.$m2-deep-purple-palette, A200, A100, A400);
+$light-theme: mat.m2-define-light-theme((color: (primary: $light-primary, accent: $light-accent, ), typography: mat.m2-define-typography-config(), density: 0, ));
+
+/*add a subtle gradient effect
+✅ Prevents harsh contrast shifts between themes.
+✅ Gives a softer gradient transition when switching modes.
+*/
+[data-theme="dark"] {
+  --background-color: #lelele; // for docs-viewer.ts
+  // --bg-color: #lelele;
+  --bg-color: rgba(0, 0, 0, 1.0);
+  // --bg-color: linear-gradient(180deg, #1a1a1a, #000000);
+  --text-color: white; //$dark-primary-text;
+  --link-color: lightblue;
+  --link-hover-color: cyan;
+
+  --table-bg-even: #1e1e1e;
+  --table-bg-odd: #111;
+  --table-border: #555;
+  --table-header-bg: #333;
+
+  @include mat.all-component-themes($dark-theme);
+}
+
+[data-theme="dark"] .mat-icon {
+  color: lightblue;
+}
+
+[data-theme="dark"] .mat-icon:hover {
+  // background-color: red !important;
+  transform: scale(1.5);
+  transition: transform 0.2s ease-in-out;
+  // transform: rotate(180deg);
+  /* Rotate for a smooth effect */
+  opacity: 0.8;
+}
+
+//https://github.com/angular/components/blob/15.2.9/guides/duplicate-theming-styles.md
+[data-theme="light"] {
+  // --bg-color: white;
+  --background-color: #ffffff; // for docs-viewer.ts
+  // --bg-color: #ffffff;
+  --bg-color: linear-gradient(180deg, #ffffff, #f0f0f0);
+  --text-color: $light-primary-text;
+  --link-color: blue;
+  --link-hover-color: darkblue;
+
+  --table-bg-even: #f9f9f9;
+  --table-bg-odd: #ffffff;
+  --table-border: #333;
+  --table-header-bg: #e0e0e0;
+
+  @include mat.all-component-colors($light-theme);
+}
+
+[data-theme="light"] .mat-icon {
+  color: darkblue;
+}
+
+[data-theme="light"] .mat-icon:hover {
+  transform: scale(1.5);
+  transition: transform 0.2s ease-in-out;
+  // transform: rotate(0deg);
+  opacity: 1;
+}
+
+/* Only fade the BODY, not the entire app */
+body[data-theme="dark"],
+body[data-theme="light"] {
+  opacity: 0;
+  animation: fade-in 0.7s forwards ease-in-out;
+}
+
+
+/* ---------------------------------------------------------
+   Katex
+--------------------------------------------------------- */
+
+/* Katex Stylesheet Trouble Shouting: refer to body in the index.html*/
+.katex-version {
+  display: none;
+}
+
+.katex-version::after {
+  content: "0.10.2 or earlier";
+}
+
+/* Katex CSS customization: refer to https://katex.org/docs/issues*/
+.katex-display {
+  overflow: auto hidden
+}
+
+.katex-display>.katex {
+  white-space: normal
+}
+
+/* Add space between broken lines: */
+.katex-display>.base {
+  margin: 0.25em 0
+}
+
+/* Compensate by reducing space around display math */
+.katex-display {
+  margin: 0.5em 0;
+}
+
+.katex {
+  font-size: 1.1em;
+}
+
+
+/* ---------------------------------------------------------
+   Marked
+--------------------------------------------------------- */
+
+[data-theme="light"] .backToIndex:hover,
+[data-theme="light"] .backToPrevious:hover {
+  // position: relative;
+  background-color: red !important;
+  transform: scale(1.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+[data-theme="dark"] .backToIndex:hover,
+[data-theme="dark"] .backToPrevious:hover {
+  // position: relative;
+  background-color: rgb(126, 238, 122);
+  transform: scale(1.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+// .docs-viewer_content table {
+//   border-collapse: collapse;
+//   width: fit-content; //100%;
+//   margin-top: 1rem;
+//   margin-bottom: 1rem;
+//   // padding: 5px;
+//   font-size: 1rem;
+//   border-radius: 3em;
+// }
+
+// .docs-viewer_content table th {
+//   // background-color: rgb(206, 14, 78);
+//   background-color: var(--table-header-bg);
+// }
+
+// .docs-viewer_content table th,
+// .docs-viewer_content table td {
+//   // border: 1rem solid var(--table-border);
+//   // border: 1px solid var(--table-border);
+//   border: 2px solid #1bee22;
+//   padding: 0.3rem;
+//   vertical-align: top;
+// }
+
+
+// .docs-viewer_content table tr:nth-child(even) {
+//   // background-color: yellow;
+//   // background-color: #05252e;
+//   border-bottom: solid 1px rgb(227, 219, 219);
+// }
+
+// .docs-viewer_content table tr:nth-child(odd) {
+//   // background-color: green;
+//   // background-color: #ce164a;
+//   border-bottom: solid 1px rgb(227, 219, 219);
+// }
+
+
+// // temporary class: scroll by onClick function
+// .docs-viewer_content .inline-highlight {
+//   background-color: rgb(219, 219, 22);
+//   transition: background-color 0.7s ease-in-out, color 0.7s ease-in-out;
+//   // transition: background-color 1.5s ease;
+// }
+
+
+.ulde-layout-main_content table {
+  border-collapse: collapse;
+  width: fit-content; //100%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  // padding: 5px;
+  font-size: 1rem;
+  border-radius: 3em;
+}
+
+.ulde-layout-main_content table th {
+  // background-color: rgb(206, 14, 78);
+  background-color: var(--table-header-bg);
+}
+
+.ulde-layout-main_content table th,
+.ulde-layout-main_content table td {
+  // border: 1rem solid var(--table-border);
+  // border: 1px solid var(--table-border);
+  border: 2px solid #1bee22;
+  padding: 0.3rem;
+  vertical-align: top;
+}
+
+
+.ulde-layout-main_content table tr:nth-child(even) {
+  // background-color: yellow;
+  // background-color: #05252e;
+  border-bottom: solid 1px rgb(227, 219, 219);
+}
+
+.ulde-layout-main_content table tr:nth-child(odd) {
+  // background-color: green;
+  // background-color: #ce164a;
+  border-bottom: solid 1px rgb(227, 219, 219);
+}
+
+
+// temporary class: scroll by onClick function
+.ulde-layout-main_content .inline-highlight {
+  background-color: rgb(219, 219, 22);
+  transition: background-color 0.7s ease-in-out, color 0.7s ease-in-out;
+  // transition: background-color 1.5s ease;
+}
+
+
+
+
+// @import './app/docs-viewer/docs-viewer.scss';
+
+
+/* ---------------------------------------------------------
+   Mermaid
+--------------------------------------------------------- */
+/*
+Source - https://stackoverflow.com/a/79199554
+Posted by grappler
+Retrieved 2026-04-23, License - CC BY-SA 4.0
+*/
+.docs-viewer_content .mermaid-container {
+  display: block;
+  width: auto;
+  height: auto;
+  overflow: hidden;
+  border: 2px solid #55db50;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.docs-viewer_content .mermaid-container svg {
+  cursor: grab;
+}
+
+.docs-viewer_content .mermaid-container .language-mermaid {
+  position: relative;
+  padding: 1rem;
+  margin: 0.5rem;
+  border: 0.5px dashed; // var(--text-color);
+  color: var(--text-color);
+  display: block;
+  // flex-direction: row;
+  justify-content: center;
+
+}
+
+.docs-viewer_content .langauge-mermaid g text {
+  // word-wrap: normal;
+  word-wrap: break-word;
+  // font-size: 10px;
+}
+
+.docs-viewer_content .mermaid-container .mermaid-button-container {
+  position: relative;
+  display: block;
+  align-items: flex-end;
+  margin: 0.5rem;
+
+  transition: background-color 0.3s ease;
+  // z-index: 1000;
+  /* Ensure it stays on top */
+}
+
+.mermaid-reset-button,
+.mermaid-zoomin-button,
+.mermaid-zoomout-button {
+  position: relative;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+
+}
+
+[data-theme="light"] .mermaid-reset-button:hover,
+[data-theme="light"] .mermaid-zoomin-button:hover,
+[data-theme="light"] .mermaid-zoomout-button:hover {
+  // position: relative;
+  background-color: red;
+  color: var(--text-color);
+  transform: scale(1.2);
+  transition: transform 0.2s ease-in-out;
+}
+
+[data-theme="dark"] .mermaid-reset-button:hover,
+[data-theme="dark"] .mermaid-zoomin-button:hover,
+[data-theme="dark"] .mermaid-zoomout-button:hover {
+  // position: relative;
+  background-color: rgb(126, 238, 122);
+  color: var(--text-color);
+  transform: scale(1.2);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* ---------------------------------------------------------
+   Debug Tools for docs-viewer_content
+--------------------------------------------------------- */
+:root .dv-scroll-debug-overlay {
+  // html .dv-scroll-debug-overlay {
+  position: fixed;
+  top: 12px;
+  right: 250px;
+  background: rgba(35, 35, 35, 0.78);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 99999;
+
+  .dv-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .dv-subtitle {
+    margin-top: 8px;
+    font-weight: 600;
+  }
+
+  &.visible {
+    opacity: 1;
+  }
+}
