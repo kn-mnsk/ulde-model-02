@@ -1,0 +1,51 @@
+<div class="docs-layout">
+
+  <!-- Sidebar: Artifacts Panel -->
+  @if (artifactsPanel()) {
+    <aside class="docs-sidebar">
+      <h3>Artifacts</h3>
+
+      @for (section of artifactsPanel().sections; track trackByTitle($index, section)) {
+        <div class="artifact-section">
+          <h4>{{ section.title }}</h4>
+
+          <ul>
+            @for (item of section.items; track trackByIndex($index, item)) {
+              <li>
+                <pre>{{ item | json }}</pre>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </aside>
+  }
+
+  <!-- Main content -->
+  <main class="docs-main">
+    <div class="docs-content" [innerHTML]="html()"></div>
+  </main>
+
+  <!-- Debug Overlay -->
+  @if (debugOverlay()) {
+    <section class="docs-debug-overlay">
+      <h3>Debug Overlay</h3>
+      <pre>{{ debugOverlay().summary | json }}</pre>
+    </section>
+  }
+
+  <!-- ScrollSpy -->
+  @if (scrollspy().length > 0) {
+    <nav class="docs-scrollspy">
+      <h4>Sections</h4>
+      <ul>
+        @for (s of scrollspy(); track trackBySlug($index, s)) {
+          <li>
+            <a [href]="'#' + s.slug">{{ s.slug }}</a>
+          </li>
+        }
+      </ul>
+    </nav>
+  }
+
+</div>
