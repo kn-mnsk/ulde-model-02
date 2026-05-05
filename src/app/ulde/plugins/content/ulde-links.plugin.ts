@@ -76,7 +76,8 @@ export const UldeLinksPlugin: UldePlugin = {
     //   group 2 → link URL
     const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
 
-    const baseUrl = config?.baseUrl ?? ''; // optional base URL
+    const baseUrl = config['baseUrl'] ?? ''; // optional base URL
+    // const baseUrl = config?.baseUrl ?? ''; // optional base URL
 
     const rewritten: string[] = [];
 
@@ -139,7 +140,7 @@ export const UldeLinksPlugin: UldePlugin = {
     });
 
     // Optionally store debug info
-    artifacts.linkRewrites = rewritten;
+    artifacts.links = rewritten;
   },
 
   // ---------------------------------------------------------

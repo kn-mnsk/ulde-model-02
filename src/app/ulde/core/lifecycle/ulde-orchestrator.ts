@@ -17,11 +17,12 @@
 import { UldePhaseContext } from './ulde-phase-context';
 import { UldePhase } from './ulde-phases';
 import { UldePlugin } from '../registry/ulde-plugin-api';
+import { UldeConfig } from '../config/ulde-config';
 
 export interface UldePipelineInput {
   content: string;
   plugins: UldePlugin[];
-  config?: Record<string, any>;
+  config?: UldeConfig;
 }
 
 export async function runUldePipeline(input: UldePipelineInput): Promise<UldePhaseContext> {

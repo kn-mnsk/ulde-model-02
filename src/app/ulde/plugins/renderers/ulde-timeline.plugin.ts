@@ -20,6 +20,7 @@
 
 import { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
+import { TimelineEntry } from '../../core/artifacts/ulde-artifacts';
 
 export const UldeTimelinePlugin: UldePlugin = {
   // ---------------------------------------------------------
@@ -68,7 +69,10 @@ export const UldeTimelinePlugin: UldePlugin = {
     const timings = artifacts.timings?.all?.() ?? [];
 
     if (timings.length === 0) {
-      artifacts.timeline = [];
+      artifacts.timeline = {
+        entries:[],
+        totalMs: 0};
+      // artifacts.timeline = [];
       ctx.artifacts.diagnostics.add({
         plugin: 'ulde-timeline',
         message: 'No timings found — timeline will be empty.',
@@ -110,7 +114,7 @@ export const UldeTimelinePlugin: UldePlugin = {
     //     ]
     //   }
     //
-    const timeline = Object.keys(phases).map(phase => {
+    const entries = Object.keys(phases).map(phase => {
       const total = phaseTotals[phase];
 
       const segments = phases[phase].map(p => ({
@@ -122,14 +126,19 @@ export const UldeTimelinePlugin: UldePlugin = {
       return {
         phase,
         totalMs: total,
-        segments,
+        segments: segments
       };
     });
+    const totalMs = entries.reduce((sum, e) => sum + e.totalMs, 0);
 
     // -----------------------------------------------------
     // 4. Store timeline metadata
     // -----------------------------------------------------
-    artifacts.timeline = timeline;
+    artifacts.timeline = {
+      entries,
+      totalMs
+    };
+    // artifacts.timeline = timeline;
 
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-timeline',

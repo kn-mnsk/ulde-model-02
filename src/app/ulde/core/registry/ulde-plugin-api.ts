@@ -14,8 +14,8 @@
  * This is the "model ULDE" plugin API — small, readable, and stable.
  */
 
-import { UldePhase, UldePhaseContext } from '../lifecycle/ulde-phases';
-
+import { UldePhase } from '../lifecycle/ulde-phases';
+import { UldePhaseContext } from '../lifecycle/ulde-phase-context';
 /**
  * Plugin metadata describes WHAT the plugin is.
  *

@@ -20,6 +20,7 @@
 
 import { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
+import { HighlightRequest } from '../../core/artifacts/ulde-artifacts';
 
 export const UldeSyntaxHighlightPlugin: UldePlugin = {
   // ---------------------------------------------------------
@@ -73,13 +74,14 @@ export const UldeSyntaxHighlightPlugin: UldePlugin = {
     const knownLanguages: string[] =
       config?.highlightLanguages ?? ['ts', 'js', 'html', 'css', 'json', 'bash'];
 
-    const highlightRequests: Array<{
-      index: number;
-      language: string | null;
-      code: string;
-      highlight: boolean;
-      reason?: string;
-    }> = [];
+    const highlightRequests:Array<HighlightRequest> =[];
+    // const highlightRequests: Array<{
+    //   index: number;
+    //   language: string | null;
+    //   code: string;
+    //   highlight: boolean;
+    //   reason?: string;
+    // }> = [];
 
     for (const block of codeblocks) {
       const lang = block.language;
@@ -96,10 +98,10 @@ export const UldeSyntaxHighlightPlugin: UldePlugin = {
 
         highlightRequests.push({
           index: block.index,
-          language: null,
-          code: block.code,
+          language: '',//null,
+          // code: block.code,
           highlight: false,
-          reason: 'missing-language',
+          // reason: 'missing-language',
         });
 
         continue;
@@ -118,9 +120,9 @@ export const UldeSyntaxHighlightPlugin: UldePlugin = {
         highlightRequests.push({
           index: block.index,
           language: lang,
-          code: block.code,
+          // code: block.code,
           highlight: false,
-          reason: 'unknown-language',
+          // reason: 'unknown-language',
         });
 
         continue;
@@ -132,7 +134,7 @@ export const UldeSyntaxHighlightPlugin: UldePlugin = {
       highlightRequests.push({
         index: block.index,
         language: lang,
-        code: block.code,
+        // code: block.code,
         highlight: true,
       });
     }

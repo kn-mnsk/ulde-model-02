@@ -70,7 +70,15 @@ export const UldeProfilerPlugin: UldePlugin = {
     const timings = artifacts.timings?.all?.() ?? [];
 
     if (timings.length === 0) {
-      artifacts.profiler = { phases: [], summary: {} };
+      artifacts.profiler = {
+        phases: [],
+        memorySnapshots: [],
+        anomalies: [],//new Array({phase:'', message:''}),
+        summary: {
+          totalPlugins: 0,
+          totalPhases: 0,
+          totalTimeMs: 0} };
+      // artifacts.profiler = { phases: [], summary: {} };
       ctx.artifacts.diagnostics.add({
         plugin: 'ulde-profiler',
         message: 'No timings found — profiler will be empty.',

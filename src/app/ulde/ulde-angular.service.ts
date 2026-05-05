@@ -5,12 +5,19 @@ import { BehaviorSubject } from 'rxjs';
 import { createUldePluginRegistry } from './core/registry/ulde-plugin-registry';
 import { runUldePipeline } from './core/lifecycle/ulde-orchestrator'; // teaching stub
 
+import {
+  DebugOverlayModel,
+  ArtifactsPanelModel,
+  ScrollSpyEntry,
+} from './core/artifacts/ulde-artifacts';
+
 export interface UldeRunResult {
   finalHtml: string;
-  debugOverlay: any;
-  artifactsPanel: any;
-  scrollspy: any[];
+  debugOverlay: DebugOverlayModel | null;
+  artifactsPanel: ArtifactsPanelModel | null;
+  scrollspy: ScrollSpyEntry[];
 }
+
 
 @Injectable({ providedIn: 'root' })
 export class UldeAngularService {
@@ -24,10 +31,12 @@ export class UldeAngularService {
     const ctx = await runUldePipeline({
       content: markdown,
       plugins,
-      config: {
-        validDocs: [],          // for Broken Links
-        highlightLanguages: [], // for Syntax Highlight
-      },
+      config:  {
+      enableProfiler: true,
+      enableDebugOverlay: true,
+      enableArtifactsPanel: true,
+      highlightLanguages: ['ts', 'js', 'html'],
+    },
     });
 
     this._result$.next({

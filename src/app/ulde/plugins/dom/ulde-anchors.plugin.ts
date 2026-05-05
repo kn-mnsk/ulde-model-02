@@ -66,7 +66,8 @@ export const UldeAnchorsPlugin: UldePlugin = {
     const { artifacts } = ctx;
 
     // We rely on headingStructure created by the Headings Check plugin.
-    const headings = artifacts.headingStructure ?? [];
+    const headings = artifacts.anchors ?? [];
+    // const headings = artifacts.headingStructure ?? [];
 
     const anchors: Array<{
       text: string;

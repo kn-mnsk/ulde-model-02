@@ -7,8 +7,8 @@ export enum UldePhase {
   RENDER = 'render',
 }
 
-export interface UldePhaseContext {
-  phase: UldePhase;
-  artifacts: any; // will be UldeArtifacts, but typed later to avoid circular deps
-  config: any;    // UldeConfig
-}
+// export interface UldePhaseContext {
+//   phase: UldePhase;
+//   artifacts: any; // will be UldeArtifacts, but typed later to avoid circular deps
+//   config: any;    // UldeConfig
+// }
