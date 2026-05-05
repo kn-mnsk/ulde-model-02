@@ -22,6 +22,7 @@
 
 import { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
+import { CodeblockEntry } from '../../core/artifacts/ulde-artifacts';
 
 export const UldeCodeblocksPlugin: UldePlugin = {
   // ---------------------------------------------------------
@@ -86,17 +87,14 @@ export const UldeCodeblocksPlugin: UldePlugin = {
     const codeblockRegex =
       /```([a-zA-Z0-9_-]*)\s*\n([\s\S]*?)```/g;
 
-    const codeblocks: Array<{
-      language: string | null;
-      code: string;
-      index: number;
-    }> = [];
+    const codeblocks: Array<CodeblockEntry> = [];
 
     let match: RegExpExecArray | null;
     let index = 0;
 
     while ((match = codeblockRegex.exec(markdown)) !== null) {
-      const lang = match[1]?.trim() || null;
+      const lang = match[1]?.trim();
+      // const lang = match[1]?.trim() || null;
       const code = match[2];
 
       if (!lang) {

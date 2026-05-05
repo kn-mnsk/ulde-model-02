@@ -3,7 +3,8 @@
 import { Component, input, signal, effect } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { JsonPipe } from '@angular/common';
-import { UldeAngularService } from '../ulde/ulde-angular.service';
+import { UldeAngularService, UldeRunResult } from '../ulde/ulde-angular.service';
+import { ArtifactsPanelModel, DebugOverlayModel, ScrollSpyEntry } from '../ulde/core/artifacts/ulde-artifacts';
 
 @Component({
   selector: 'app-docs-viewer',
@@ -22,9 +23,9 @@ export class DocsViewer {
   // Internal reactive state (signals)
   // ---------------------------------------------------------
   html = signal<SafeHtml | null>(null);
-  debugOverlay = signal<any>(null);
-  artifactsPanel = signal<any>(null);
-  scrollspy = signal<any[]>([]);
+  debugOverlay = signal<DebugOverlayModel | null>(null);
+  artifactsPanel = signal<ArtifactsPanelModel | null>(null);
+  scrollspy = signal<ScrollSpyEntry[]>([]);
 
   constructor(
     private readonly ulde: UldeAngularService,
@@ -51,7 +52,7 @@ export class DocsViewer {
   // ---------------------------------------------------------
   // Apply ULDE results into signals
   // ---------------------------------------------------------
-  private applyResult(result: any) {
+  private applyResult(result: UldeRunResult) {
     this.html.set(this.sanitizer.bypassSecurityTrustHtml(result.finalHtml));
     this.debugOverlay.set(result.debugOverlay);
     this.artifactsPanel.set(result.artifactsPanel);

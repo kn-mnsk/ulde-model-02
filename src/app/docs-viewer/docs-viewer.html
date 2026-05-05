@@ -5,7 +5,7 @@
     <aside class="docs-sidebar">
       <h3>Artifacts</h3>
 
-      @for (section of artifactsPanel().sections; track trackByTitle($index, section)) {
+      @for (section of artifactsPanel()?.sections; track trackByTitle($index, section)) {
         <div class="artifact-section">
           <h4>{{ section.title }}</h4>
 
@@ -30,7 +30,7 @@
   @if (debugOverlay()) {
     <section class="docs-debug-overlay">
       <h3>Debug Overlay</h3>
-      <pre>{{ debugOverlay().summary | json }}</pre>
+      <pre>{{ debugOverlay()?.summary | json }}</pre>
     </section>
   }
 

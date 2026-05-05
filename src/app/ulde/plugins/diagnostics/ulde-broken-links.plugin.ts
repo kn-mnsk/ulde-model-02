@@ -1,156 +1,67 @@
 // ulde/plugins/diagnostics/ulde-broken-links.plugin.ts
 
-/**
- * ULDE Broken Links Plugin (Teaching Version)
- *
- * This plugin demonstrates:
- *   - how to read links from artifacts.content
- *   - how to check them against a simple registry or base URL
- *   - how to detect broken links
- *   - how to add diagnostics
- *
- * This is intentionally simple:
- *   - It does NOT perform network requests
- *   - It does NOT validate external URLs
- *   - It only checks internal links (relative links)
- *
- * The goal is to teach plugin architecture,
- * not to implement a full link checker.
- */
-
 import { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
+import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
+import { DiagnosticEntry } from '../../core/artifacts/ulde-artifacts';
 
 export const UldeBrokenLinksPlugin: UldePlugin = {
-  // ---------------------------------------------------------
-  // 1. Metadata
-  // ---------------------------------------------------------
   meta: {
-    name: 'ulde-broken-links',
-    description: 'Checks internal links against a registry and reports broken ones.',
-    version: '1.0.0',
-    author: 'ULDE Model Project',
+    name: 'broken-links',
+    description: 'Detects links that do not match the configured validDocs list.',
+    version: '2.0.0',
+    author: 'ULDE',
   },
 
-  // ---------------------------------------------------------
-  // 2. Lifecycle phase
-  // ---------------------------------------------------------
-  // Runs in DIAGNOSTICS phase because it analyzes structure
-  // after content plugins have run.
   phase: UldePhase.DIAGNOSTICS,
 
-  // ---------------------------------------------------------
-  // 3. Capabilities
-  // ---------------------------------------------------------
   capabilities: {
-    transformsContent: false,      // does not modify markdown
-    usesDiagnostics: true,         // reports broken links
-    usesDom: false,
+    usesDiagnostics: true,
     producesRenderArtifacts: false,
   },
 
-  // ---------------------------------------------------------
-  // 4. Optional hook: beforeRun
-  // ---------------------------------------------------------
-  beforeRun(ctx) {
-    ctx.artifacts.diagnostics.add({
-      plugin: 'ulde-broken-links',
-      message: 'Broken Links plugin starting…',
-      severity: 'info',
-    });
+  beforeRun(ctx: UldePhaseContext): void {
+    // Teaching note:
+    // This hook is optional. Here we could log or prepare state.
+    // For now, we keep it simple and do nothing.
   },
 
-  // ---------------------------------------------------------
-  // 5. Main plugin logic
-  // ---------------------------------------------------------
-  run(ctx) {
-    const { artifacts, config } = ctx;
+  run(ctx: UldePhaseContext): void {
+    // 1. Read config safely (typed)
+    const validDocs = ctx.config.validDocs ?? [];
 
-    const markdown = artifacts.content;
+    // 2. Read links from artifacts (typed)
+    const links = ctx.artifacts.links ?? [];
 
-    // -----------------------------------------------------
-    // 1. Extract links from markdown
-    // -----------------------------------------------------
-    //
-    // Matches:
-    //   [text](url)
-    //
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    // 3. Compute broken links
+    const broken = links.filter(link => !validDocs.includes(link.href));
 
-    const links: Array<{ text: string; url: string }> = [];
+    // 4. Add diagnostics for each broken link
+    for (const link of broken) {
+      const diagnostic: DiagnosticEntry = {
+        plugin: this.meta.name,
+        message: `Broken link: ${link.href}`,
+        severity: 'warning',
+      };
 
-    let match: RegExpExecArray | null;
+      ctx.artifacts.diagnostics.add(diagnostic);
+    }
 
-    while ((match = linkRegex.exec(markdown)) !== null) {
-      links.push({
-        text: match[1],
-        url: match[2].trim(),
+    // 5. Add a section to the Artifacts Panel (if enabled)
+    if (ctx.artifacts.artifactsPanel) {
+      ctx.artifacts.artifactsPanel.sections.push({
+        title: 'Broken Links',
+        items: broken,
       });
     }
 
-    // -----------------------------------------------------
-    // 2. Determine internal link registry
-    // -----------------------------------------------------
-    //
-    // The registry is a simple list of valid internal paths.
-    // Example:
-    //   config.validDocs = ["index.md", "guide/intro.md"]
-    //
-    const registry: string[] = config?.validDocs ?? [];
-
-    // -----------------------------------------------------
-    // 3. Check each link
-    // -----------------------------------------------------
-    const broken: Array<{ text: string; url: string }> = [];
-
-    for (const link of links) {
-      const url = link.url;
-
-      // Skip external links
-      const isExternal =
-        url.startsWith('http://') ||
-        url.startsWith('https://') ||
-        url.startsWith('#');
-
-      if (isExternal) continue;
-
-      // Normalize URL (remove leading slash)
-      const normalized = url.replace(/^\//, '');
-
-      // Check against registry
-      const exists = registry.includes(normalized);
-
-      if (!exists) {
-        broken.push(link);
-
-        artifacts.diagnostics.add({
-          plugin: 'ulde-broken-links',
-          message: `Broken link detected: "${url}" (text: "${link.text}")`,
-          severity: 'warning',
-        });
-      }
-    }
-
-    // -----------------------------------------------------
-    // 4. Store debug info (optional)
-    // -----------------------------------------------------
-    artifacts.brokenLinks = broken;
-
-    artifacts.diagnostics.add({
-      plugin: 'ulde-broken-links',
-      message: `Checked ${links.length} link(s), found ${broken.length} broken.`,
-      severity: 'info',
-    });
+    // Teaching note:
+    // We DO NOT write arbitrary fields like artifacts.brokenLinks.
+    // Everything goes through typed artifacts, diagnostics, or artifactsPanel.
   },
 
-  // ---------------------------------------------------------
-  // 6. Optional hook: afterRun
-  // ---------------------------------------------------------
-  afterRun(ctx) {
-    ctx.artifacts.diagnostics.add({
-      plugin: 'ulde-broken-links',
-      message: 'Broken Links plugin finished.',
-      severity: 'info',
-    });
+  afterRun(ctx: UldePhaseContext): void {
+    // Teaching note:
+    // This hook is also optional. Could be used for logging or cleanup.
   },
 };

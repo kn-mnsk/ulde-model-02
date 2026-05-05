@@ -1,12 +1,13 @@
 // ulde/core/registry/ulde-registry.ts
 
 import { UldePhase } from '../lifecycle/ulde-phases';
+import { UldePlugin } from './ulde-plugin-api';
 
-export interface UldePlugin {
-  name: string;
-  phase: UldePhase;
-  run(ctx: any): Promise<void> | void;
-}
+// export interface UldePlugin {
+//   name: string;
+//   phase: UldePhase;
+//   run(ctx: any): Promise<void> | void;
+// }
 
 export class UldeRegistry {
   private plugins: Map<UldePhase, UldePlugin[]> = new Map();
