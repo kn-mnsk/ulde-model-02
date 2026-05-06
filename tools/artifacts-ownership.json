@@ -1,0 +1,47 @@
+{
+  "content": {
+    "writtenBy": ["Markdown Parser", "KaTeX Plugin", "Links Plugin", "Containers Plugin"],
+    "readBy": ["All content-phase plugins"],
+    "description": "Raw or transformed content."
+  },
+  "toc": {
+    "writtenBy": ["TOC Plugin"],
+    "readBy": ["Anchors Plugin", "Debug Overlay Plugin"],
+    "description": "Table of contents entries."
+  },
+  "links": {
+    "writtenBy": ["Links Plugin"],
+    "readBy": ["Debug Overlay Plugin"],
+    "description": "Link metadata extracted from content."
+  },
+  "highlightRequests": {
+    "writtenBy": ["Syntax Highlight Plugin"],
+    "readBy": ["Highlight Renderer"],
+    "description": "Highlight requests for the renderer."
+  },
+  "anchors": {
+    "writtenBy": ["Anchors Plugin"],
+    "readBy": ["ScrollSpy Plugin"],
+    "description": "Anchor entries derived from TOC."
+  },
+  "timeline": {
+    "writtenBy": ["Timeline Plugin"],
+    "readBy": ["Debug Overlay Plugin", "Profiler Plugin"],
+    "description": "Timeline of plugin execution."
+  },
+  "debugOverlay": {
+    "writtenBy": ["Debug Overlay Plugin"],
+    "readBy": ["DevTools"],
+    "description": "Debug overlay model."
+  },
+  "profiler": {
+    "writtenBy": ["Profiler Plugin"],
+    "readBy": ["DevTools"],
+    "description": "Profiler model."
+  },
+  "timings": {
+    "writtenBy": ["Orchestrator"],
+    "readBy": ["Timeline Plugin", "Profiler Plugin", "Debug Overlay Plugin"],
+    "description": "Timing entries for all plugins."
+  }
+}

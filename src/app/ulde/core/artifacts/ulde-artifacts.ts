@@ -35,6 +35,11 @@ export interface HighlightRequest {
 export interface ContainerEntry {
   index: number;
   type: string;       // note, warning, tip, etc.
+  /**
+   * Raw or transformed content.
+   * Written by: Markdown Parser, KaTeX Plugin, Links Plugin, Containers Plugin
+   * Read by: All content-phase plugins
+   */
   content: string;
 }
 
@@ -88,6 +93,11 @@ export interface DebugOverlayModel {
     totalTimeMs: number;
   };
   diagnostics: DiagnosticEntry[];
+  /**
+   * Timing entries for all plugins.
+   * Written by: Orchestrator
+   * Read by: Timeline Plugin, Profiler Plugin, Debug Overlay Plugin
+   */
   timings: TimelineEntry[];
 }
 
@@ -133,11 +143,31 @@ export interface ArtifactsPanelModel {
 
 export interface UldeArtifacts {
   // Content
+  /**
+   * Raw or transformed content.
+   * Written by: Markdown Parser, KaTeX Plugin, Links Plugin, Containers Plugin
+   * Read by: All content-phase plugins
+   */
   content: string;
+  /**
+   * Table of contents entries.
+   * Written by: TOC Plugin
+   * Read by: Anchors Plugin, Debug Overlay Plugin
+   */
   toc?: TocEntry[];
+  /**
+   * Link metadata extracted from content.
+   * Written by: Links Plugin
+   * Read by: Debug Overlay Plugin
+   */
   links?: LinkEntry[];
   frontmatter?: FrontmatterData;
   codeblocks?: CodeblockEntry[];
+  /**
+   * Highlight requests for the renderer.
+   * Written by: Syntax Highlight Plugin
+   * Read by: Highlight Renderer
+   */
   highlightRequests?: HighlightRequest[];
   containers?: ContainerEntry[];
 
@@ -148,20 +178,45 @@ export interface UldeArtifacts {
   };
 
   // DOM
+  /**
+   * Anchor entries derived from TOC.
+   * Written by: Anchors Plugin
+   * Read by: ScrollSpy Plugin
+   */
   anchors?: AnchorEntry[];
   scrollspy?: ScrollSpyEntry[];
 
   // Render
   html?: string;
   finalHtml?: string;
+  /**
+   * Timeline of plugin execution.
+   * Written by: Timeline Plugin
+   * Read by: Debug Overlay Plugin, Profiler Plugin
+   */
   timeline?: TimelineModel;
+  /**
+   * Debug overlay model.
+   * Written by: Debug Overlay Plugin
+   * Read by: DevTools
+   */
   debugOverlay?: DebugOverlayModel;
+  /**
+   * Profiler model.
+   * Written by: Profiler Plugin
+   * Read by: DevTools
+   */
   profiler?: ProfilerModel;
 
   // DevTools
   artifactsPanel?: ArtifactsPanelModel;
 
   // Timings
+  /**
+   * Timing entries for all plugins.
+   * Written by: Orchestrator
+   * Read by: Timeline Plugin, Profiler Plugin, Debug Overlay Plugin
+   */
   timings: {
     add(entry: TimelineEntry): void;
     all(): TimelineEntry[];
