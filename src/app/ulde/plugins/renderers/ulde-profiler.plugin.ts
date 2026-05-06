@@ -1,189 +1,68 @@
-// ulde/plugins/renderers/ulde-profiler.plugin.ts
-
-/**
- * ULDE Profiler Plugin (Teaching Version)
- *
- * This plugin demonstrates:
- *   - how to compute deeper performance metrics
- *   - how to measure orchestrator overhead
- *   - how to compute per-phase CPU deltas
- *   - how to generate synthetic memory snapshots
- *   - how to detect performance anomalies
- *   - how to produce a profiler model for UI adapters
- *
- * This plugin does NOT:
- *   - access real system memory APIs
- *   - perform real CPU profiling
- *   - manipulate the DOM
- *
- * The goal is to teach plugin architecture,
- * not to implement a full performance profiler.
- */
-
-import { UldePlugin } from '../../core/registry/ulde-plugin-api';
+import type { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
+import type { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
+import type { ProfilerModel, ProfilerPhaseEntry, MemorySnapshot } from '../../core/artifacts/ulde-artifacts';
 
-export const UldeProfilerPlugin: UldePlugin = {
-  // ---------------------------------------------------------
-  // 1. Metadata
-  // ---------------------------------------------------------
-  meta: {
-    name: 'ulde-profiler',
-    description: 'Computes deeper performance metrics for ULDE.',
-    version: '1.0.0',
-    author: 'ULDE Model Project',
-  },
+export function createUldeProfilerPlugin(): UldePlugin {
+  return {
+    meta: {
+      name: 'ulde-profiler',
+      version: '1.0.0',
+      description: 'Aggregates profiling information across phases.',
+    },
+    phase: UldePhase.DIAGNOSTICS,
 
-  // ---------------------------------------------------------
-  // 2. Lifecycle phase
-  // ---------------------------------------------------------
-  // Runs in RENDER phase because profiling is a visualization concern.
-  phase: UldePhase.RENDER,
+    run(ctx: UldePhaseContext) {
+      const { artifacts, config } = ctx;
 
-  // ---------------------------------------------------------
-  // 3. Capabilities
-  // ---------------------------------------------------------
-  capabilities: {
-    transformsContent: false,
-    usesDiagnostics: true,
-    usesDom: false,
-    producesRenderArtifacts: true, // produces profiler metadata
-  },
+      if (!config.enableProfiler) return;
 
-  // ---------------------------------------------------------
-  // 4. Optional hook: beforeRun
-  // ---------------------------------------------------------
-  beforeRun(ctx) {
-    ctx.artifacts.diagnostics.add({
-      plugin: 'ulde-profiler',
-      message: 'Profiler plugin starting…',
-      severity: 'info',
-    });
-  },
+      const timings = artifacts.timings.all();
 
-  // ---------------------------------------------------------
-  // 5. Main plugin logic
-  // ---------------------------------------------------------
-  run(ctx) {
-    const { artifacts } = ctx;
+      const phasesMap = new Map<string, { totalMs: number; plugins: Map<string, number> }>();
 
-    const timings = artifacts.timings?.all?.() ?? [];
-
-    if (timings.length === 0) {
-      artifacts.profiler = {
-        phases: [],
-        memorySnapshots: [],
-        anomalies: [],//new Array({phase:'', message:''}),
-        summary: {
-          totalPlugins: 0,
-          totalPhases: 0,
-          totalTimeMs: 0} };
-      // artifacts.profiler = { phases: [], summary: {} };
-      ctx.artifacts.diagnostics.add({
-        plugin: 'ulde-profiler',
-        message: 'No timings found — profiler will be empty.',
-        severity: 'warning',
-      });
-      return;
-    }
-
-    // -----------------------------------------------------
-    // 1. Group timings by phase
-    // -----------------------------------------------------
-    const phases: Record<string, Array<{ plugin: string; ms: number }>> = {};
-
-    for (const t of timings) {
-      if (!phases[t.phase]) phases[t.phase] = [];
-      phases[t.phase].push({ plugin: t.plugin, ms: t.ms });
-    }
-
-    // -----------------------------------------------------
-    // 2. Compute per-phase totals and overhead
-    // -----------------------------------------------------
-    const profilerPhases = Object.keys(phases).map(phase => {
-      const entries = phases[phase];
-      const total = entries.reduce((sum, p) => sum + p.ms, 0);
-
-      // Synthetic overhead: 3% of total (teaching version)
-      const overhead = total * 0.03;
-
-      return {
-        phase,
-        totalMs: total,
-        overheadMs: overhead,
-        plugins: entries,
-      };
-    });
-
-    // -----------------------------------------------------
-    // 3. Synthetic memory snapshots
-    // -----------------------------------------------------
-    //
-    // Teaching version:
-    //   - memory grows slightly per phase
-    //   - not tied to real system memory
-    //
-    let memory = 50; // baseline MB
-
-    const memorySnapshots = profilerPhases.map(p => {
-      memory += Math.max(1, p.totalMs * 0.1); // synthetic growth
-      return {
-        phase: p.phase,
-        memoryMB: Math.round(memory),
-      };
-    });
-
-    // -----------------------------------------------------
-    // 4. Detect performance anomalies
-    // -----------------------------------------------------
-    const anomalies: Array<{ phase: string; message: string }> = [];
-
-    for (const p of profilerPhases) {
-      if (p.totalMs > 20) {
-        anomalies.push({
-          phase: p.phase,
-          message: `Phase "${p.phase}" took unusually long (${p.totalMs.toFixed(
-            2
-          )}ms).`,
-        });
-
-        ctx.artifacts.diagnostics.add({
-          plugin: 'ulde-profiler',
-          message: `Performance anomaly detected in phase "${p.phase}".`,
-          severity: 'warning',
-        });
+      for (const t of timings) {
+        if (!phasesMap.has(t.phase)) {
+          phasesMap.set(t.phase, {
+            totalMs: 0,
+            plugins: new Map(),
+          });
+        }
+        const phase = phasesMap.get(t.phase)!;
+        phase.totalMs += t.ms;
+        phase.plugins.set(
+          t.plugin,
+          (phase.plugins.get(t.plugin) ?? 0) + t.ms
+        );
       }
-    }
 
-    // -----------------------------------------------------
-    // 5. Build profiler model
-    // -----------------------------------------------------
-    artifacts.profiler = {
-      phases: profilerPhases,
-      memorySnapshots,
-      anomalies,
-      summary: {
-        totalPlugins: timings.length,
-        totalPhases: profilerPhases.length,
-        totalTimeMs: profilerPhases.reduce((s, p) => s + p.totalMs, 0),
-      },
-    };
+      const phases: ProfilerPhaseEntry[] = Array.from(phasesMap.entries()).map(
+        ([phase, data]) => ({
+          phase,
+          totalMs: data.totalMs,
+          overheadMs: 0,
+          plugins: Array.from(data.plugins.entries()).map(
+            ([plugin, ms]) => ({ plugin, ms })
+          ),
+        })
+      );
 
-    ctx.artifacts.diagnostics.add({
-      plugin: 'ulde-profiler',
-      message: 'Profiler model built.',
-      severity: 'info',
-    });
-  },
+      const memorySnapshots: MemorySnapshot[] = [];
 
-  // ---------------------------------------------------------
-  // 6. Optional hook: afterRun
-  // ---------------------------------------------------------
-  afterRun(ctx) {
-    ctx.artifacts.diagnostics.add({
-      plugin: 'ulde-profiler',
-      message: 'Profiler plugin finished.',
-      severity: 'info',
-    });
-  },
-};
+      const summary: ProfilerModel['summary'] = {
+        totalPlugins: new Set(timings.map(t => t.plugin)).size,
+        totalPhases: phases.length,
+        totalTimeMs: timings.reduce((sum, t) => sum + t.ms, 0),
+      };
+
+      const profiler: ProfilerModel = {
+        phases,
+        memorySnapshots,
+        anomalies: [],
+        summary,
+      };
+
+      artifacts.profiler = profiler;
+    },
+  };
+}

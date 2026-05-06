@@ -1,129 +1,38 @@
-// ulde/plugins/renderers/ulde-debug-overlay.plugin.ts
-
-/**
- * ULDE Debug Overlay Plugin (Teaching Version)
- *
- * This plugin demonstrates:
- *   - how to gather all ULDE artifacts into a single debug model
- *   - how to prepare data for a visual overlay (rendered by Angular/React)
- *   - how to expose diagnostics, timings, anchors, scrollspy, containers, etc.
- *   - how renderer-phase plugins unify data rather than mutate content
- *
- * This plugin does NOT:
- *   - draw the overlay
- *   - manipulate the DOM
- *   - inject HTML
- *
- * The goal is to teach plugin architecture,
- * not to implement a full UI.
- */
-
-import { UldePlugin } from '../../core/registry/ulde-plugin-api';
+import type { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
+import type { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
+import type { DebugOverlayModel, DiagnosticEntry, TimelineEntry } from '../../core/artifacts/ulde-artifacts';
 
-export const UldeDebugOverlayPlugin: UldePlugin = {
-  // ---------------------------------------------------------
-  // 1. Metadata
-  // ---------------------------------------------------------
-  meta: {
-    name: 'ulde-debug-overlay',
-    description: 'Builds a unified debug model for visual overlays.',
-    version: '1.0.0',
-    author: 'ULDE Model Project',
-  },
+export function createUldeDebugOverlayPlugin(): UldePlugin {
+  return {
+    meta: {
+      name: 'ulde-debug-overlay',
+      version: '1.0.0',
+      description: 'Builds a debug overlay model from diagnostics and timings.',
+    },
+    phase: UldePhase.RENDER,
 
-  // ---------------------------------------------------------
-  // 2. Lifecycle phase
-  // ---------------------------------------------------------
-  // Runs in RENDER phase because it prepares visualization data.
-  phase: UldePhase.RENDER,
+    run(ctx: UldePhaseContext) {
+      const { artifacts, config } = ctx;
 
-  // ---------------------------------------------------------
-  // 3. Capabilities
-  // ---------------------------------------------------------
-  capabilities: {
-    transformsContent: false,
-    usesDiagnostics: false,
-    usesDom: false,
-    producesRenderArtifacts: true, // produces debug overlay metadata
-  },
+      if (!config.enableDebugOverlay) return;
 
-  // ---------------------------------------------------------
-  // 4. Optional hook: beforeRun
-  // ---------------------------------------------------------
-  beforeRun(ctx) {
-    ctx.artifacts.diagnostics.add({
-      plugin: 'ulde-debug-overlay',
-      message: 'Debug Overlay plugin starting…',
-      severity: 'info',
-    });
-  },
+      const diagnostics: DiagnosticEntry[] = artifacts.diagnostics.all();
+      const timings: TimelineEntry[] = artifacts.timings.all();
 
-  // ---------------------------------------------------------
-  // 5. Main plugin logic
-  // ---------------------------------------------------------
-  run(ctx) {
-    const { artifacts } = ctx;
+      const summary: DebugOverlayModel['summary'] = {
+        totalPlugins: new Set(timings.map(t => t.plugin)).size,
+        totalDiagnostics: diagnostics.length,
+        totalTimeMs: timings.reduce((sum, t) => sum + t.ms, 0),
+      };
 
-    // -----------------------------------------------------
-    // 1. Gather all artifacts
-    // -----------------------------------------------------
-    const diagnostics = artifacts.diagnostics?.all?.() ?? [];
-    const timings = artifacts.timings?.all?.() ?? [];
-    const toc = artifacts.toc ?? [];
-    const frontmatter = artifacts.frontmatter ?? {};
-    const codeblocks = artifacts.codeblocks ?? [];
-    const containers = artifacts.containers ?? [];
-    const anchors = artifacts.anchors ?? [];
-    const scrollspy = artifacts.scrollspy ?? [];
-    const timeline = artifacts.timeline ?? [];
+      const debugOverlay: DebugOverlayModel = {
+        summary,
+        diagnostics,
+        timings,
+      };
 
-    // -----------------------------------------------------
-    // 2. Build unified debug model
-    // -----------------------------------------------------
-    //
-    // This model is intentionally simple and UI-friendly.
-    // Angular/React adapters will render it visually.
-    //
-    const debugModel = {
-      diagnostics,
-      timings,
-      toc,
-      frontmatter,
-      codeblocks,
-      containers,
-      anchors,
-      scrollspy,
-      timeline,
-      summary: {
-        diagnosticsCount: diagnostics.length,
-        timingsCount: timings.length,
-        headingsCount: anchors.length,
-        containersCount: containers.length,
-        codeblocksCount: codeblocks.length,
-      },
-    };
-
-    // -----------------------------------------------------
-    // 3. Store debug overlay metadata
-    // -----------------------------------------------------
-    artifacts.debugOverlay = debugModel;
-
-    ctx.artifacts.diagnostics.add({
-      plugin: 'ulde-debug-overlay',
-      message: 'Debug overlay model built.',
-      severity: 'info',
-    });
-  },
-
-  // ---------------------------------------------------------
-  // 6. Optional hook: afterRun
-  // ---------------------------------------------------------
-  afterRun(ctx) {
-    ctx.artifacts.diagnostics.add({
-      plugin: 'ulde-debug-overlay',
-      message: 'Debug Overlay plugin finished.',
-      severity: 'info',
-    });
-  },
-};
+      artifacts.debugOverlay = debugOverlay;
+    },
+  };
+}
