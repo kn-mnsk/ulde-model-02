@@ -1,0 +1,405 @@
+{
+  "$meta": {
+    "schemaVersion": "1.0.0",
+    "description": "Complete ULDE Ownership Map (auto-derived from UldeArtifacts comments)",
+    "generatedBy": "Copilot",
+    "generatedAt": "2026-05-08T14:55:00+09:00"
+  },
+  "stable": {
+    "content": {
+      "path": "content",
+      "type": "string",
+      "owner": "Markdown Parser",
+      "pluginCategory": "core",
+      "readers": [
+        "All content-phase plugins"
+      ],
+      "writers": [
+        "Markdown Parser",
+        "KaTeX Plugin",
+        "Links Plugin",
+        "Containers Plugin"
+      ],
+      "lifecycle": "stable",
+      "description": "Raw or transformed document content after all content‑phase plugins have executed.",
+      "constraints": {
+        "format": "markdwon | html",
+        "maxLengthKB": 1024,
+        "mustBeString": true,
+        "mustNotContainNullBytes": true
+      }
+    },
+    "toc[]": {
+      "path": "toc[]",
+      "type": "TocEntry",
+      "owner": "TOC Plugin",
+      "pluginCategory": "core",
+      "readers": [
+        "Anchors Plugin",
+        "Debug Overlay Plugin"
+      ],
+      "writers": [
+        "TOC Plugin"
+      ],
+      "lifecycle": "stable",
+      "description": "Table of contents entries extracted from headings in the document.",
+      "constraints": {
+        "requiredFields": [
+          "id",
+          "title"
+        ],
+        "unique": [
+          "id"
+        ],
+        "idMustMatchHeading": true,
+        "mustBeSortedByPosition": true
+      }
+    },
+    "links[]": {
+      "path": "links[]",
+      "type": "LinkEntry",
+      "owner": "Links Plugin",
+      "pluginCategory": "core",
+      "readers": [
+        "Debug Overlay Plugin"
+      ],
+      "writers": [
+        "Links Plugin"
+      ],
+      "lifecycle": "stable",
+      "description": "Metadata for all hyperlinks detected in the document content.",
+      "constraints": {
+        "requiredFields": [
+          "href"
+        ],
+        "hrefMustBeValidUrlOrAnchor": true,
+        "mustNotContainJavascriptUrls": true
+      }
+    },
+    "frontmatter": {
+      "path": "frontmatter",
+      "type": "FrontmatterData",
+      "owner": "",
+      "readers": [],
+      "writers": [],
+      "lifecycle": "stable",
+      "description": "YAML or JSON metadata block parsed from the top of the document.",
+      "constraints": {
+        "mustBeObject": true,
+        "allowedTypes": [
+          "string",
+          "number",
+          "boolean",
+          "array",
+          "object"
+        ],
+        "noFunctionsAllowed": true
+      }
+    },
+    "anchors[]": {
+      "path": "anchors[]",
+      "type": "AnchorEntry",
+      "owner": "Anchors Plugin",
+      "pluginCategory": "core",
+      "readers": [
+        "ScrollSpy Plugin"
+      ],
+      "writers": [
+        "Anchors Plugin"
+      ],
+      "lifecycle": "stable",
+      "description": "Anchor positions derived from TOC entries for navigation and scroll tracking.",
+      "constraints": {
+        "requiredFields": [
+          "id",
+          "offset"
+        ],
+        "idMustExistInToc": true,
+        "offsetMustBeNumber": true
+      }
+    },
+    "html": {
+      "path": "html",
+      "type": "string",
+      "owner": "",
+      "readers": [],
+      "writers": [],
+      "lifecycle": "stable",
+      "description": "Intermediate HTML output generated before final render transformations.",
+      "constraints": {
+        "mustBeString": true,
+        "mustBeValidHtmlFragment": true
+      }
+    },
+    "finalHtml": {
+      "path": "finalHtml",
+      "type": "string",
+      "owner": "",
+      "readers": [],
+      "writers": [],
+      "lifecycle": "stable",
+      "description": "Final HTML output after all render‑phase plugins have completed.",
+      "constraints": {
+        "mustBeString": true,
+        "mustBeValidHtmlDocument": true,
+        "mustNotContainDebugMarkers": true
+      }
+    }
+  },
+  "advanced": {
+    "codeblocks[]": {
+      "path": "codeblocks[]",
+      "type": "CodeblockEntry",
+      "owner": "",
+      "readers": [],
+      "writers": [],
+      "lifecycle": "stable",
+      "description": "Structured metadata for fenced code blocks extracted from the document.",
+      "constraints": {
+        "requiredFields": [
+          "language",
+          "content"
+        ],
+        "languageMustBeKnown": true,
+        "contentMustBeString": true
+      }
+    },
+    "highlightRequests[]": {
+      "path": "highlightRequests[]",
+      "type": "HighlightRequest",
+      "owner": "Syntax Highlight Plugin",
+      "pluginCategory": "renderer"
+,
+      "readers": [
+        "Highlight Renderer"
+      ],
+      "writers": [
+        "Syntax Highlight Plugin"
+      ],
+      "lifecycle": "stable",
+      "description": "Requests for syntax highlighting emitted by the syntax highlight plugin.",
+      "constraints": {
+        "requiredFields": [
+          "language",
+          "code"
+        ],
+        "languageMustBeKnown": true,
+        "codeMustBeString": true
+      }
+    },
+    "containers[]": {
+      "path": "containers[]",
+      "type": "ContainerEntry",
+      "owner": "",
+      "readers": [],
+      "writers": [],
+      "lifecycle": "stable",
+      "description": "Structured metadata for custom container blocks (notes, warnings, tips, etc.).",
+      "constraints": {
+        "requiredFields": [
+          "type",
+          "content"
+        ],
+        "typeMustBeRegisteredContainer": true
+      }
+    },
+    "scrollspy[]": {
+      "path": "scrollspy[]",
+      "type": "ScrollSpyEntry",
+      "owner": "","pluginCategory": "navigation"
+,
+      "readers": [],
+      "writers": [],
+      "lifecycle": "stable",
+      "description": "Scroll position tracking entries used by navigation UI components.",
+      "constraints": {
+        "requiredFields": [
+          "id",
+          "position"
+        ],
+        "positionMustBeNumber": true,
+        "idMustExistInAnchors": true
+      }
+    }
+  },
+  "experimental": {},
+  "internal": {
+    "diagnostics": {
+      "path": "diagnostics",
+      "type": "DiagnosticsModel",
+      "owner": "",
+      "readers": [],
+      "writers": [],
+      "lifecycle": "stable",
+      "description": "Diagnostic message collector for warnings, errors, and plugin messages.",
+      "constraints": {
+        "mustImplementMethods": [
+          "add",
+          "all"
+        ],
+        "entriesMustBeSerializable": true
+      }
+    },
+    "diagnostics.add": {
+      "path": "diagnostics.add",
+      "type": "function",
+      "owner": "",
+      "readers": [],
+      "writers": [],
+      "lifecycle": "stable",
+      "description": "Adds a diagnostic entry to the diagnostics collection.",
+      "constraints": {
+        "argumentType": "DiagnosticEntry",
+        "mustNotThrow": true
+      }
+    },
+    "diagnostics.all": {
+      "path": "diagnostics.all",
+      "type": "function",
+      "owner": "",
+      "readers": [],
+      "writers": [],
+      "lifecycle": "stable",
+      "description": "Returns all diagnostic entries accumulated during processing.",
+      "constraints": {
+        "returnsArray": true
+      }
+    },
+    "timeline": {
+      "path": "timeline",
+      "type": "TimelineModel",
+      "owner": "Timeline Plugin","pluginCategory": "devtools"
+,
+      "readers": [
+        "Debug Overlay Plugin",
+        "Profiler Plugin"
+      ],
+      "writers": [
+        "Timeline Plugin"
+      ],
+      "lifecycle": "stable",
+      "description": "Execution timeline of all plugins, including start/end timestamps.",
+      "constraints": {
+        "entriesMustBeChronological": true,
+        "requiredFields": [
+          "plugin",
+          "start",
+          "end"
+        ]
+      }
+    },
+    "debugOverlay": {
+      "path": "debugOverlay",
+      "type": "DebugOverlayModel",
+      "owner": "Debug Overlay Plugin","pluginCategory": "devtools"
+,
+      "readers": [
+        "DevTools"
+      ],
+      "writers": [
+        "Debug Overlay Plugin"
+      ],
+      "lifecycle": "stable",
+      "description": "Debug overlay model containing visual debugging metadata for DevTools.",
+      "constraints": {
+        "mustBeSerializable": true,
+        "noCircularReferences": true
+      }
+    },
+    "profiler": {
+      "path": "profiler",
+      "type": "ProfilerModel",
+      "owner": "Profiler Plugin",
+      "pluginCategory": "devtools"
+,
+      "readers": [
+        "DevTools"
+      ],
+      "writers": [
+        "Profiler Plugin"
+      ],
+      "lifecycle": "stable",
+      "description": "Profiler model containing performance metrics for each plugin.",
+      "constraints": {
+        "requiredFields": [
+          "plugin",
+          "duration"
+        ],
+        "durationMustBeNumber": true
+      }
+    },
+    "artifactsPanel": {
+      "path": "artifactsPanel",
+      "type": "ArtifactsPanelModel",
+      "owner": "",
+      "readers": [],
+      "writers": [],
+      "lifecycle": "stable",
+      "description": "DevTools panel model showing the current state of all artifacts.",
+      "constraints": {
+        "mustBeSerializable": true
+      }
+    },
+    "timings": {
+      "path": "timings",
+      "type": "TimingsModel",
+      "owner": "Orchestrator",
+      "readers": [
+        "Timeline Plugin",
+        "Profiler Plugin",
+        "Debug Overlay Plugin"
+      ],
+      "writers": [
+        "Orchestrator"
+      ],
+      "lifecycle": "stable",
+      "description": "Performance timing entries recorded by the orchestrator.",
+      "constraints": {
+        "requiredFields": [
+          "plugin",
+          "duration"
+        ],
+        "durationMustBeNumber": true,
+        "entriesMustBeMonotonic": true
+      }
+    },
+    "timings.add": {
+      "path": "timings.add",
+      "type": "function",
+      "owner": "Orchestrator",
+      "readers": [
+        "Timeline Plugin",
+        "Profiler Plugin",
+        "Debug Overlay Plugin"
+      ],
+      "writers": [
+        "Orchestrator"
+      ],
+      "lifecycle": "stable",
+      "description": "Adds a timing entry for a plugin execution step.",
+      "constraints": {
+        "argumentType": "TimelineEntry",
+        "mustNotThrow": true
+      }
+    },
+    "timings.all": {
+      "path": "timings.all",
+      "type": "function",
+      "owner": "Orchestrator",
+      "readers": [
+        "Timeline Plugin",
+        "Profiler Plugin",
+        "Debug Overlay Plugin"
+      ],
+      "writers": [
+        "Orchestrator"
+      ],
+      "lifecycle": "stable",
+      "description": "Returns all timing entries collected during processing.",
+      "constraints": {
+        "returnsArray": true
+      }
+    }
+  },
+  "deprecated": {}
+}
