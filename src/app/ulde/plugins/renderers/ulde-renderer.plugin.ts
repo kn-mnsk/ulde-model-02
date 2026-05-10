@@ -154,6 +154,7 @@ export const UldeRendererPlugin: UldePlugin = {
     // 5. Store HTML output
     // -----------------------------------------------------
     artifacts.html = html;
+    artifacts.finalHtml = html;
 
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-renderer',

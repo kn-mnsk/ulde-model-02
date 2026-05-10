@@ -13,19 +13,27 @@
  * This is intentionally simple and explicit.
  */
 // ulde/core/lifecycle/ulde-orchestrator.ts
-
-import { UldePhaseContext } from './ulde-phase-context';
 import { UldePhase } from './ulde-phases';
-import { UldePlugin } from '../registry/ulde-plugin-api';
+import { UldePhaseContext } from './ulde-phase-context';
+import { createUldePluginRegistry } from '../registry/ulde-plugin-registry';
+import { UldeRegistry } from '../registry/ulde-registry';
 import { UldeConfig } from '../config/ulde-config';
 
 export interface UldePipelineInput {
   content: string;
-  plugins: UldePlugin[];
   config?: UldeConfig;
 }
 
 export async function runUldePipeline(input: UldePipelineInput): Promise<UldePhaseContext> {
+  // 1. Build plugin registry
+  const registry = new UldeRegistry();
+  const plugins = createUldePluginRegistry();
+
+  for (const plugin of plugins) {
+    registry.register(plugin);
+  }
+
+  // 2. Create initial context
   const ctx: UldePhaseContext = {
     phase: UldePhase.CONTENT,
     content: input.content,
@@ -37,22 +45,34 @@ export async function runUldePipeline(input: UldePipelineInput): Promise<UldePha
     },
   };
 
-  for (const plugin of input.plugins) {
-    ctx.phase = plugin.phase;
+  // 3. Execute plugins phase-by-phase
+  const phases = [
+    UldePhase.CONTENT,
+    UldePhase.DIAGNOSTICS,
+    UldePhase.DOM,
+    UldePhase.RENDER,
+  ];
 
-    const start = performance.now();
+  for (const phase of phases) {
+    ctx.phase = phase;
 
-    plugin.beforeRun?.(ctx);
-    plugin.run(ctx);
-    plugin.afterRun?.(ctx);
+    const phasePlugins = registry.getPluginsForPhase(phase);
 
-    const end = performance.now();
+    for (const plugin of phasePlugins) {
+      const start = performance.now();
 
-    ctx.artifacts.timings.add({
-      plugin: plugin.meta.name,
-      phase: plugin.phase,
-      ms: end - start,
-    });
+      plugin.beforeRun?.(ctx);
+      await plugin.run(ctx);
+      plugin.afterRun?.(ctx);
+
+      const end = performance.now();
+
+      ctx.artifacts.timings.add({
+        plugin: plugin.meta.name,
+        phase: plugin.phase,
+        ms: end - start,
+      });
+    }
   }
 
   return ctx;
