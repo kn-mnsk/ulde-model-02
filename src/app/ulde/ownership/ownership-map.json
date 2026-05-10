@@ -1,123 +1,113 @@
 {
   "$meta": {
     "schemaVersion": "1.0.0",
-    "description": "Complete ULDE Ownership Map (auto-derived from UldeArtifacts comments)",
+    "description": "Complete ULDE Ownership Map (updated with Mermaid Plugin)",
     "generatedBy": "Copilot",
-    "generatedAt": "2026-05-08T14:55:00+09:00"
+    "generatedAt": "2026-05-10T13:29:00+09:00"
   },
+
   "stable": {
     "content": {
       "path": "content",
       "type": "string",
       "owner": "Markdown Parser",
       "pluginCategory": "core",
-      "readers": [
-        "All content-phase plugins"
-      ],
-      "writers": [
-        "Markdown Parser",
-        "KaTeX Plugin",
-        "Links Plugin",
-        "Containers Plugin"
-      ],
-      "lifecycle": "stable",
+      "readers": ["All content-phase plugins"],
+      "writers": ["Markdown Parser", "KaTeX Plugin", "Links Plugin", "Containers Plugin"],
+      "lifecycle": "content",
       "description": "Raw or transformed document content after all content‑phase plugins have executed.",
       "constraints": {
-        "format": "markdwon | html",
+        "format": "markdown | html",
         "maxLengthKB": 1024,
         "mustBeString": true,
         "mustNotContainNullBytes": true
       }
     },
+
     "toc[]": {
       "path": "toc[]",
       "type": "TocEntry",
       "owner": "TOC Plugin",
       "pluginCategory": "core",
-      "readers": [
-        "Anchors Plugin",
-        "Debug Overlay Plugin"
-      ],
-      "writers": [
-        "TOC Plugin"
-      ],
-      "lifecycle": "stable",
+      "readers": ["Anchors Plugin", "Debug Overlay Plugin"],
+      "writers": ["TOC Plugin"],
+      "lifecycle": "content",
       "description": "Table of contents entries extracted from headings in the document.",
       "constraints": {
-        "requiredFields": [
-          "id",
-          "title"
-        ],
-        "unique": [
-          "id"
-        ],
+        "requiredFields": ["id", "title"],
+        "unique": ["id"],
         "idMustMatchHeading": true,
         "mustBeSortedByPosition": true
       }
     },
+
     "links[]": {
       "path": "links[]",
       "type": "LinkEntry",
       "owner": "Links Plugin",
       "pluginCategory": "core",
-      "readers": [
-        "Debug Overlay Plugin"
-      ],
-      "writers": [
-        "Links Plugin"
-      ],
-      "lifecycle": "stable",
+      "readers": ["Debug Overlay Plugin"],
+      "writers": ["Links Plugin"],
+      "lifecycle": "content",
       "description": "Metadata for all hyperlinks detected in the document content.",
       "constraints": {
-        "requiredFields": [
-          "href"
-        ],
+        "requiredFields": ["href"],
         "hrefMustBeValidUrlOrAnchor": true,
         "mustNotContainJavascriptUrls": true
       }
     },
+
     "frontmatter": {
       "path": "frontmatter",
       "type": "FrontmatterData",
       "owner": "",
       "readers": [],
       "writers": [],
-      "lifecycle": "stable",
+      "lifecycle": "content",
       "description": "YAML or JSON metadata block parsed from the top of the document.",
       "constraints": {
         "mustBeObject": true,
-        "allowedTypes": [
-          "string",
-          "number",
-          "boolean",
-          "array",
-          "object"
-        ],
+        "allowedTypes": ["string", "number", "boolean", "array", "object"],
         "noFunctionsAllowed": true
       }
     },
+
     "anchors[]": {
       "path": "anchors[]",
       "type": "AnchorEntry",
       "owner": "Anchors Plugin",
       "pluginCategory": "core",
-      "readers": [
-        "ScrollSpy Plugin"
-      ],
-      "writers": [
-        "Anchors Plugin"
-      ],
+      "readers": ["ScrollSpy Plugin"],
+      "writers": ["Anchors Plugin"],
       "lifecycle": "stable",
       "description": "Anchor positions derived from TOC entries for navigation and scroll tracking.",
       "constraints": {
-        "requiredFields": [
-          "id",
-          "offset"
-        ],
+        "requiredFields": ["id", "offset"],
         "idMustExistInToc": true,
         "offsetMustBeNumber": true
       }
     },
+
+    "mermaid": {
+      "path": "mermaid",
+      "type": "DomTransformation",
+      "owner": "Mermaid Plugin",
+      "pluginCategory": "dom",
+      "readers": ["Mermaid Plugin"],
+      "writers": ["Mermaid Plugin"],
+      "lifecycle": "stable",
+      "description": "Renders Mermaid diagrams by transforming <code class='language-mermaid'> blocks into SVG elements in the DOM.",
+      "constraints": {
+        "requiresRealDom": true,
+        "mustRunAfter": ["anchors[]"],
+        "mustRunBefore": ["scrollspy[]", "domInjector"],
+        "noContentPhaseAccess": true,
+        "noHtmlStringMutation": true,
+        "inputSelector": "code.language-mermaid",
+        "outputType": "svg"
+      }
+    },
+
     "html": {
       "path": "html",
       "type": "string",
@@ -131,6 +121,7 @@
         "mustBeValidHtmlFragment": true
       }
     },
+
     "finalHtml": {
       "path": "finalHtml",
       "type": "string",
@@ -146,6 +137,7 @@
       }
     }
   },
+
   "advanced": {
     "codeblocks[]": {
       "path": "codeblocks[]",
@@ -156,37 +148,28 @@
       "lifecycle": "stable",
       "description": "Structured metadata for fenced code blocks extracted from the document.",
       "constraints": {
-        "requiredFields": [
-          "language",
-          "content"
-        ],
+        "requiredFields": ["language", "content"],
         "languageMustBeKnown": true,
         "contentMustBeString": true
       }
     },
+
     "highlightRequests[]": {
       "path": "highlightRequests[]",
       "type": "HighlightRequest",
       "owner": "Syntax Highlight Plugin",
-      "pluginCategory": "renderer"
-,
-      "readers": [
-        "Highlight Renderer"
-      ],
-      "writers": [
-        "Syntax Highlight Plugin"
-      ],
+      "pluginCategory": "renderer",
+      "readers": ["Highlight Renderer"],
+      "writers": ["Syntax Highlight Plugin"],
       "lifecycle": "stable",
       "description": "Requests for syntax highlighting emitted by the syntax highlight plugin.",
       "constraints": {
-        "requiredFields": [
-          "language",
-          "code"
-        ],
+        "requiredFields": ["language", "code"],
         "languageMustBeKnown": true,
         "codeMustBeString": true
       }
     },
+
     "containers[]": {
       "path": "containers[]",
       "type": "ContainerEntry",
@@ -196,33 +179,30 @@
       "lifecycle": "stable",
       "description": "Structured metadata for custom container blocks (notes, warnings, tips, etc.).",
       "constraints": {
-        "requiredFields": [
-          "type",
-          "content"
-        ],
+        "requiredFields": ["type", "content"],
         "typeMustBeRegisteredContainer": true
       }
     },
+
     "scrollspy[]": {
       "path": "scrollspy[]",
       "type": "ScrollSpyEntry",
-      "owner": "","pluginCategory": "navigation"
-,
+      "owner": "",
+      "pluginCategory": "navigation",
       "readers": [],
       "writers": [],
       "lifecycle": "stable",
       "description": "Scroll position tracking entries used by navigation UI components.",
       "constraints": {
-        "requiredFields": [
-          "id",
-          "position"
-        ],
+        "requiredFields": ["id", "position"],
         "positionMustBeNumber": true,
         "idMustExistInAnchors": true
       }
     }
   },
+
   "experimental": {},
+
   "internal": {
     "diagnostics": {
       "path": "diagnostics",
@@ -233,13 +213,11 @@
       "lifecycle": "stable",
       "description": "Diagnostic message collector for warnings, errors, and plugin messages.",
       "constraints": {
-        "mustImplementMethods": [
-          "add",
-          "all"
-        ],
+        "mustImplementMethods": ["add", "all"],
         "entriesMustBeSerializable": true
       }
     },
+
     "diagnostics.add": {
       "path": "diagnostics.add",
       "type": "function",
@@ -253,6 +231,7 @@
         "mustNotThrow": true
       }
     },
+
     "diagnostics.all": {
       "path": "diagnostics.all",
       "type": "function",
@@ -265,40 +244,29 @@
         "returnsArray": true
       }
     },
+
     "timeline": {
       "path": "timeline",
       "type": "TimelineModel",
-      "owner": "Timeline Plugin","pluginCategory": "devtools"
-,
-      "readers": [
-        "Debug Overlay Plugin",
-        "Profiler Plugin"
-      ],
-      "writers": [
-        "Timeline Plugin"
-      ],
+      "owner": "Timeline Plugin",
+      "pluginCategory": "devtools",
+      "readers": ["Debug Overlay Plugin", "Profiler Plugin"],
+      "writers": ["Timeline Plugin"],
       "lifecycle": "stable",
       "description": "Execution timeline of all plugins, including start/end timestamps.",
       "constraints": {
         "entriesMustBeChronological": true,
-        "requiredFields": [
-          "plugin",
-          "start",
-          "end"
-        ]
+        "requiredFields": ["plugin", "start", "end"]
       }
     },
+
     "debugOverlay": {
       "path": "debugOverlay",
       "type": "DebugOverlayModel",
-      "owner": "Debug Overlay Plugin","pluginCategory": "devtools"
-,
-      "readers": [
-        "DevTools"
-      ],
-      "writers": [
-        "Debug Overlay Plugin"
-      ],
+      "owner": "Debug Overlay Plugin",
+      "pluginCategory": "devtools",
+      "readers": ["DevTools"],
+      "writers": ["Debug Overlay Plugin"],
       "lifecycle": "stable",
       "description": "Debug overlay model containing visual debugging metadata for DevTools.",
       "constraints": {
@@ -306,28 +274,22 @@
         "noCircularReferences": true
       }
     },
+
     "profiler": {
       "path": "profiler",
       "type": "ProfilerModel",
       "owner": "Profiler Plugin",
-      "pluginCategory": "devtools"
-,
-      "readers": [
-        "DevTools"
-      ],
-      "writers": [
-        "Profiler Plugin"
-      ],
+      "pluginCategory": "devtools",
+      "readers": ["DevTools"],
+      "writers": ["Profiler Plugin"],
       "lifecycle": "stable",
       "description": "Profiler model containing performance metrics for each plugin.",
       "constraints": {
-        "requiredFields": [
-          "plugin",
-          "duration"
-        ],
+        "requiredFields": ["plugin", "duration"],
         "durationMustBeNumber": true
       }
     },
+
     "artifactsPanel": {
       "path": "artifactsPanel",
       "type": "ArtifactsPanelModel",
@@ -340,41 +302,28 @@
         "mustBeSerializable": true
       }
     },
+
     "timings": {
       "path": "timings",
       "type": "TimingsModel",
       "owner": "Orchestrator",
-      "readers": [
-        "Timeline Plugin",
-        "Profiler Plugin",
-        "Debug Overlay Plugin"
-      ],
-      "writers": [
-        "Orchestrator"
-      ],
+      "readers": ["Timeline Plugin", "Profiler Plugin", "Debug Overlay Plugin"],
+      "writers": ["Orchestrator"],
       "lifecycle": "stable",
       "description": "Performance timing entries recorded by the orchestrator.",
       "constraints": {
-        "requiredFields": [
-          "plugin",
-          "duration"
-        ],
+        "requiredFields": ["plugin", "duration"],
         "durationMustBeNumber": true,
         "entriesMustBeMonotonic": true
       }
     },
+
     "timings.add": {
       "path": "timings.add",
       "type": "function",
       "owner": "Orchestrator",
-      "readers": [
-        "Timeline Plugin",
-        "Profiler Plugin",
-        "Debug Overlay Plugin"
-      ],
-      "writers": [
-        "Orchestrator"
-      ],
+      "readers": ["Timeline Plugin", "Profiler Plugin", "Debug Overlay Plugin"],
+      "writers": ["Orchestrator"],
       "lifecycle": "stable",
       "description": "Adds a timing entry for a plugin execution step.",
       "constraints": {
@@ -382,18 +331,13 @@
         "mustNotThrow": true
       }
     },
+
     "timings.all": {
       "path": "timings.all",
       "type": "function",
       "owner": "Orchestrator",
-      "readers": [
-        "Timeline Plugin",
-        "Profiler Plugin",
-        "Debug Overlay Plugin"
-      ],
-      "writers": [
-        "Orchestrator"
-      ],
+      "readers": ["Timeline Plugin", "Profiler Plugin", "Debug Overlay Plugin"],
+      "writers": ["Orchestrator"],
       "lifecycle": "stable",
       "description": "Returns all timing entries collected during processing.",
       "constraints": {
@@ -401,5 +345,6 @@
       }
     }
   },
+
   "deprecated": {}
 }

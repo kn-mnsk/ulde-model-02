@@ -27,10 +27,10 @@ import { UldePhase } from '../lifecycle/ulde-phases';
 
 // Content-phase plugins
 import { UldeTocPlugin } from '../../plugins/content/ulde-toc.plugin';
-import { UldeLinksPlugin } from '../../plugins/content/ulde-links.plugin';
+import { createUldeLinksPlugin } from '../../plugins/content/ulde-links.plugin';
 import { UldeFrontmatterPlugin } from '../../plugins/content/ulde-frontmatter.plugin';
 import { UldeCodeblocksPlugin } from '../../plugins/content/ulde-codeblocks.plugin';
-import { UldeSyntaxHighlightPlugin } from '../../plugins/content/ulde-syntax-highlight.plugin';
+import { createUldeSyntaxHighlightPlugin } from '../../plugins/content/ulde-syntax-highlight.plugin';
 import { UldeContainersPlugin } from '../../plugins/content/ulde-containers.plugin';
 
 // Diagnostics-phase plugins
@@ -38,16 +38,17 @@ import { UldeHeadingsCheckPlugin } from '../../plugins/diagnostics/ulde-headings
 import { UldeBrokenLinksPlugin } from '../../plugins/diagnostics/ulde-broken-links.plugin';
 
 // DOM-phase plugins
-import { UldeAnchorsPlugin } from '../../plugins/dom/ulde-anchors.plugin';
+import { createUldeAnchorsPlugin } from '../../plugins/dom/ulde-anchors.plugin';
 import { UldeScrollSpyPlugin } from '../../plugins/dom/ulde-scrollspy.plugin';
 import { UldeDomInjectorPlugin } from '../../plugins/dom/ulde-dom-injector.plugin';
 
 // Render-phase plugins
 import { UldeRendererPlugin } from '../../plugins/renderers/ulde-renderer.plugin';
-import { UldeTimelinePlugin } from '../../plugins/renderers/ulde-timeline.plugin';
-import { UldeDebugOverlayPlugin } from '../../plugins/renderers/ulde-debug-overlay.plugin';
+import { createUldeTimelinePlugin } from '../../plugins/renderers/ulde-timeline.plugin';
+import { createUldeDebugOverlayPlugin } from '../../plugins/renderers/ulde-debug-overlay.plugin';
 import { UldeArtifactsPanelPlugin } from '../../plugins/renderers/ulde-artifacts-panel.plugin';
-import { UldeProfilerPlugin } from '../../plugins/renderers/ulde-profiler.plugin';
+import { createUldeProfilerPlugin } from '../../plugins/renderers/ulde-profiler.plugin';
+import { UldeMermaidPlugin } from '../../plugins/dom/ulde-mermaid.plugin';
 
 // ------------------------------
 // Registry builder
@@ -76,10 +77,10 @@ export function createUldePluginRegistry(): UldePlugin[] {
     // CONTENT PHASE
     // -----------------------------------------------------
     UldeTocPlugin,
-    UldeLinksPlugin,
+    createUldeLinksPlugin(),
     UldeFrontmatterPlugin,
     UldeCodeblocksPlugin,
-    UldeSyntaxHighlightPlugin,
+    createUldeSyntaxHighlightPlugin(),
     UldeContainersPlugin,
 
     // -----------------------------------------------------
@@ -91,7 +92,8 @@ export function createUldePluginRegistry(): UldePlugin[] {
     // -----------------------------------------------------
     // DOM PHASE
     // -----------------------------------------------------
-    UldeAnchorsPlugin,
+    createUldeAnchorsPlugin(),
+    UldeMermaidPlugin,
     UldeScrollSpyPlugin,
     UldeDomInjectorPlugin,
 
@@ -99,9 +101,9 @@ export function createUldePluginRegistry(): UldePlugin[] {
     // RENDER PHASE
     // -----------------------------------------------------
     UldeRendererPlugin,
-    UldeTimelinePlugin,
-    UldeDebugOverlayPlugin,
+    createUldeTimelinePlugin(),
+    createUldeDebugOverlayPlugin(),
     UldeArtifactsPanelPlugin,
-    UldeProfilerPlugin,
+    createUldeProfilerPlugin(),
   ];
 }
