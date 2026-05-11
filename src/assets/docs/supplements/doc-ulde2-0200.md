@@ -42,7 +42,8 @@ ulde/
     config/
       ulde-config.ts
     host/
-      ulde-host-api.ts ← need to be implemented
+      ulde-host-api.ts
+
 
   plugins/
     content/
@@ -52,6 +53,7 @@ ulde/
       ulde-codeblocks.plugin.ts
       ulde-syntax-highlight.plugin.ts
       ulde-containers.plugin.ts
+      ulde-katex.plugin.ts
 
     diagnostics/
       ulde-headings-check.plugin.ts
@@ -72,12 +74,11 @@ ulde/
 
   integration/
     angular/
-      ulde-angular-adapter.module.ts ← need to be implemented
-      ulde-docs-viewer-bridge.service.ts ← need to be implemented
+      ulde-docs-viewer-bridge.service.ts 
     react/
-      ulde-react-provider.tsx ← need to be implemented
+      ulde-react-provider.tsx 
     static/
-      ulde-static-runner.ts ← need to be implemented
+      ulde-static-runner.ts 
 
   examples/
     basic-angular-docs/
@@ -94,6 +95,7 @@ ulde/
 
   tests/
     core/
+      ulde-pipline-smoke.test.ts
     plugins/
     integration/
 
