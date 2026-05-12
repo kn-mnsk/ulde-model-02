@@ -24,7 +24,7 @@
 //   active?: boolean;
 // }
 
-export interface ArtifactSection {
-  title: string;
-  items: any[];
-}
+// export interface ArtifactSection {
+//   title: string;
+//   items: any[];
+// }

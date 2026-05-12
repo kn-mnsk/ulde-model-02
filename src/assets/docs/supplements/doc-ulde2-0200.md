@@ -42,35 +42,41 @@ ulde/
     config/
       ulde-config.ts
     host/
+      ulde-browser-host.ts
       ulde-host-api.ts
 
 
   plugins/
-    content/
-      ulde-toc.plugin.ts
-      ulde-links.plugin.ts
+    content/                  ← CONTENT PHASE (markdown → HTML)
       ulde-frontmatter.plugin.ts
+      ulde-links.plugin.ts
+      ulde-toc.plugin.ts
       ulde-codeblocks.plugin.ts
       ulde-syntax-highlight.plugin.ts
       ulde-containers.plugin.ts
-      ulde-katex.plugin.ts
 
-    diagnostics/
+    transform/                ← TRANSFORM PHASE (string-based HTML transforms)
+      ulde-dom-injector.plugin.ts
+      ulde-katex-transform.plugin.ts      ← optional SSR KaTeX (string-based)
+      ulde-anchors-transform.plugin.ts    ← optional string-based anchors
+      ulde-scrollspy-transform.plugin.ts  ← optional string-based scrollspy
+
+    diagnostics/              ← DIAGNOSTICS PHASE
       ulde-headings-check.plugin.ts
       ulde-broken-links.plugin.ts
 
-    dom/
-      ulde-anchors.plugin.ts
-      ulde-scrollspy.plugin.ts
-      ulde-dom-injector.plugin.ts
-      ulde-mermaid.plugin.ts   
-
-    renderers/
+    assemble/                 ← ASSEMBLE PHASE (finalHtml)
       ulde-renderer.plugin.ts
       ulde-timeline.plugin.ts
       ulde-debug-overlay.plugin.ts
       ulde-artifacts-panel.plugin.ts
       ulde-profiler.plugin.ts
+
+    browser/                   ← BROWSER DOM PHASE (real DOM)
+      ulde-mermaid-browser.plugin.ts
+      ulde-katex-browser.plugin.ts
+      ulde-anchors-browser.plugin.ts
+      ulde-scrollspy-browser.plugin.ts
 
   integration/
     angular/
@@ -80,6 +86,11 @@ ulde/
     static/
       ulde-static-runner.ts 
 
+  ownership/
+    ownership-map.json
+    ownership-registry.ts
+    ownership-scheme.json
+
   examples/
     basic-angular-docs/
     basic-react-docs/
@@ -88,10 +99,10 @@ ulde/
   docs/
     architecture.md
     lifecycle.md
-    plugin-api-v2.md
+    plugin-api-v3.md              ← updated for new phases
     integration-angular.md
     integration-react.md
-    migration-guide.md
+    migration-guide.md            ← explains v2 → v3 changes
 
   tests/
     core/

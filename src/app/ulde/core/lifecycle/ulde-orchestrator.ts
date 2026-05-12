@@ -1,31 +1,37 @@
 // ulde/core/lifecycle/ulde-orchestrator.ts
 
-/**
- * ULDE Orchestrator (Teaching Version)
- *
- * This orchestrator:
- *   - creates the ULDE context
- *   - initializes artifacts
- *   - runs plugins in registry order
- *   - collects timings
- *   - returns the final context
- *
- * This is intentionally simple and explicit.
- */
-// ulde/core/lifecycle/ulde-orchestrator.ts
 import { UldePhase } from './ulde-phases';
 import { UldePhaseContext } from './ulde-phase-context';
 import { createUldePluginRegistry } from '../registry/ulde-plugin-registry';
 import { UldeRegistry } from '../registry/ulde-registry';
 import { UldeConfig } from '../config/ulde-config';
 
+/**
+ * ULDE Pipeline Input
+ */
 export interface UldePipelineInput {
   content: string;
   config?: UldeConfig;
 }
 
-export async function runUldePipeline(input: UldePipelineInput): Promise<UldePhaseContext> {
+/**
+ * ULDE v3 Pipeline
+ *
+ * Runs the 4-phase string-based pipeline:
+ *   1. CONTENT
+ *   2. TRANSFORM
+ *   3. DIAGNOSTICS
+ *   4. ASSEMBLE
+ *
+ * Browser DOM plugins are NOT executed here.
+ */
+export async function runUldePipeline(
+  input: UldePipelineInput
+): Promise<UldePhaseContext> {
+
+  // ---------------------------------------------------------
   // 1. Build plugin registry
+  // ---------------------------------------------------------
   const registry = new UldeRegistry();
   const plugins = createUldePluginRegistry();
 
@@ -33,24 +39,30 @@ export async function runUldePipeline(input: UldePipelineInput): Promise<UldePha
     registry.register(plugin);
   }
 
+  // ---------------------------------------------------------
   // 2. Create initial context
+  // ---------------------------------------------------------
   const ctx: UldePhaseContext = {
     phase: UldePhase.CONTENT,
     content: input.content,
     config: input.config ?? {},
     artifacts: {
       content: input.content,
+      html: '',
+      finalHtml: '',
       diagnostics: createDiagnosticsStore(),
       timings: createTimingsStore(),
     },
   };
 
-  // 3. Execute plugins phase-by-phase
-  const phases = [
+  // ---------------------------------------------------------
+  // 3. Execute phases in order
+  // ---------------------------------------------------------
+  const phases: UldePhase[] = [
     UldePhase.CONTENT,
+    UldePhase.TRANSFORM,
     UldePhase.DIAGNOSTICS,
-    UldePhase.DOM,
-    UldePhase.RENDER,
+    UldePhase.ASSEMBLE,
   ];
 
   for (const phase of phases) {
@@ -69,7 +81,7 @@ export async function runUldePipeline(input: UldePipelineInput): Promise<UldePha
 
       ctx.artifacts.timings.add({
         plugin: plugin.meta.name,
-        phase: plugin.phase,
+        phase,
         ms: end - start,
       });
     }
@@ -78,9 +90,8 @@ export async function runUldePipeline(input: UldePipelineInput): Promise<UldePha
   return ctx;
 }
 
-
 // -----------------------------------------------------------
-// Diagnostics store (teaching version)
+// Diagnostics store
 // -----------------------------------------------------------
 function createDiagnosticsStore() {
   const list: any[] = [];
@@ -95,7 +106,7 @@ function createDiagnosticsStore() {
 }
 
 // -----------------------------------------------------------
-// Timings store (teaching version)
+// Timings store
 // -----------------------------------------------------------
 function createTimingsStore() {
   const list: any[] = [];

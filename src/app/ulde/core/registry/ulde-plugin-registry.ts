@@ -1,105 +1,87 @@
 // ulde/core/registry/ulde-plugin-registry.ts
 
 /**
- * ULDE Plugin Registry (Teaching Version)
+ * ULDE v3 Plugin Registry
  *
- * This file demonstrates:
- *   - how ULDE discovers and orders plugins
- *   - how plugins are grouped by lifecycle phase
- *   - how the orchestrator executes them in sequence
- *   - how contributors can add new plugins safely
+ * This registry returns ONLY ULDE pipeline plugins:
+ *   - CONTENT phase
+ *   - TRANSFORM phase
+ *   - DIAGNOSTICS phase
+ *   - ASSEMBLE phase
  *
- * This registry is intentionally explicit:
- *   - no auto-discovery
- *   - no dynamic imports
- *   - no magic
- *
- * The goal is to teach plugin architecture,
- * not to implement a full plugin loader.
+ * Browser DOM plugins (Mermaid, KaTeX auto-render, Anchors, ScrollSpy)
+ * are NOT included here — they are registered in UldeBrowserHost.
  */
 
-import { UldePlugin } from './ulde-plugin-api';
-import { UldePhase } from '../lifecycle/ulde-phases';
+// import { UldePhase } from '../lifecycle/ulde-phases';
 
 // ------------------------------
-// Import all plugins
+// CONTENT PHASE PLUGINS
 // ------------------------------
-
-// Content-phase plugins
-import { UldeTocPlugin } from '../../plugins/content/ulde-toc.plugin';
-import { createUldeLinksPlugin } from '../../plugins/content/ulde-links.plugin';
 import { UldeFrontmatterPlugin } from '../../plugins/content/ulde-frontmatter.plugin';
+import { createUldeLinksPlugin } from '../../plugins/content/ulde-links.plugin';
+import { UldeTocPlugin } from '../../plugins/content/ulde-toc.plugin';
 import { UldeCodeblocksPlugin } from '../../plugins/content/ulde-codeblocks.plugin';
 import { createUldeSyntaxHighlightPlugin } from '../../plugins/content/ulde-syntax-highlight.plugin';
 import { UldeContainersPlugin } from '../../plugins/content/ulde-containers.plugin';
 
-// Diagnostics-phase plugins
+// ------------------------------
+// TRANSFORM PHASE PLUGINS
+// ------------------------------
+import { UldeDomInjectorPlugin } from '../../plugins/transform/ulde-dom-injector.plugin';
+// import { UldeKatexTransformPlugin } from '../../plugins/transform/ulde-katex-transform.plugin';
+// import { UldeAnchorsTransformPlugin } from '../../plugins/transform/ulde-anchors-transform.plugin';
+// import { UldeScrollspyTransformPlugin } from '../../plugins/transform/ulde-scrollspy-transform.plugin';
+
+// ------------------------------
+// DIAGNOSTICS PHASE PLUGINS
+// ------------------------------
 import { UldeHeadingsCheckPlugin } from '../../plugins/diagnostics/ulde-headings-check.plugin';
 import { UldeBrokenLinksPlugin } from '../../plugins/diagnostics/ulde-broken-links.plugin';
 
-// DOM-phase plugins
-import { createUldeAnchorsPlugin } from '../../plugins/dom/ulde-anchors.plugin';
-import { UldeScrollSpyPlugin } from '../../plugins/dom/ulde-scrollspy.plugin';
-import { UldeDomInjectorPlugin } from '../../plugins/dom/ulde-dom-injector.plugin';
-
-// Render-phase plugins
-import { UldeRendererPlugin } from '../../plugins/renderers/ulde-renderer.plugin';
-import { createUldeTimelinePlugin } from '../../plugins/renderers/ulde-timeline.plugin';
-import { createUldeDebugOverlayPlugin } from '../../plugins/renderers/ulde-debug-overlay.plugin';
-import { UldeArtifactsPanelPlugin } from '../../plugins/renderers/ulde-artifacts-panel.plugin';
-import { createUldeProfilerPlugin } from '../../plugins/renderers/ulde-profiler.plugin';
-import { UldeMermaidPlugin } from '../../plugins/dom/ulde-mermaid.plugin';
-
 // ------------------------------
-// Registry builder
+// ASSEMBLE PHASE PLUGINS
 // ------------------------------
+import { UldeRendererPlugin } from '../../plugins/assemble/ulde-renderer.plugin';
+import { createUldeTimelinePlugin } from '../../plugins/assemble/ulde-timeline.plugin';
+import { createUldeDebugOverlayPlugin } from '../../plugins/assemble/ulde-debug-overlay.plugin';
+import { UldeArtifactsPanelPlugin } from '../../plugins/assemble/ulde-artifacts-panel.plugin';
+import { createUldeProfilerPlugin } from '../../plugins/assemble/ulde-profiler.plugin';
 
-export function createUldePluginRegistry(): UldePlugin[] {
-  /**
-   * The registry is ordered by lifecycle phase:
-   *
-   *   1. CONTENT
-   *   2. DIAGNOSTICS
-   *   3. DOM
-   *   4. RENDER
-   *
-   * Within each phase, plugins run in the order listed.
-   *
-   * This explicit ordering is essential for teaching:
-   *   - TOC must run before Headings Check
-   *   - Anchors must run before ScrollSpy
-   *   - Renderer must run before DOM Injector
-   *   - Timeline/Profiler/DebugOverlay must run last
-   */
 
+// -----------------------------------------------------
+// BUILD REGISTRY (ORDER MATTERS)
+// -----------------------------------------------------
+export function createUldePluginRegistry() {
   return [
-    // -----------------------------------------------------
+
+    // ---------------------------------------------
     // CONTENT PHASE
-    // -----------------------------------------------------
-    UldeTocPlugin,
-    createUldeLinksPlugin(),
+    // ---------------------------------------------
     UldeFrontmatterPlugin,
+    createUldeLinksPlugin(),
+    UldeTocPlugin,
     UldeCodeblocksPlugin,
     createUldeSyntaxHighlightPlugin(),
     UldeContainersPlugin,
 
-    // -----------------------------------------------------
+    // ---------------------------------------------
+    // TRANSFORM PHASE
+    // ---------------------------------------------
+    UldeDomInjectorPlugin,
+    // UldeKatexTransformPlugin,
+    // UldeAnchorsTransformPlugin,
+    // UldeScrollspyTransformPlugin,
+
+    // ---------------------------------------------
     // DIAGNOSTICS PHASE
-    // -----------------------------------------------------
+    // ---------------------------------------------
     UldeHeadingsCheckPlugin,
     UldeBrokenLinksPlugin,
 
-    // -----------------------------------------------------
-    // DOM PHASE
-    // -----------------------------------------------------
-    createUldeAnchorsPlugin(),
-    UldeMermaidPlugin,
-    UldeScrollSpyPlugin,
-    UldeDomInjectorPlugin,
-
-    // -----------------------------------------------------
-    // RENDER PHASE
-    // -----------------------------------------------------
+    // ---------------------------------------------
+    // ASSEMBLE PHASE
+    // ---------------------------------------------
     UldeRendererPlugin,
     createUldeTimelinePlugin(),
     createUldeDebugOverlayPlugin(),
