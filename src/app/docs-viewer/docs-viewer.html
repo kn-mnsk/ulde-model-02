@@ -34,18 +34,4 @@
     </section>
   }
 
-  <!-- ScrollSpy -->
-  @if (scrollspy().length > 0) {
-    <nav class="docs-scrollspy">
-      <h4>Sections</h4>
-      <ul>
-        @for (s of scrollspy(); track trackBySlug($index, s)) {
-          <li>
-            <a [href]="'#' + s.slug">{{ s.slug }}</a>
-          </li>
-        }
-      </ul>
-    </nav>
-  }
-
 </div>

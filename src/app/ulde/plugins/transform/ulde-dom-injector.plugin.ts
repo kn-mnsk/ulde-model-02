@@ -37,7 +37,8 @@ export const UldeDomInjectorPlugin: UldePlugin = {
   // 2. Lifecycle phase
   // ---------------------------------------------------------
   // Runs in DOM phase because it transforms HTML using metadata.
-  phase: UldePhase.DOM,
+  phase: UldePhase.TRANSFORM,
+  // phase: UldePhase.DOM,
 
   // ---------------------------------------------------------
   // 3. Capabilities

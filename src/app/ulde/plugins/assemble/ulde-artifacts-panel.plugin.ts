@@ -36,7 +36,8 @@ export const UldeArtifactsPanelPlugin: UldePlugin = {
   // 2. Lifecycle phase
   // ---------------------------------------------------------
   // Runs in RENDER phase because it prepares visualization data.
-  phase: UldePhase.RENDER,
+  phase: UldePhase.ASSEMBLE,
+  // phase: UldePhase.RENDER,
 
   // ---------------------------------------------------------
   // 3. Capabilities

@@ -1,19 +1,27 @@
 // ulde/integration/angular/ulde-docs-viewer-bridge.service.ts
-/**
- * Bridge Angular → ULDE pipeline.
- */
+
 import { Injectable } from '@angular/core';
-import { DefaultUldeHostApi } from '../../core/host/ulde-host-api';
-import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
-import { UldeConfig } from '../../core/config/ulde-config';
+import { UldeBrowserHost } from '../../core/host/ulde-browser-host';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class UldeDocsViewerBridgeService {
-  private host = new DefaultUldeHostApi();
+// Browser DOM plugins
+import { UldeMermaidBrowserPlugin } from '../../plugins/browser/ulde-mermaid-browser.plugin';
+import { UldeKatexBrowserPlugin } from '../../plugins/browser/ulde-katex-browser.plugin';
+import { UldeAnchorsBrowserPlugin } from '../../plugins/browser/ulde-anchors-browser.plugin';
+import { UldeScrollSpyBrowserPlugin } from '../../plugins/browser/ulde-scrollspy-browser.plugin';
 
-  async render(content: string, config?: UldeConfig): Promise<UldePhaseContext> {
-    return this.host.render(content, config);
+@Injectable({ providedIn: 'root' })
+export class UldeDocsViewerBridge {
+  private host = new UldeBrowserHost();
+
+  constructor() {
+    // Register browser DOM plugins
+    this.host.registerBrowserDomPlugin(UldeMermaidBrowserPlugin);
+    this.host.registerBrowserDomPlugin(UldeKatexBrowserPlugin);
+    this.host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
+    this.host.registerBrowserDomPlugin(UldeScrollSpyBrowserPlugin);
+  }
+
+  run(container: HTMLElement, content: string) {
+    return this.host.run(container, content);
   }
 }

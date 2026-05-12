@@ -1,27 +1,27 @@
-// ulde/integration/react/ulde-react-provider.tsx
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { DefaultUldeHostApi } from '../../core/host/ulde-host-api';
-import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
-import { UldeConfig } from '../../core/config/ulde-config';
+// ulde/integration/react/UldeProvider.tsx
 
-const UldeContext = createContext<any>(null);
+import React, { createContext, ReactNode } from 'react';
+import { UldeBrowserHost } from '../../core/host/ulde-browser-host';
 
-export function UldeProvider({ children }: { children: ReactNode }) {
-  const host = new DefaultUldeHostApi();
-  const [result, setResult] = useState<UldePhaseContext | null>(null);
+// Browser DOM plugins
+import { UldeMermaidBrowserPlugin } from '../../plugins/browser/ulde-mermaid-browser.plugin';
+import { UldeKatexBrowserPlugin } from '../../plugins/browser/ulde-katex-browser.plugin';
+import { UldeAnchorsBrowserPlugin } from '../../plugins/browser/ulde-anchors-browser.plugin';
+import { UldeScrollSpyBrowserPlugin } from '../../plugins/browser/ulde-scrollspy-browser.plugin';
 
-  async function render(content: string, config?: UldeConfig) {
-    const ctx = await host.render(content, config);
-    setResult(ctx);
-  }
+export const UldeContext = createContext<UldeBrowserHost | null>(null);
+
+export const UldeProvider = ({ children }: {children: ReactNode}) => {
+  const host = new UldeBrowserHost();
+
+  host.registerBrowserDomPlugin(UldeMermaidBrowserPlugin);
+  host.registerBrowserDomPlugin(UldeKatexBrowserPlugin);
+  host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
+  host.registerBrowserDomPlugin(UldeScrollSpyBrowserPlugin);
 
   return (
-    <UldeContext.Provider value={{ render, result }}>
+    <UldeContext.Provider value={host}>
       {children}
     </UldeContext.Provider>
   );
-}
-
-export function useUlde() {
-  return useContext(UldeContext);
-}
+};

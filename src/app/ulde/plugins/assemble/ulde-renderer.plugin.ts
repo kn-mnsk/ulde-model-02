@@ -37,7 +37,7 @@ export const UldeRendererPlugin: UldePlugin = {
   // 2. Lifecycle phase
   // ---------------------------------------------------------
   // Runs in RENDER phase because it produces HTML.
-  phase: UldePhase.RENDER,
+  phase: UldePhase.ASSEMBLE,
 
   // ---------------------------------------------------------
   // 3. Capabilities

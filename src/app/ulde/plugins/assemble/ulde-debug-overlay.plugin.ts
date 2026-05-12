@@ -10,7 +10,8 @@ export function createUldeDebugOverlayPlugin(): UldePlugin {
       version: '1.0.0',
       description: 'Builds a debug overlay model from diagnostics and timings.',
     },
-    phase: UldePhase.RENDER,
+    phase: UldePhase.ASSEMBLE,
+    // phase: UldePhase.RENDER,
 
     run(ctx: UldePhaseContext) {
       const { artifacts, config } = ctx;

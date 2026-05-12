@@ -1,54 +1,64 @@
-// src/app/ulde/core/host/ulde-browser-host.ts
+// ulde/core/host/ulde-browser-host.ts
 
 import { runUldePipeline } from '../lifecycle/ulde-orchestrator';
-import { createUldePluginRegistry } from '../registry/ulde-plugin-registry';
-import { UldeRegistry } from '../registry/ulde-registry';
-import { UldePhase } from '../lifecycle/ulde-phases';
 
 /**
- * ULDE Browser Host
+ * Browser DOM Plugin Interface
  *
- * This host:
- *   1. Runs the ULDE string-phase pipeline (markdown → HTML)
- *   2. Injects the resulting HTML into a container
- *   3. Runs DOM-phase plugins (mermaid, anchors, scrollspy, etc.)
+ * These plugins operate on the REAL DOM.
+ * They run AFTER ULDE has produced finalHtml.
  *
- * It is intentionally simple and matches ULDE v2 teaching architecture.
+ * Examples:
+ *   - Mermaid rendering
+ *   - KaTeX auto-render
+ *   - Anchors injection
+ *   - ScrollSpy observers
+ */
+export interface BrowserDomPlugin {
+  id: string;
+  init(container: HTMLElement): Promise<void> | void;
+}
+
+/**
+ * ULDE Browser Host (v3)
+ *
+ * Responsibilities:
+ *   1. Run ULDE string-based pipeline (CONTENT → TRANSFORM → DIAGNOSTICS → ASSEMBLE)
+ *   2. Inject finalHtml into the DOM
+ *   3. Run browser-only DOM plugins on the real DOM
  */
 export class UldeBrowserHost {
-  private registry: UldeRegistry;
+  private browserDomPlugins: BrowserDomPlugin[] = [];
 
-  constructor() {
-    // Build registry once
-    this.registry = new UldeRegistry();
-    const plugins = createUldePluginRegistry();
-    for (const p of plugins) this.registry.register(p);
+  /**
+   * Register a browser-only DOM plugin
+   */
+  registerBrowserDomPlugin(plugin: BrowserDomPlugin) {
+    this.browserDomPlugins.push(plugin);
   }
 
   /**
    * Run ULDE end-to-end in the browser.
    */
   async run(container: HTMLElement, content: string) {
-    // 1. Run string-phase pipeline
+    // 1. Run ULDE pipeline (string world)
     const ctx = await runUldePipeline({ content });
 
-    // 2. Inject HTML (renderer plugin stores finalHtml)
-    const html = ctx.artifacts.finalHtml ?? ctx.artifacts.html ?? '';
+    // 2. Insert final HTML into the DOM
+    const html =
+      ctx.artifacts.finalHtml ??
+      ctx.artifacts.html ??
+      ctx.artifacts.content ??
+      '';
+
     container.innerHTML = html;
 
-    // 3. Run DOM-phase plugins
-    const domPlugins = this.registry.getPluginsForPhase(UldePhase.DOM);
-
-    for (const plugin of domPlugins) {
+    // 3. Run browser DOM plugins (real DOM world)
+    for (const plugin of this.browserDomPlugins) {
       try {
-        // DOM plugins use onDomInit() instead of run()
-        await plugin.onDomInit?.(container, {
-          artifacts: ctx.artifacts,
-          diagnostics: ctx.artifacts.diagnostics.all(),
-          timings: ctx.artifacts.timings.all(),
-        });
+        await plugin.init(container);
       } catch (err) {
-        console.error(`[ULDE DOM Plugin Error] ${plugin.meta?.name}`, err);
+        console.error(`[ULDE Browser Plugin Error] ${plugin.id}`, err);
       }
     }
   }
