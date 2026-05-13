@@ -5,6 +5,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { JsonPipe } from '@angular/common';
 import { UldeAngularService, UldeRunResult } from '../ulde/ulde-angular.service';
 import { ArtifactsPanelModel, DebugOverlayModel } from '../ulde/core/artifacts/ulde-artifacts';
+import { UldeDocsViewerBridge } from '../ulde/integration/angular/ulde-docs-viewer-bridge.service';
 
 @Component({
   selector: 'app-docs-viewer',
@@ -29,6 +30,7 @@ export class DocsViewer {
   constructor(
     private readonly ulde: UldeAngularService,
     private readonly sanitizer: DomSanitizer,
+    private readonly bridge: UldeDocsViewerBridge,
   ) {
     // -------------------------------------------------------
     // React to markdown input changes
@@ -52,17 +54,39 @@ export class DocsViewer {
   // Apply ULDE results into signals
   // ---------------------------------------------------------
   private applyResult(result: UldeRunResult) {
-    this.html.set(this.sanitizer.bypassSecurityTrustHtml(result.finalHtml));
+    console.log("FINAL HTML FROM PIPELINE:", result.finalHtml);
+
+    const html = result.finalHtml;
+    // insert HTML into Angular DOM
+    this.html.set(this.sanitizer.bypassSecurityTrustHtml(html));
+    // Run browser plugins AFTER Angular updates DOM
+    setTimeout(() => {
+      const container = document.querySelector('.docs-content') as HTMLElement;
+      if (container) {
+        this.bridge.run(container, html);
+      }
+    });
+
     this.debugOverlay.set(result.debugOverlay);
     this.artifactsPanel.set(result.artifactsPanel);
+
   }
 
   // Artifact sections
-  trackByTitle = (_: number, item: { title: string }) => item.title;
+  trackByTitle = (index: number, item: { title: string }) =>
+    `${item.title ?? 'untitled'}-${index}`;
 
   // Artifact items
-  trackByIndex = (_: number, item: { index: number }) => item.index;
+  trackByIndex = (index: number, item: { index: number }) =>
+    `${item.index ?? index}-${index}`;
 
   // Fallback
-  trackByObjectIdentity = (_: number, item: any) => item;
+  trackByObjectIdentity = (index: number, item: any) =>
+    `${index}-${JSON.stringify(item).length}`;
+
+  // optional if  artifacts have a slug or id property, prefer that as the key:
+  trackBySlug = (index: number, item: { slug?: string }) =>
+    item.slug ?? `slug-${index}`;
+
+
 }
