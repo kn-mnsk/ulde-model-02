@@ -1,0 +1,18 @@
+// product-configurator/product-configurator.html
+
+<div class="configurator-layout">
+  <div class="viewer-pane">
+    <ulde-viewer
+      [modelId]="selectedModelId"
+      [variantId]="selectedVariantId"
+      [zoom]="zoom"
+      [rotation]="rotation"
+      (stateChange)="onViewerStateChange($event)"
+    ></ulde-viewer>
+  </div>
+
+  <div class="controls-pane">
+    <!-- controls for ULDE-MODEL-01 -->
+  </div>
+</div>
+
