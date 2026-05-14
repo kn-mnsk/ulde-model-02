@@ -21,7 +21,28 @@ export class UldeDocsViewerBridge {
     this.host.registerBrowserDomPlugin(UldeScrollSpyBrowserPlugin);
   }
 
-  run(container: HTMLElement, html: string) {
-    return this.host.run(container, html);
+
+  run(options: { host: HTMLElement; docId: string; reload?: number }) {
+    const { host, docId } = options;
+
+    // TODO: resolve docId → HTML
+    const html = this.resolveHtml(docId);
+
+
+    // This returns a Promise<void>
+    this.host.run(host, html);
+
+    // Return a no-op cleanup function
+    return () => { };
   }
+
+  private resolveHtml(docId: string): string {
+    // Temporary: replace with real lookup
+    return `<h1>${docId}</h1>`;
+  }
+
+  // run(container: HTMLElement, html: string) {
+  //   return this.host.run(container, html);
+  // }
+
 }

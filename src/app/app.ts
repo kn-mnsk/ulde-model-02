@@ -4,10 +4,6 @@ import { DocsViewer } from './docs-viewer/docs-viewer';
 
 @Component({
   selector: 'app-root',
-  imports: [
-    // RouterOutlet,
-     DocsViewer],
-  providers: [DocsViewer],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
