@@ -21,7 +21,7 @@ export class UldeDocsViewerBridge {
     this.host.registerBrowserDomPlugin(UldeScrollSpyBrowserPlugin);
   }
 
-  run(container: HTMLElement, content: string) {
-    return this.host.run(container, content);
+  run(container: HTMLElement, html: string) {
+    return this.host.run(container, html);
   }
 }

@@ -37,7 +37,7 @@ export class DocsViewer {
     // -------------------------------------------------------
     effect(() => {
       const md = this.markdown();
-      if (md === '') return;
+      if (!md) return;
       this.ulde.renderMarkdown(md);
     });
 
@@ -61,11 +61,15 @@ export class DocsViewer {
     this.html.set(this.sanitizer.bypassSecurityTrustHtml(html));
     // Run browser plugins AFTER Angular updates DOM
     setTimeout(() => {
+      if (typeof window === 'undefined') return;
+      if (typeof document === 'undefined') return;
+
       const container = document.querySelector('.docs-content') as HTMLElement;
       if (container) {
         this.bridge.run(container, html);
       }
     });
+
 
     this.debugOverlay.set(result.debugOverlay);
     this.artifactsPanel.set(result.artifactsPanel);

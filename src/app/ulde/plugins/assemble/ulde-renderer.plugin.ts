@@ -1,4 +1,4 @@
-// ulde/plugins/renderers/ulde-renderer.plugin.ts
+// ulde/plugins/assemble/ulde-renderer.plugin.ts
 
 /**
  * ULDE Renderer Plugin (Teaching Version)
@@ -18,9 +18,16 @@
  * The goal is to teach plugin architecture,
  * not to implement a full markdown parser.
  */
-
+import MarkdownIt from 'markdown-it';
 import { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
+
+
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+});
 
 export const UldeRendererPlugin: UldePlugin = {
   // ---------------------------------------------------------
@@ -28,8 +35,8 @@ export const UldeRendererPlugin: UldePlugin = {
   // ---------------------------------------------------------
   meta: {
     name: 'ulde-renderer',
-    description: 'Minimal markdown → HTML renderer (teaching version).',
-    version: '1.0.0',
+    description: 'Minimal markdown → HTML renderer (markdwon-it version).',
+    version: '2.0.0',
     author: 'ULDE Model Project',
   },
 
@@ -64,98 +71,14 @@ export const UldeRendererPlugin: UldePlugin = {
   // 5. Main plugin logic
   // ---------------------------------------------------------
   run(ctx) {
-    const { artifacts } = ctx;
 
-    const markdown = artifacts.content;
+    const markdown = ctx.artifacts.content;
 
-    // -----------------------------------------------------
-    // 1. Split into lines
-    // -----------------------------------------------------
-    const lines = markdown.split('\n');
+    // Markdown → HTML
+    const html = md.render(markdown);
 
-    const htmlLines: string[] = [];
-
-    // -----------------------------------------------------
-    // 2. Simple state machine for code blocks
-    // -----------------------------------------------------
-    let inCode = false;
-    let codeLang: string | null = null;
-    let codeBuffer: string[] = [];
-
-    const flushCode = () => {
-      if (!inCode) return;
-
-      htmlLines.push(
-        `<pre><code data-lang="${codeLang ?? ''}">` +
-          codeBuffer.join('\n') +
-        `</code></pre>`
-      );
-
-      inCode = false;
-      codeLang = null;
-      codeBuffer = [];
-    };
-
-    // -----------------------------------------------------
-    // 3. Process each line
-    // -----------------------------------------------------
-    for (const line of lines) {
-      // Code block start/end
-      const codeMatch = /^```(\w*)/.exec(line);
-
-      if (codeMatch) {
-        if (!inCode) {
-          // Start code block
-          inCode = true;
-          codeLang = codeMatch[1] || null;
-        } else {
-          // End code block
-          flushCode();
-        }
-        continue;
-      }
-
-      if (inCode) {
-        codeBuffer.push(line);
-        continue;
-      }
-
-      // Headings
-      const headingMatch = /^(#{1,6})\s+(.*)$/.exec(line);
-      if (headingMatch) {
-        const level = headingMatch[1].length;
-        const text = headingMatch[2];
-        htmlLines.push(`<h${level}>${text}</h${level}>`);
-        continue;
-      }
-
-      // Unordered list
-      const listMatch = /^[-*+]\s+(.*)$/.exec(line);
-      if (listMatch) {
-        htmlLines.push(`<ul><li>${listMatch[1]}</li></ul>`);
-        continue;
-      }
-
-      // Paragraph
-      if (line.trim()) {
-        htmlLines.push(`<p>${line.trim()}</p>`);
-      }
-    }
-
-    // Flush any unclosed code block
-    flushCode();
-
-    // -----------------------------------------------------
-    // 4. Join HTML
-    // -----------------------------------------------------
-    const html = htmlLines.join('\n');
-
-    // -----------------------------------------------------
-    // 5. Store HTML output
-    // -----------------------------------------------------
-    artifacts.html = html;
-    artifacts.finalHtml = html;
-
+    ctx.artifacts.html = html;
+    ctx.artifacts.finalHtml = html;
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-renderer',
       message: 'HTML rendering complete.',
