@@ -22,12 +22,14 @@ export class UldeDocsViewerBridge {
   }
 
 
-  run(options: { host: HTMLElement; docId: string; reload?: number }) {
-    const { host, docId } = options;
+  run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string }) {
+    const { host, html, reload } = options;
 
-    // TODO: resolve docId → HTML
-    const html = this.resolveHtml(docId);
-
+    // // TODO: resolve docId → HTML
+    // const html = this.resolveHtml(docId);
+    if (reload) {
+      host.innerHTML = '';
+    }
 
     // This returns a Promise<void>
     this.host.run(host, html);

@@ -1,4 +1,26 @@
 // app/docs-viewer/docs-viewer.ts
+/**
+ * Final Architecture (Locked In)
+ * docId
+  ↓
+fetch /docs/{docId}.md
+  ↓
+UldeAngularService.renderMarkdown(markdown)
+  ↓
+runUldePipeline()
+  ↓
+result$ emits:
+  - finalHtml
+  - debugOverlay
+  - artifactsPanel
+  ↓
+DocsViewerBridge.run()
+  ↓
+BrowserHost DOM plugins
+  ↓
+Rendered document
+ */
+
 
 import {
   Component,
@@ -6,14 +28,13 @@ import {
   ViewChild,
   AfterViewInit,
   OnDestroy,
-  signal,
   effect,
   input
 } from '@angular/core';
 
-//?import { UldeDocsViewerBridge } from '../ulde-core/ulde-docs-viewer-bridge';
-// =>
 import { UldeDocsViewerBridge } from '../ulde/integration/angular/ulde-docs-viewer-bridge.service';
+import { UldeAngularService, UldeRunResult } from '../ulde/integration/angular/ulde-angular.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-docs-viewer',
@@ -24,43 +45,43 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   @ViewChild('host', { static: true })
   hostRef!: ElementRef<HTMLElement>;
 
-  docId = input<string>('');
-  // @Input() docId = '';
-  reload = input<number>(0);
-  // @Input() reload = 0;
+  $docId = input<string>('');
+  $reload = input<boolean>(false);
 
   private cleanupFn: (() => void) | null = null;
 
-  // Signals for reactive updates
-  $docId = signal('');
-  $reload = signal(0);
-
   constructor(
-    private bridgeService: UldeDocsViewerBridge,
+    private bridge: UldeDocsViewerBridge,
+    private ulde: UldeAngularService,
   ) {
-    effect(() => {
-      const id = this.$docId();
-      const r = this.$reload();
+    // React to ULDE pipeline results
+    this.ulde.result$.subscribe(result => {
+      if (!result) return;
+
+      const html = result.finalHtml;
 
       if (this.cleanupFn) {
         this.cleanupFn();
         this.cleanupFn = null;
       }
 
-      if (id) {
-        this.cleanupFn = this.bridgeService.run({
-          host: this.hostRef?.nativeElement,
-          docId: id,
-          reload: r
-        });
-      }
+      this.cleanupFn = this.bridge.run({
+        host: this.hostRef.nativeElement,
+        docId: this.$docId(),
+        reload: this.$reload(),
+        html
+      });
+    });
+
+    // React to docId changes
+    effect(() => {
+      const id = this.$docId();
+      if (!id) return;
+
+      this.loadAndRender(id);
     });
   }
-
-  ngAfterViewInit(): void {
-    this.$docId.set(this.docId());
-    this.$reload.set(this.reload());
-  }
+  ngAfterViewInit(): void { }
 
   ngOnDestroy(): void {
     if (this.cleanupFn) {
@@ -68,105 +89,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       this.cleanupFn = null;
     }
   }
+
+  private async loadAndRender(docId: string) {
+    const url = `/docs/${docId}.md`;
+    const markdown = await fetch(url).then(r => r.text());
+    await this.ulde.renderMarkdown(markdown);
+  }
 }
-
-
-
-
-
-
-
-// import { Component, input, signal, effect } from '@angular/core';
-// import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-// import { JsonPipe } from '@angular/common';
-// import { UldeAngularService, UldeRunResult } from '../ulde/ulde-angular.service';
-// import { ArtifactsPanelModel, DebugOverlayModel } from '../ulde/core/artifacts/ulde-artifacts';
-// import { UldeDocsViewerBridge } from '../ulde/integration/angular/ulde-docs-viewer-bridge.service';
-
-// @Component({
-//   selector: 'app-docs-viewer',
-//   standalone: true,
-//   imports: [JsonPipe],
-//   templateUrl: './docs-viewer.html',
-//   styleUrls: ['./docs-viewer.scss'],
-// })
-// export class DocsViewer {
-//   // ---------------------------------------------------------
-//   // Signal input instead of @Input()
-//   // ---------------------------------------------------------
-//   markdown = input<string>('');
-
-//   // ---------------------------------------------------------
-//   // Internal reactive state (signals)
-//   // ---------------------------------------------------------
-//   html = signal<SafeHtml | null>(null);
-//   debugOverlay = signal<DebugOverlayModel | null>(null);
-//   artifactsPanel = signal<ArtifactsPanelModel | null>(null);
-
-//   constructor(
-//     private readonly ulde: UldeAngularService,
-//     private readonly sanitizer: DomSanitizer,
-//     private readonly bridge: UldeDocsViewerBridge,
-//   ) {
-//     // -------------------------------------------------------
-//     // React to markdown input changes
-//     // -------------------------------------------------------
-//     effect(() => {
-//       const md = this.markdown();
-//       if (!md) return;
-//       this.ulde.renderMarkdown(md);
-//     });
-
-//     // -------------------------------------------------------
-//     // React to ULDE pipeline results
-//     // -------------------------------------------------------
-//     this.ulde.result$.subscribe(result => {
-//       if (!result) return;
-//       this.applyResult(result);
-//     });
-//   }
-
-//   // ---------------------------------------------------------
-//   // Apply ULDE results into signals
-//   // ---------------------------------------------------------
-//   private applyResult(result: UldeRunResult) {
-//     // console.log("FINAL HTML FROM PIPELINE:", result.finalHtml);
-
-//     const html = result.finalHtml;
-//     // insert HTML into Angular DOM
-//     this.html.set(this.sanitizer.bypassSecurityTrustHtml(html));
-//     // Run browser plugins AFTER Angular updates DOM
-//     setTimeout(() => {
-//       if (typeof window === 'undefined') return;
-//       if (typeof document === 'undefined') return;
-
-//       const container = document.querySelector('.docs-content') as HTMLElement;
-//       if (container) {
-//         this.bridge.run(container, html);
-//       }
-//     });
-
-
-//     this.debugOverlay.set(result.debugOverlay);
-//     this.artifactsPanel.set(result.artifactsPanel);
-
-//   }
-
-//   // Artifact sections
-//   trackByTitle = (index: number, item: { title: string }) =>
-//     `${item.title ?? 'untitled'}-${index}`;
-
-//   // Artifact items
-//   trackByIndex = (index: number, item: { index: number }) =>
-//     `${item.index ?? index}-${index}`;
-
-//   // Fallback
-//   trackByObjectIdentity = (index: number, item: any) =>
-//     `${index}-${JSON.stringify(item).length}`;
-
-//   // optional if  artifacts have a slug or id property, prefer that as the key:
-//   trackBySlug = (index: number, item: { slug?: string }) =>
-//     item.slug ?? `slug-${index}`;
-
-
-// }

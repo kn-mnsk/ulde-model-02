@@ -1,13 +1,13 @@
 // app/ulde/ulde-angular.service.ts
 
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { runUldePipeline } from './core/lifecycle/ulde-orchestrator';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { runUldePipeline } from '../../core/lifecycle/ulde-orchestrator';
 
 import {
   DebugOverlayModel,
   ArtifactsPanelModel,
-} from './core/artifacts/ulde-artifacts';
+} from '../../core/artifacts/ulde-artifacts';
 
 export interface UldeRunResult {
   finalHtml: string;
@@ -37,4 +37,6 @@ export class UldeAngularService {
       artifactsPanel: ctx.artifacts.artifactsPanel ?? null,
     });
   }
+
+
 }

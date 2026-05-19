@@ -1,2 +1,51 @@
+<!-- app/docs-viewer/docs-viewer.html -->
 
-<div #host class="docs-viewer-host"></div>
+<div class="docs-viewer">
+
+  <!-- Header -->
+  <header class="dv-header">
+    <div class="dv-title">{{ $docId() }}</div>
+
+    <nav class="dv-nav">
+      <button (click)="backToIndex()">Index</button>
+      <button (click)="reloadDoc()">Reload</button>
+    </nav>
+  </header>
+
+  <div class="dv-body">
+
+    <!-- Table of Contents -->
+    @if (toc?.length) {
+      <aside class="dv-toc">
+        <ul>
+          @for (item of toc; track item.id) {
+            <li>
+              <a (click)="scrollTo(item.id)">{{ item.text }}</a>
+            </li>
+          }
+        </ul>
+      </aside>
+    }
+
+    <!-- Main content -->
+    <main class="dv-content">
+      <div #host class="dv-host"></div>
+    </main>
+
+  </div>
+
+  <!-- Debug Overlay -->
+  @if (debugOverlay) {
+    <div class="dv-debug-overlay">
+      <!-- debugOverlay HTML injected by bridge -->
+    </div>
+  }
+
+  <!-- Artifacts Panel -->
+  @if (artifactsPanel) {
+    <div class="dv-artifacts-panel">
+      <!-- artifactsPanel HTML injected by bridge -->
+    </div>
+  }
+
+</div>
