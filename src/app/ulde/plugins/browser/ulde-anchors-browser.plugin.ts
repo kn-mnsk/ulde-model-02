@@ -41,5 +41,26 @@ export const UldeAnchorsBrowserPlugin: BrowserDomPlugin = {
       // Insert anchor at the beginning of the heading
       h.prepend(anchor);
     });
+
+    //
+    // 2. NEW: Internal docId routing
+    //
+    const internalLinks = container.querySelectorAll('a[href^="#docId:"]');
+
+    internalLinks.forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const href = a.getAttribute('href')!;
+        const docId = href.replace('#docId:', '');
+
+        container.dispatchEvent(new CustomEvent('ulde:navigate', {
+          detail: { docId },
+          bubbles: true
+        }));
+      });
+    });
+
   }
+
 };

@@ -31,6 +31,18 @@ export const UldeScrollSpyBrowserPlugin: BrowserDomPlugin = {
 
             // Mark the current heading as active
             entry.target.classList.add('active-heading');
+
+            // Dispatch ScrollSpy event with the heading ID
+            const id = (entry.target as HTMLElement).id;
+            if (id) {
+              container.dispatchEvent(
+                new CustomEvent('ulde:scrollspy', {
+                  detail: { id },
+                  bubbles: true
+                })
+              );
+            }
+            
           }
         }
       },

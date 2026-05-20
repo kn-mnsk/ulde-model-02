@@ -8,6 +8,8 @@ import { UldeMermaidBrowserPlugin } from '../../plugins/browser/ulde-mermaid-bro
 import { UldeKatexBrowserPlugin } from '../../plugins/browser/ulde-katex-browser.plugin';
 import { UldeAnchorsBrowserPlugin } from '../../plugins/browser/ulde-anchors-browser.plugin';
 import { UldeScrollSpyBrowserPlugin } from '../../plugins/browser/ulde-scrollspy-browser.plugin';
+import { UldeDebugOverlayBrowserPlugin } from '../../plugins/browser/ulde-debug-overlay-browser.plugin';
+
 
 @Injectable({ providedIn: 'root' })
 export class UldeDocsViewerBridge {
@@ -19,11 +21,13 @@ export class UldeDocsViewerBridge {
     this.host.registerBrowserDomPlugin(UldeKatexBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeScrollSpyBrowserPlugin);
+    this.host.registerBrowserDomPlugin(UldeDebugOverlayBrowserPlugin);
+
   }
 
 
-  run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string }) {
-    const { host, html, reload } = options;
+  run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string; onScrollSpy: (id: string) => void ; onNavigate?: (docId: string) => void }) {
+    const { host, html, reload, onNavigate, onScrollSpy } = options;
 
     // // TODO: resolve docId → HTML
     // const html = this.resolveHtml(docId);
@@ -31,6 +35,18 @@ export class UldeDocsViewerBridge {
       host.innerHTML = '';
     }
 
+    // Listen for ULDE navigation events
+    if (onNavigate) {
+      host.addEventListener('ulde:navigate', (e: any) => {
+        onNavigate(e.detail.docId);
+      });
+    }
+
+    if (options.onScrollSpy) {
+      host.addEventListener('ulde:scrollspy', (e: any) => {
+        options.onScrollSpy(e.detail.id);
+      });
+    }
     // This returns a Promise<void>
     this.host.run(host, html);
 
