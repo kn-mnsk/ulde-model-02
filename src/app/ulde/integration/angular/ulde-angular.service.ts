@@ -3,6 +3,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { runUldePipeline } from '../../core/lifecycle/ulde-orchestrator';
+import { TocEntry } from '../../core/artifacts/ulde-artifacts';
 
 import {
   DebugOverlayModel,
@@ -13,6 +14,7 @@ export interface UldeRunResult {
   finalHtml: string;
   debugOverlay: DebugOverlayModel | null;
   artifactsPanel: ArtifactsPanelModel | null;
+  toc: TocEntry[] | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -35,6 +37,7 @@ export class UldeAngularService {
       finalHtml: ctx.artifacts.finalHtml ?? ctx.artifacts.html ?? '',
       debugOverlay: ctx.artifacts.debugOverlay ?? null,
       artifactsPanel: ctx.artifacts.artifactsPanel ?? null,
+      toc: ctx.artifacts.toc ?? null
     });
   }
 

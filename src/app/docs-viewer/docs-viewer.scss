@@ -26,6 +26,11 @@
   padding: 1rem;
   overflow-y: auto;
 }
+.dv-toc li.active > a {
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
 
 .dv-content {
   flex: 1;
@@ -37,8 +42,7 @@
   width: 100%;
 }
 
-.dv-debug-overlay,
-.dv-artifacts-panel {
+.dv-debug-overlay {
   position: fixed;
   bottom: 0;
   right: 0;
@@ -47,4 +51,21 @@
   background: rgba(0,0,0,0.8);
   color: white;
   padding: 1rem;
+}
+
+.dv-artifacts-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 380px;
+  height: 100vh;
+  background: #fff;
+  border-left: 1px solid #ddd;
+  overflow-y: auto;
+  transform: translateX(0);
+  transition: transform 0.25s ease;
+}
+
+.dv-artifacts-panel.hidden {
+  transform: translateX(100%);
 }

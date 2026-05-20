@@ -1,3 +1,5 @@
+// app/ulde/plugins/assemble/ulde-debug-overlay.plugin.ts
+
 import type { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
 import type { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
