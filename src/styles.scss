@@ -30,13 +30,6 @@ body {
 Adds a subtle size change to prevent the transition from feeling static. ✅ Creates a more natural fade effect instead of a hard opacity shift.
 */
 @keyframes fade-in {
-  // from {
-  //   opacity: 0;
-  // }
-  // to {
-  //   opacity: 1;
-  // }
-
   0% {
     opacity: 0;
     transform: scale(0.98);
@@ -111,10 +104,10 @@ a {
    Thema drak and light
 --------------------------------------------------------- */
 
-.theme-transition-overlay {
-  background: rgba(0, 0, 0, 0.4);
-  transition: background-color 0.8s ease-in-out;
-}
+// .theme-transition-overlay {
+//   background: rgba(0, 0, 0, 0.4);
+//   transition: background-color 0.8s ease-in-out;
+// }
 
 /* Thema*/
 $dark-primary-text: white;
@@ -130,8 +123,7 @@ $light-theme: mat.m2-define-light-theme((color: (primary: $light-primary, accent
 ✅ Gives a softer gradient transition when switching modes.
 */
 [data-theme="dark"] {
-  --background-color: #lelele; // for docs-viewer.ts
-  // --bg-color: #lelele;
+  --background-color: #1e1e1e; // for docs-viewer.ts
   --bg-color: rgba(0, 0, 0, 1.0);
   // --bg-color: linear-gradient(180deg, #1a1a1a, #000000);
   --text-color: white; //$dark-primary-text;
@@ -193,7 +185,154 @@ body[data-theme="dark"],
 body[data-theme="light"] {
   opacity: 0;
   animation: fade-in 0.7s forwards ease-in-out;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
 }
+
+
+/* ---------------------------------------------------------
+   Thema button - regular style
+--------------------------------------------------------- */
+/* Button container */
+.theme-toggle-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Icon base */
+.theme-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  border-radius: 50%;
+  position: relative;
+  transition:
+    background 0.35s ease,
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+/* ☀️ Light mode icon */
+[data-theme="light"] .theme-icon {
+  background: #ffcc33;
+  box-shadow:
+    0 -8px 0 #ffcc33,
+    0 8px 0 #ffcc33,
+    8px 0 0 #ffcc33,
+    -8px 0 0 #ffcc33,
+    6px 6px 0 #ffcc33,
+    -6px 6px 0 #ffcc33,
+    6px -6px 0 #ffcc33,
+    -6px -6px 0 #ffcc33;
+  transform: rotate(0deg);
+}
+
+/* 🌙 Dark mode icon */
+[data-theme="dark"] .theme-icon {
+  background: #f0f0f0;
+  box-shadow: inset -6px -6px 0 0 #000;
+  transform: rotate(180deg);
+}
+
+/* Adds a tactile micro‑interaction */
+.theme-toggle-btn:active .theme-icon {
+  transform: scale(0.85);
+}
+
+
+/* ---------------------------------------------------------
+   Thema button - VSCODE Style
+--------------------------------------------------------- */
+/* Container button*/
+.vscode-toggle {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Track */
+.vscode-toggle-track {
+  width: 48px;
+  height: 24px;
+  border-radius: 24px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--toggle-track-bg);
+  transition: background 0.25s ease;
+}
+
+/* Thumb (the pill) */
+.vscode-toggle-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--toggle-thumb-bg);
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.25s ease;
+}
+
+/* Icons inside thumb */
+.vscode-toggle-thumb .icon {
+  position: absolute;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Light mode */
+[data-theme="light"] {
+  --toggle-track-bg: #e0e0e0;
+  --toggle-thumb-bg: #ffffff;
+}
+
+[data-theme="light"] .vscode-toggle-thumb {
+  transform: translateX(0);
+}
+
+[data-theme="light"] .vscode-toggle-thumb .sun {
+  opacity: 1;
+}
+
+/* Dark mode */
+[data-theme="dark"] {
+  --toggle-track-bg: #3a3a3a;
+  --toggle-thumb-bg: #1e1e1e;
+}
+
+[data-theme="dark"] .vscode-toggle-thumb {
+  transform: translateX(24px);
+}
+
+[data-theme="dark"] .vscode-toggle-thumb .moon {
+  opacity: 1;
+}
+
+
 
 
 /* ---------------------------------------------------------
@@ -462,4 +601,204 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   &.visible {
     opacity: 1;
   }
+}
+
+/* ---------------------------------------------
+   ARTIFACTS PANEL — GROUPED MODEL (FINAL)
+--------------------------------------------- */
+
+/* Root container */
+.ulde-artifacts-panel-content {
+  font-family: system-ui, sans-serif;
+  padding: 0;
+  margin: 0;
+  color: var(--ap-fg);
+  background: var(--ap-bg);
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Light / Dark theme variables */
+[data-theme="light"] {
+  --ap-bg: #fafafa;
+  --ap-fg: #222;
+  --ap-border: #ddd;
+  --ap-header-bg: #f0f0f0;
+  --ap-hover: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] {
+  --ap-bg: #1e1e1e;
+  --ap-fg: #e0e0e0;
+  --ap-border: #333;
+  --ap-header-bg: #252525;
+  --ap-hover: rgba(255, 255, 255, 0.05);
+}
+
+/* ---------------------------------------------
+   HEADER + SEARCH BAR
+--------------------------------------------- */
+.ulde-ap-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--ap-header-bg);
+  padding: 10px;
+  border-bottom: 1px solid var(--ap-border);
+  backdrop-filter: blur(6px);
+}
+
+.ulde-ap-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.ulde-ap-search {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-bg);
+  color: var(--ap-fg);
+  font-size: 13px;
+}
+
+/* ---------------------------------------------
+   GROUPS
+--------------------------------------------- */
+.ulde-ap-group {
+  border-bottom: 1px solid var(--ap-border);
+}
+
+.ulde-ap-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--ap-header-bg);
+  position: sticky;
+  top: 42px; /* below main header */
+  z-index: 15;
+  backdrop-filter: blur(6px);
+}
+
+.ulde-ap-group-header:hover {
+  background: var(--ap-hover);
+}
+
+.ulde-ap-group-icon {
+  opacity: 0.85;
+}
+
+.ulde-ap-group.collapsed .ulde-ap-group-body {
+  display: none;
+}
+
+.ulde-ap-group.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+/* ---------------------------------------------
+   SECTIONS
+--------------------------------------------- */
+.ulde-ap-section {
+  border-top: 1px solid var(--ap-border);
+}
+
+.ulde-ap-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 500;
+  position: sticky;
+  top: 72px; /* below group header */
+  z-index: 10;
+  background: var(--ap-bg);
+  backdrop-filter: blur(4px);
+}
+
+.ulde-ap-section-header:hover {
+  background: var(--ap-hover);
+}
+
+.ulde-ap-section.collapsed .ulde-ap-section-body {
+  display: none;
+}
+
+.ulde-ap-section.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.ulde-ap-icon {
+  margin-right: 6px;
+  font-size: 1.1rem;
+  opacity: 0.85;
+}
+
+/* ---------------------------------------------
+   ITEMS
+--------------------------------------------- */
+.ulde-ap-section-body {
+  padding: 6px 12px 10px 12px;
+}
+
+.ulde-ap-item {
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  background: var(--ap-hover);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ulde-ap-item.hidden {
+  opacity: 0;
+  transform: translateX(8px);
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ulde-ap-empty {
+  opacity: 0.6;
+  font-style: italic;
+  padding: 4px 0;
+}
+
+/* ---------------------------------------------
+   CHEVRON
+--------------------------------------------- */
+.chevron {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+}
+
+/* ---------------------------------------------
+   PRE BLOCKS
+--------------------------------------------- */
+.ulde-ap-item pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 12px;
+}
+
+/* ---------------------------------------------
+   TRANSITIONS
+--------------------------------------------- */
+.ulde-ap-group,
+.ulde-ap-group-header,
+.ulde-ap-section,
+.ulde-ap-section-header,
+.ulde-ap-section-body,
+.ulde-ap-item,
+.ulde-ap-field {
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }

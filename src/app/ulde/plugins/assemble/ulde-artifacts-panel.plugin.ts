@@ -1,4 +1,4 @@
-// ulde/plugins/renderers/ulde-artifacts-panel.plugin.ts
+// app/ulde/plugins/assemble/ulde-artifacts-panel.plugin.ts
 
 /**
  * ULDE Artifacts Panel Plugin (Teaching Version)
@@ -20,6 +20,156 @@
 
 import { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
+import { UldeArtifacts, ArtifactsPanelSection, ArtifactsPanelGroup } from '../../core/artifacts/ulde-artifacts';
+
+
+function buildGroupedSections(artifacts: UldeArtifacts): ArtifactsPanelGroup[] {
+  return [
+    // ---------------------------------------------------------
+    // CONTENT GROUP
+    // ---------------------------------------------------------
+    {
+      id: 'content',
+      title: 'Content',
+      icon: '📄',
+      sections: [
+        {
+          id: 'frontmatter',
+          title: 'Frontmatter',
+          icon: '📝',
+          items: artifacts.frontmatter ? [artifacts.frontmatter] : []
+        },
+        {
+          id: 'toc',
+          title: 'Table of Contents',
+          icon: '🧭',
+          items: artifacts.toc ?? []
+        },
+        {
+          id: 'codeblocks',
+          title: 'Codeblocks',
+          icon: '🔧',
+          items: artifacts.codeblocks ?? []
+        },
+        {
+          id: 'containers',
+          title: 'Containers',
+          icon: '📦',
+          items: artifacts.containers ?? []
+        }
+      ]
+    },
+
+    // ---------------------------------------------------------
+    // NAVIGATION GROUP
+    // ---------------------------------------------------------
+    {
+      id: 'navigation',
+      title: 'Navigation',
+      icon: '🧭',
+      sections: [
+        {
+          id: 'anchors',
+          title: 'Anchors',
+          icon: '🪝',
+          items: artifacts.anchors ?? []
+        },
+        {
+          id: 'scrollspy',
+          title: 'ScrollSpy',
+          icon: '🎯',
+          items: artifacts.scrollspy ?? []
+        }
+      ]
+    },
+
+    // ---------------------------------------------------------
+    // DIAGNOSTICS GROUP
+    // ---------------------------------------------------------
+    {
+      id: 'diagnostics',
+      title: 'Diagnostics',
+      icon: '🧪',
+      sections: [
+        {
+          id: 'diagnostics',
+          title: 'Diagnostics',
+          icon: '🧪',
+          items: artifacts.diagnostics?.all?.() ?? []
+        }
+      ]
+    },
+
+    // ---------------------------------------------------------
+    // PERFORMANCE GROUP
+    // ---------------------------------------------------------
+    {
+      id: 'performance',
+      title: 'Performance',
+      icon: '⏱️',
+      sections: [
+        {
+          id: 'timings',
+          title: 'Timings',
+          icon: '⏱️',
+          items: artifacts.timings?.all?.() ?? []
+        }
+      ]
+    }
+  ];
+}
+function buildSections(artifacts: UldeArtifacts): ArtifactsPanelSection[] {
+  return [
+    {
+      id: 'frontmatter',
+      title: 'Frontmatter',
+      icon: '📝',
+      items: artifacts.frontmatter ? [artifacts.frontmatter] : []
+    },
+    {
+      id: 'toc',
+      title: 'Table of Contents',
+      icon: '🧭',
+      items: artifacts.toc ?? []
+    },
+    {
+      id: 'codeblocks',
+      title: 'Codeblocks',
+      icon: '🔧',
+      items: artifacts.codeblocks ?? []
+    },
+    {
+      id: 'containers',
+      title: 'Containers',
+      icon: '📦',
+      items: artifacts.containers ?? []
+    },
+    {
+      id: 'anchors',
+      title: 'Anchors',
+      icon: '🪝',
+      items: artifacts.anchors ?? []
+    },
+    {
+      id: 'scrollspy',
+      title: 'ScrollSpy',
+      icon: '🎯',
+      items: artifacts.scrollspy ?? []
+    },
+    {
+      id: 'diagnostics',
+      title: 'Diagnostics',
+      icon: '🧪',
+      items: artifacts.diagnostics?.all?.() ?? []
+    },
+    {
+      id: 'timings',
+      title: 'Timings',
+      icon: '⏱️',
+      items: artifacts.timings?.all?.() ?? []
+    }
+  ];
+}
 
 export const UldeArtifactsPanelPlugin: UldePlugin = {
   // ---------------------------------------------------------
@@ -66,106 +216,28 @@ export const UldeArtifactsPanelPlugin: UldePlugin = {
   run(ctx) {
     const { artifacts } = ctx;
 
-    // -----------------------------------------------------
-    // 1. Gather artifacts
-    // -----------------------------------------------------
-    const toc = artifacts.toc ?? [];
-    const frontmatter = artifacts.frontmatter ?? {};
-    const codeblocks = artifacts.codeblocks ?? [];
-    const containers = artifacts.containers ?? [];
-    const anchors = artifacts.anchors ?? [];
-    const scrollspy = artifacts.scrollspy ?? [];
-    const diagnostics = artifacts.diagnostics?.all?.() ?? [];
-    const timings = artifacts.timings?.all?.() ?? [];
+    // // -----------------------------------------------------
+    // // Build polished section model
+    // // -----------------------------------------------------
+    // const sections = buildSections(artifacts);
 
-    // -----------------------------------------------------
-    // 2. Build sidebar-friendly structure
-    // -----------------------------------------------------
-    //
-    // The structure is intentionally simple:
-    //
-    //   {
-    //     sections: [
-    //       { title: "Frontmatter", items: [...] },
-    //       { title: "TOC", items: [...] },
-    //       { title: "Codeblocks", items: [...] },
-    //       ...
-    //     ]
-    //   }
-    //
-    const panel = {
-      sections: [
-        {
-          title: 'Frontmatter',
-          items: Object.entries(frontmatter).map(([key, value]) => ({
-            key,
-            value,
-          })),
-        },
-        {
-          title: 'Table of Contents',
-          items: toc.map((t: any)=> ({
-            level: t.level,
-            text: t.text,
-          })),
-        },
-        {
-          title: 'Codeblocks',
-          items: codeblocks.map((cb: any) => ({
-            index: cb.index,
-            language: cb.language,
-            preview: cb.code.slice(0, 60) + (cb.code.length > 60 ? '…' : ''),
-          })),
-        },
-        {
-          title: 'Containers',
-          items: containers.map((c: any) => ({
-            index: c.index,
-            type: c.type,
-            preview: c.content.slice(0, 60) + (c.content.length > 60 ? '…' : ''),
-          })),
-        },
-        {
-          title: 'Anchors',
-          items: anchors.map((a: any) => ({
-            slug: a.slug,
-            text: a.text,
-            level: a.level,
-          })),
-        },
-        {
-          title: 'ScrollSpy',
-          items: scrollspy.map((s: any) => ({
-            slug: s.slug,
-            level: s.level,
-            active: s.active,
-          })),
-        },
-        {
-          title: 'Diagnostics',
-          items: diagnostics.map((d: any) => ({
-            plugin: d.plugin,
-            severity: d.severity,
-            message: d.message,
-          })),
-        },
-        {
-          title: 'Timings',
-          items: timings.map((t: any) => ({
-            plugin: t.plugin,
-            phase: t.phase,
-            ms: t.ms,
-          })),
-        },
-      ],
+    // // -----------------------------------------------------
+    // // Store final structured model
+    // // -----------------------------------------------------
+    // artifacts.artifactsPanel = {
+    //   sections
+    // };
+
+  // Build grouped model
+    const groups = buildGroupedSections(artifacts);
+
+    // Store final grouped model
+    artifacts.artifactsPanel = {
+      groups
     };
 
-    // -----------------------------------------------------
-    // 3. Store artifacts panel metadata
-    // -----------------------------------------------------
-    artifacts.artifactsPanel = panel;
 
-    ctx.artifacts.diagnostics.add({
+    artifacts.diagnostics.add({
       plugin: 'ulde-artifacts-panel',
       message: 'Artifacts panel model built.',
       severity: 'info',
