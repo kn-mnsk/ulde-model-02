@@ -64,6 +64,8 @@
   overflow-y: auto;
   transform: translateX(0);
   transition: transform 0.25s ease;
+  padding: 1rem;
+  z-index: 9999;
 }
 
 .dv-artifacts-panel.hidden {

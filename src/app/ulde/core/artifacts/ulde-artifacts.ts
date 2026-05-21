@@ -129,13 +129,24 @@ export interface ProfilerModel {
 // ---------------------------------------------------------
 
 export interface ArtifactsPanelSection {
+  id: string;
   title: string;
+  icon: string;
   items: any[];
 }
 
 export interface ArtifactsPanelModel {
+  groups: ArtifactsPanelGroup[];
+  // sections: ArtifactsPanelSection[];
+}
+
+export interface ArtifactsPanelGroup {
+  id: string;
+  title: string;
+  icon: string;
   sections: ArtifactsPanelSection[];
 }
+
 
 // ---------------------------------------------------------
 // MASTER ARTIFACTS INTERFACE

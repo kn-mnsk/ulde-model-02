@@ -32,10 +32,11 @@ import {
   input, signal
 } from '@angular/core';
 
-import { UldeDocsViewerBridge } from '../ulde/integration/angular/ulde-docs-viewer-bridge.service';
-import { UldeAngularService, UldeRunResult } from '../ulde/integration/angular/ulde-angular.service';
-import { TocEntry } from '../ulde/core/artifacts/ulde-artifacts';
-import { DebugOverlayModel } from '../ulde/core/artifacts/ulde-artifacts';
+import { UldeDocsViewerBridge } from '../../ulde/integration/angular/ulde-docs-viewer-bridge.service';
+import { UldeAngularService, UldeRunResult } from '../../ulde/integration/angular/ulde-angular.service';
+import { ArtifactsPanelModel, TocEntry } from '../../ulde/core/artifacts/ulde-artifacts';
+import { DebugOverlayModel } from '../../ulde/core/artifacts/ulde-artifacts';
+import { ThemeService } from '../../core/services/theme.service';
 
 
 @Component({
@@ -63,13 +64,15 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   showDebugOverlay = signal(false);
   @ViewChild('debugOverlayHost') debugOverlayHost?: ElementRef<HTMLElement>;
 
-  artifactsPanel: any = null;
+  // artifactsPanel: any = null;
+  artifactsPanel: ArtifactsPanelModel | null = null;
   showArtifacts = signal(false);
   @ViewChild('artifactsHost') artifactsHost?: ElementRef<HTMLElement>;
 
   constructor(
     private bridge: UldeDocsViewerBridge,
     private ulde: UldeAngularService,
+    private theme: ThemeService,
   ) {
     // React to ULDE pipeline results
     this.ulde.result$.subscribe(result => {
@@ -177,5 +180,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     this.showArtifacts.update(v => !v);
   }
 
+
+  onToggleTheme() {
+    this.theme.toggleTheme();
+  }
 
 }

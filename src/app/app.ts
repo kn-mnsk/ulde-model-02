@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DocsViewer } from './docs-viewer/docs-viewer';
+import { DocsViewer } from './features/docs-viewer/docs-viewer';
 
 @Component({
   selector: 'app-root',

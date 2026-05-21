@@ -13,7 +13,6 @@
  * are NOT included here — they are registered in UldeBrowserHost.
  */
 
-// import { UldePhase } from '../lifecycle/ulde-phases';
 
 // ------------------------------
 // CONTENT PHASE PLUGINS
@@ -29,9 +28,6 @@ import { UldeContainersPlugin } from '../../plugins/content/ulde-containers.plug
 // TRANSFORM PHASE PLUGINS
 // ------------------------------
 import { UldeDomInjectorPlugin } from '../../plugins/transform/ulde-dom-injector.plugin';
-// import { UldeKatexTransformPlugin } from '../../plugins/transform/ulde-katex-transform.plugin';
-// import { UldeAnchorsTransformPlugin } from '../../plugins/transform/ulde-anchors-transform.plugin';
-// import { UldeScrollspyTransformPlugin } from '../../plugins/transform/ulde-scrollspy-transform.plugin';
 
 // ------------------------------
 // DIAGNOSTICS PHASE PLUGINS
@@ -46,6 +42,7 @@ import { UldeRendererPlugin } from '../../plugins/assemble/ulde-renderer.plugin'
 import { createUldeTimelinePlugin } from '../../plugins/assemble/ulde-timeline.plugin';
 import { createUldeDebugOverlayPlugin } from '../../plugins/assemble/ulde-debug-overlay.plugin';
 import { UldeArtifactsPanelPlugin } from '../../plugins/assemble/ulde-artifacts-panel.plugin';
+import { UldeArtifactsPanelHtmlPlugin } from '../../plugins/assemble/ulde-artifacts-panel-html.plugin';
 import { createUldeProfilerPlugin } from '../../plugins/assemble/ulde-profiler.plugin';
 
 
@@ -69,9 +66,6 @@ export function createUldePluginRegistry() {
     // TRANSFORM PHASE
     // ---------------------------------------------
     UldeDomInjectorPlugin,
-    // UldeKatexTransformPlugin,
-    // UldeAnchorsTransformPlugin,
-    // UldeScrollspyTransformPlugin,
 
     // ---------------------------------------------
     // DIAGNOSTICS PHASE
@@ -82,10 +76,11 @@ export function createUldePluginRegistry() {
     // ---------------------------------------------
     // ASSEMBLE PHASE
     // ---------------------------------------------
-    UldeRendererPlugin,
-    createUldeTimelinePlugin(),
-    createUldeDebugOverlayPlugin(),
-    UldeArtifactsPanelPlugin,
-    createUldeProfilerPlugin(),
+    UldeRendererPlugin,              // produces base HTML
+    createUldeTimelinePlugin(),      // timeline model
+    createUldeDebugOverlayPlugin(),  // debug overlay model
+    UldeArtifactsPanelPlugin,        // artifacts panel model
+    UldeArtifactsPanelHtmlPlugin,    // artifacts panel HTML (NEW)
+    createUldeProfilerPlugin(),      // profiler model
   ];
 }

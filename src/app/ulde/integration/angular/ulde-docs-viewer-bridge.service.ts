@@ -9,6 +9,7 @@ import { UldeKatexBrowserPlugin } from '../../plugins/browser/ulde-katex-browser
 import { UldeAnchorsBrowserPlugin } from '../../plugins/browser/ulde-anchors-browser.plugin';
 import { UldeScrollSpyBrowserPlugin } from '../../plugins/browser/ulde-scrollspy-browser.plugin';
 import { UldeDebugOverlayBrowserPlugin } from '../../plugins/browser/ulde-debug-overlay-browser.plugin';
+import { UldeArtifactsPanelBrowserPlugin } from '../../plugins/browser/ulde-artifacts-panel-browser.plugin';
 
 
 @Injectable({ providedIn: 'root' })
@@ -22,7 +23,7 @@ export class UldeDocsViewerBridge {
     this.host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeScrollSpyBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeDebugOverlayBrowserPlugin);
-
+    this.host.registerBrowserDomPlugin(UldeArtifactsPanelBrowserPlugin);
   }
 
 
