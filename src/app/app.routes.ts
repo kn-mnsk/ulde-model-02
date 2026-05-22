@@ -4,9 +4,14 @@ import { Error } from './page-error/error';
 
 
 export const routes: Routes = [
+  // {
+  //   path: '',
+  //   redirectTo: 'configure',
+  //   pathMatch: 'full'
+  // },
   {
     path: '',
-    redirectTo: 'configure',
+    redirectTo: 'docs',
     pathMatch: 'full'
   },
 

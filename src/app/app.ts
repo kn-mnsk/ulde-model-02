@@ -4,40 +4,15 @@ import { DocsViewer } from './features/docs-viewer/docs-viewer';
 
 @Component({
   selector: 'app-root',
+  imports: [
+    DocsViewer,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('ulde-model');
+  protected readonly title = signal('ulde-model-01');
 
-  markdown =
-`
----
-title: ULDE Demo
----
-# Hello ULDE
-
-This is a **test**.
-
-\`\`\`ts
-console.log("Hello ULDE");
-\`\`\`
-
-:::info
-This is a container block.
-:::
-
-# 1️⃣ **Markdown enters the pipeline**
-
-\`\`\`mermaid
-sequenceDiagram
-    autonumber
-    participant App as App / Angular / React
-    participant Pipeline as ULDE Pipeline
-    App->>Pipeline: runUldePipeline({ content })
-\`\`\`
-
-`;
-
+  docId = 'index';
 
 }

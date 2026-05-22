@@ -41,11 +41,13 @@ export const UldeTocPlugin: UldePlugin = {
     ctx.artifacts.toc = toc;
 
     // Optional: add TOC to Artifacts Panel
-    if (ctx.artifacts.artifactsPanel) {
-      ctx.artifacts.artifactsPanel.sections.push({
-        title: 'Table of Contents',
-        items: toc,
-      });
-    }
+    /**done in app/ulde/plugins/assemble/ulde-artifacts-panel.plugin.ts */
+    // if (ctx.artifacts.artifactsPanel) {
+    //   ctx.artifacts.artifactsPanel.sections.push({
+    //     title: 'Table of Contents',
+    //     items: toc,
+    //   });
+    // }
+
   },
 };

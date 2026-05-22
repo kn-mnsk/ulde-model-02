@@ -42,11 +42,13 @@ export const UldeHeadingsCheckPlugin: UldePlugin = {
     }
 
     // Optional: add a summary section to Artifacts Panel
-    if (ctx.artifacts.artifactsPanel) {
-      ctx.artifacts.artifactsPanel.sections.push({
-        title: 'Headings Check',
-        items: toc,
-      });
-    }
+    /**done in app/ulde/plugins/assemble/ulde-artifacts-panel.plugin.ts */
+    // if (ctx.artifacts.artifactsPanel) {
+    //   ctx.artifacts.artifactsPanel.sections.push({
+    //     title: 'Headings Check',
+    //     items: toc,
+    //   });
+    // }
+
   },
 };
