@@ -38,6 +38,8 @@ import { ArtifactsPanelModel, TocEntry } from '../../ulde/core/artifacts/ulde-ar
 import { DebugOverlayModel } from '../../ulde/core/artifacts/ulde-artifacts';
 import { ThemeService } from '../../core/services/theme.service';
 
+import { isBrowser } from '../../global.utils/global.utils';
+
 
 @Component({
   selector: 'app-docs-viewer',
@@ -74,6 +76,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     private ulde: UldeAngularService,
     private theme: ThemeService,
   ) {
+
     // React to ULDE pipeline results
     this.ulde.result$.subscribe(result => {
       if (!result) return;
@@ -114,11 +117,13 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     });
 
     // Add keyboard shortcut
-    document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
-        this.showDebugOverlay.update(v => !v);
-      }
-    });
+    if (isBrowser()) {
+      document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
+          this.showDebugOverlay.update(v => !v);
+        }
+      });
+    }
 
 
     // React to external docId input
@@ -150,7 +155,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   private async loadAndRender(docId: string) {
-    const url = `/docs/${docId}.md`;
+    const url = `assets/docs/${docId}.md`;
     const markdown = await fetch(url).then(r => r.text());
     await this.ulde.renderMarkdown(markdown);
   }
@@ -182,6 +187,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
 
   onToggleTheme() {
+
     this.theme.toggleTheme();
   }
 

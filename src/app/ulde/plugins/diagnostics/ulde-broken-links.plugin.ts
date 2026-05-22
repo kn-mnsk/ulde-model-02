@@ -48,12 +48,13 @@ export const UldeBrokenLinksPlugin: UldePlugin = {
     }
 
     // 5. Add a section to the Artifacts Panel (if enabled)
-    if (ctx.artifacts.artifactsPanel) {
-      ctx.artifacts.artifactsPanel.sections.push({
-        title: 'Broken Links',
-        items: broken,
-      });
-    }
+    /**done in app/ulde/plugins/assemble/ulde-artifacts-panel.plugin.ts */
+    // if (ctx.artifacts.artifactsPanel) {
+    //   ctx.artifacts.artifactsPanel.sections.push({
+    //     title: 'Broken Links',
+    //     items: broken,
+    //   });
+    // }
 
     // Teaching note:
     // We DO NOT write arbitrary fields like artifacts.brokenLinks.

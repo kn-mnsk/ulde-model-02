@@ -13,19 +13,20 @@
       </button> -->
 
       <!-- VSCODE Style -->
-      <button class="vscode-toggle" (click)="onToggleTheme()">
-        <div class="vscode-toggle-track">
-          <div class="vscode-toggle-thumb">
-            <span class="icon sun">☀️</span>
-            <span class="icon moon">🌙</span>
+      <div class="div-button">
+        <button class="vscode-toggle" (click)="onToggleTheme()">
+          <div class="vscode-toggle-track">
+            <div class="vscode-toggle-thumb">
+              <span class="icon sun">☀️</span>
+              <span class="icon moon">🌙</span>
+            </div>
           </div>
-        </div>
-      </button>
+        </button>
 
-      <button (click)="backToIndex()">Index</button>
-      <button (click)="reloadDoc()">Reload</button>
-      <button class="dv-artifacts-toggle" (click)="toggleArtifacts()">Artifacts</button>
-
+        <button (click)="backToIndex()">Back to Index</button>
+        <button (click)="reloadDoc()">Reload</button>
+        <button class="dv-artifacts-toggle" (click)="toggleArtifacts()">Artifacts</button>
+      </div>
     </nav>
   </header>
 

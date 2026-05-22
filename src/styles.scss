@@ -376,22 +376,6 @@ body[data-theme="light"] {
    Marked
 --------------------------------------------------------- */
 
-[data-theme="light"] .backToIndex:hover,
-[data-theme="light"] .backToPrevious:hover {
-  // position: relative;
-  background-color: red !important;
-  transform: scale(1.1);
-  transition: transform 0.2s ease-in-out;
-}
-
-[data-theme="dark"] .backToIndex:hover,
-[data-theme="dark"] .backToPrevious:hover {
-  // position: relative;
-  background-color: rgb(126, 238, 122);
-  transform: scale(1.1);
-  transition: transform 0.2s ease-in-out;
-}
-
 // .docs-viewer_content table {
 //   border-collapse: collapse;
 //   width: fit-content; //100%;
@@ -588,6 +572,8 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   transition: opacity 0.25s ease;
   z-index: 99999;
 
+
+
   .dv-title {
     font-weight: 600;
     margin-bottom: 6px;
@@ -603,8 +589,45 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   }
 }
 
+/* ---------------------------------------------------------
+   docs-viewer header
+--------------------------------------------------------- */
+.dv-title {
+  font-size: 25px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+// .div-nav{
+//   border-bottom: 1px solid red;
+// }
+
+.dv-button {
+  // position: relative;
+  display: block;
+  flex-direction: column-reverse;
+  padding: 10rem;
+  border-top: 2rem solid red;
+}
+
+[data-theme="light"] .div-nav button:hover,
+[data-theme="light"] .backToPrevious:hover {
+  // position: relative;
+  background-color: rgb(238, 112, 217) !important;
+  transform: scale(1.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+[data-theme="dark"] .div-nav button:hover,
+[data-theme="dark"] .backToPrevious:hover {
+  // position: relative;
+  background-color: rgb(126, 238, 122);
+  transform: scale(1.1);
+  transition: transform 0.2s ease-in-out;
+}
+
 /* ---------------------------------------------
-   ARTIFACTS PANEL — GROUPED MODEL (FINAL)
+   ARTIFACTS PANEL — GROUPED MODEL (2026-05-21)
 --------------------------------------------- */
 
 /* Root container */
@@ -664,6 +687,12 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   font-size: 13px;
 }
 
+/* Highlighted fuzzy match */
+.ulde-ap-highlight {
+  background: rgba(255, 208, 0, 0.25);
+  border-radius: 2px;
+}
+
 /* ---------------------------------------------
    GROUPS
 --------------------------------------------- */
@@ -680,7 +709,8 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   cursor: pointer;
   background: var(--ap-header-bg);
   position: sticky;
-  top: 42px; /* below main header */
+  top: 42px;
+  /* below main header */
   z-index: 15;
   backdrop-filter: blur(6px);
 }
@@ -716,7 +746,8 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   cursor: pointer;
   font-weight: 500;
   position: sticky;
-  top: 72px; /* below group header */
+  top: 72px;
+  /* below group header */
   z-index: 10;
   background: var(--ap-bg);
   backdrop-filter: blur(4px);
@@ -801,4 +832,150 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
 .ulde-ap-item,
 .ulde-ap-field {
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+
+/* -------------------------------------------------------
+   draggable artifacts panel (2026-05-22)
+------------------------------------------------------- */
+/* Floating draggable artifacts panel container */
+.dv-artifacts-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 420px;
+  max-height: 70vh;
+  z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--ap-bg, #1e1e1e);
+  border: 1px solid var(--ap-border, #333);
+}
+
+/* Make header the drag handle */
+.dv-artifacts-panel .ulde-ap-header {
+  cursor: move;
+  border-bottom: 1px solid var(--ap-border, #333);
+}
+
+/* Optional: subtle resize affordance */
+.dv-artifacts-panel::after {
+  content: '';
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 12px;
+  height: 12px;
+  border-right: 2px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  opacity: 0.7;
+}
+
+
+/* -------------------------------------------------------
+   VS CODE–STYLE COLLAPSE / EXPAND ANIMATIONS (2026-05-22)
+------------------------------------------------------- */
+/* Smooth height animation */
+.ulde-ap-group-body,
+.ulde-ap-section-body {
+  overflow: hidden;
+  transition:
+    height 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.18s ease,
+    transform 0.22s ease;
+}
+
+/* Expanded state */
+.ulde-ap-group:not(.collapsed) .ulde-ap-group-body,
+.ulde-ap-section:not(.collapsed) .ulde-ap-section-body {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Collapsed state */
+.ulde-ap-group.collapsed .ulde-ap-group-body,
+.ulde-ap-section.collapsed .ulde-ap-section-body {
+  opacity: 0;
+  transform: translateY(-4px);
+  height: 0 !important;
+}
+
+/* Chevron rotation animation */
+.chevron {
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ulde-ap-group.collapsed .chevron,
+.ulde-ap-section.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+/* Fade + slide for items */
+.ulde-ap-item {
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.ulde-ap-item.hidden {
+  opacity: 0;
+  transform: translateX(8px);
+}
+
+
+/* ---------------------------------------------
+   LEFT-SIDE COLLAPSIBLE SIDEBAR (2026-05-22)
+--------------------------------------------- */
+
+.dv-artifacts-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 340px;
+  height: 100vh;
+  background: var(--ap-bg);
+  border-right: 1px solid var(--ap-border);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  z-index: 900;
+  transition:
+    width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Collapsed state */
+.dv-artifacts-panel.collapsed {
+  width: 0;
+  transform: translateX(-100%);
+}
+
+/* Collapse toggle button */
+.dv-artifacts-panel-toggle {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: var(--ap-header-bg);
+  border: 1px solid var(--ap-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1001;
+  transition: background 0.2s ease;
+}
+
+.dv-artifacts-panel-toggle:hover {
+  background: var(--ap-hover);
+}
+
+.dv-artifacts-panel-toggle .chevron {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dv-artifacts-panel.collapsed+.dv-artifacts-panel-toggle .chevron {
+  transform: rotate(180deg);
 }

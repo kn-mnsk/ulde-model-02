@@ -2,6 +2,7 @@
 
 
 import { Injectable } from '@angular/core';
+import { isBrowser } from '../../global.utils/global.utils';
 
 type ThemeName = 'light' | 'dark';
 
@@ -11,7 +12,9 @@ export class ThemeService {
   private readonly attrName = 'data-theme';
 
   constructor() {
-    const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'light';
+    if (!isBrowser()) return;
+    // const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'light';
+    const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'dark';
     this.applyTheme(saved, { animate: false });
   }
 
