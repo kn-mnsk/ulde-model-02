@@ -118,58 +118,6 @@ function buildGroupedSections(artifacts: UldeArtifacts): ArtifactsPanelGroup[] {
     }
   ];
 }
-function buildSections(artifacts: UldeArtifacts): ArtifactsPanelSection[] {
-  return [
-    {
-      id: 'frontmatter',
-      title: 'Frontmatter',
-      icon: '📝',
-      items: artifacts.frontmatter ? [artifacts.frontmatter] : []
-    },
-    {
-      id: 'toc',
-      title: 'Table of Contents',
-      icon: '🧭',
-      items: artifacts.toc ?? []
-    },
-    {
-      id: 'codeblocks',
-      title: 'Codeblocks',
-      icon: '🔧',
-      items: artifacts.codeblocks ?? []
-    },
-    {
-      id: 'containers',
-      title: 'Containers',
-      icon: '📦',
-      items: artifacts.containers ?? []
-    },
-    {
-      id: 'anchors',
-      title: 'Anchors',
-      icon: '🪝',
-      items: artifacts.anchors ?? []
-    },
-    {
-      id: 'scrollspy',
-      title: 'ScrollSpy',
-      icon: '🎯',
-      items: artifacts.scrollspy ?? []
-    },
-    {
-      id: 'diagnostics',
-      title: 'Diagnostics',
-      icon: '🧪',
-      items: artifacts.diagnostics?.all?.() ?? []
-    },
-    {
-      id: 'timings',
-      title: 'Timings',
-      icon: '⏱️',
-      items: artifacts.timings?.all?.() ?? []
-    }
-  ];
-}
 
 export const UldeArtifactsPanelPlugin: UldePlugin = {
   // ---------------------------------------------------------
@@ -216,18 +164,6 @@ export const UldeArtifactsPanelPlugin: UldePlugin = {
   run(ctx) {
     const { artifacts } = ctx;
 
-    // // -----------------------------------------------------
-    // // Build polished section model
-    // // -----------------------------------------------------
-    // const sections = buildSections(artifacts);
-
-    // // -----------------------------------------------------
-    // // Store final structured model
-    // // -----------------------------------------------------
-    // artifacts.artifactsPanel = {
-    //   sections
-    // };
-
   // Build grouped model
     const groups = buildGroupedSections(artifacts);
 
@@ -236,12 +172,13 @@ export const UldeArtifactsPanelPlugin: UldePlugin = {
       groups
     };
 
-
     artifacts.diagnostics.add({
       plugin: 'ulde-artifacts-panel',
       message: 'Artifacts panel model built.',
       severity: 'info',
     });
+
+    console.log(`Log: [UldeArtifactsPanelPlugin] run finished`, artifacts.artifactsPanel);
   },
 
   // ---------------------------------------------------------

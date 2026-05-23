@@ -21,24 +21,15 @@ BrowserHost DOM plugins
 Rendered document
  */
 
-
-import {
-  Component,
-  ElementRef,
-  ViewChild,
-  AfterViewInit,
-  OnDestroy,
-  effect,
-  input, signal
-} from '@angular/core';
-
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { UldeDocsViewerBridge } from '../../ulde/integration/angular/ulde-docs-viewer-bridge.service';
 import { UldeAngularService, UldeRunResult } from '../../ulde/integration/angular/ulde-angular.service';
 import { ArtifactsPanelModel, TocEntry } from '../../ulde/core/artifacts/ulde-artifacts';
 import { DebugOverlayModel } from '../../ulde/core/artifacts/ulde-artifacts';
 import { ThemeService } from '../../core/services/theme.service';
 
-import { isBrowser } from '../../global.utils/global.utils';
+// import { isBrowser } from '../../global.utils/global.utils';
 
 
 @Component({
@@ -47,11 +38,10 @@ import { isBrowser } from '../../global.utils/global.utils';
   templateUrl: './docs-viewer.html'
 })
 export class DocsViewer implements AfterViewInit, OnDestroy {
-  @ViewChild('host', { static: true })
-  hostRef!: ElementRef<HTMLElement>;
 
   $docId = input<string>('');
   $reload = input<boolean>(false);
+  private $isBrowser = signal<boolean>(false);
 
   private cleanupFn: (() => void) | null = null;
   // Internal writable signals
@@ -60,22 +50,28 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // Placeholder TOC (will be replaced by ULDE TOC later)
   toc: TocEntry[] = [];
-  activeHeading = signal<string | null>(null);
+  $activeHeading = signal<string | null>(null);
 
   debugOverlay: DebugOverlayModel | null = null;
-  showDebugOverlay = signal(false);
+  $showDebugOverlay = signal(false);
   @ViewChild('debugOverlayHost') debugOverlayHost?: ElementRef<HTMLElement>;
 
   // artifactsPanel: any = null;
   artifactsPanel: ArtifactsPanelModel | null = null;
-  showArtifacts = signal(false);
+  $showArtifacts = signal(false);
   @ViewChild('artifactsHost') artifactsHost?: ElementRef<HTMLElement>;
 
+  @ViewChild('host', { static: true })
+  hostRef!: ElementRef<HTMLElement>;
+  
   constructor(
     private bridge: UldeDocsViewerBridge,
     private ulde: UldeAngularService,
     private theme: ThemeService,
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {
+
+    this.$isBrowser.set(isPlatformBrowser(this.platformId));
 
     // React to ULDE pipeline results
     this.ulde.result$.subscribe(result => {
@@ -85,6 +81,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
       // NEW: store debug + artifacts
       this.toc = result.toc ?? [];
+      console.log(`Log: [DocsViewer] toc lenghth=`, this.toc.length, this.toc)
       this.debugOverlay = result.debugOverlay;
       // if (this.debugOverlayHost && result.debugOverlay?.html) {
       //   this.debugOverlayHost.nativeElement.innerHTML = result.debugOverlay?.html
@@ -111,16 +108,20 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
           this.$currentReload.set(true);
         },
         onScrollSpy: (id: string) => {
-          this.activeHeading.set(id);
+          this.$activeHeading.set(id);
         }
       });
     });
 
     // Add keyboard shortcut
-    if (isBrowser()) {
+    if (this.$isBrowser()) {
       document.addEventListener('keydown', (e) => {
+        // e.preventDefault();
         if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
-          this.showDebugOverlay.update(v => !v);
+          e.preventDefault();
+
+          this.$showDebugOverlay.update(v => !v);
+          console.log(`Log: [DocsViewer] keydown event`, e, `this.showDebugOverlay=`, this.$showDebugOverlay());
         }
       });
     }
@@ -138,7 +139,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // React to internal docId changes
     effect(() => {
       const id = this.$currentDocId();
-      if (id) {
+      if (id && this.$isBrowser()) {
         this.loadAndRender(id);
       }
     });
@@ -155,7 +156,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   private async loadAndRender(docId: string) {
-    const url = `assets/docs/${docId}.md`;
+    // const url = `assets/docs/${docId}.md`;
+    const url = `assets/${docId}.md`;
     const markdown = await fetch(url).then(r => r.text());
     await this.ulde.renderMarkdown(markdown);
   }
@@ -163,7 +165,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   // Navigate back to index (placeholder)
   backToIndex() {
     // Temporary: navigate to a known doc or index page
-    this.$currentDocId.set('index');
+    this.$currentDocId.set('docs/index');
+    // this.$currentDocId.set('docs/APPREADME'); // test
     this.$currentReload.set(true);
   }
 
@@ -182,7 +185,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   toggleArtifacts() {
-    this.showArtifacts.update(v => !v);
+    this.$showArtifacts.update(v => !v);
   }
 
 
