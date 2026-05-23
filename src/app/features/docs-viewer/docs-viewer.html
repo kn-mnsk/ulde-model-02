@@ -37,7 +37,7 @@
     <aside class="dv-toc">
       <ul>
         @for (item of toc; track item.slug) {
-        <li [class.active]="activeHeading() === item.slug">
+        <li [class.active]="$activeHeading() === item.slug">
           <a (click)="scrollTo(item.slug)">{{ item.text }}</a>
         </li>
         }
@@ -53,13 +53,13 @@
   </div>
 
   <!-- Debug Overlay -->
-  @if (debugOverlay && showDebugOverlay()) {
+  @if (debugOverlay && $showDebugOverlay()) {
   <div class="dv-debug-overlay" #debugOverlayHost></div>
   }
 
 
   <!-- Artifacts Panel -->
-  @if (artifactsPanel && showArtifacts()) {
+  @if (artifactsPanel && $showArtifacts()) {
   <div class="dv-artifacts-panel" #artifactsHost></div>
   }
 

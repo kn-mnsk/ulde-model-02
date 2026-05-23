@@ -705,7 +705,7 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   align-items: center;
   gap: 6px;
   padding: 8px 10px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   background: var(--ap-header-bg);
   position: sticky;
@@ -742,11 +742,16 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  // padding: 6px 12px;
+  // padding: 6px 5%;
+  padding-top: 6px;
+  padding-right: 10px;
+  padding-bottom: 6px;
+  padding-left: 5%;
   cursor: pointer;
   font-weight: 500;
   position: sticky;
-  top: 72px;
+  top: 2px;
   /* below group header */
   z-index: 10;
   background: var(--ap-bg);
@@ -782,9 +787,15 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   padding: 6px 8px;
   margin-bottom: 6px;
   border-radius: 4px;
+  // background: var(--ap-hover);
+  // transition: opacity 0.2s ease, transform 0.2s ease;
+  border-top: solid var(--ap-hover);
+}
+.ulde-ap-item:hover{
   background: var(--ap-hover);
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
+
 
 .ulde-ap-item.hidden {
   opacity: 0;

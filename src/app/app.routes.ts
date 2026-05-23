@@ -23,6 +23,13 @@ export const routes: Routes = [
   },
 
   {
+    path: 'home',
+    loadComponent: () =>
+      import('./app')
+        .then(m => m.App)
+  },
+
+  {
     path: 'docs',
     loadChildren: () =>
       import('./features/docs-viewer/docs-viewer.routes')
