@@ -61,9 +61,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   $showArtifacts = signal(false);
   @ViewChild('artifactsHost') artifactsHost?: ElementRef<HTMLElement>;
 
-  @ViewChild('host', { static: true })
-  hostRef!: ElementRef<HTMLElement>;
-  
+  // @ViewChild('docsViewer', { static: true }) hostRef!: ElementRef<HTMLElement>;
+  @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLElement>;
+
   constructor(
     private bridge: UldeDocsViewerBridge,
     private ulde: UldeAngularService,
@@ -74,6 +74,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     this.$isBrowser.set(isPlatformBrowser(this.platformId));
 
     // React to ULDE pipeline results
+    // if (this.$isBrowser()) {
     this.ulde.result$.subscribe(result => {
       if (!result) return;
 
@@ -88,29 +89,37 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       // }
 
       this.artifactsPanel = result.artifactsPanel;
-      // if (this.artifactsHost && result.artifactsPanel?.html) {
-      //   this.artifactsHost.nativeElement.innerHTML = result.artifactsPanel.html;
+
+      // if (this.artifactsHost && result.artifactsPanel) {
+      //   this.artifactsHost.nativeElement.innerHTML = result.finalHtml;
+      // }
+      // if (this.artifactsHost && result.artifactsPanel) {
+      //   this.artifactsHost.nativeElement.innerHTML =html;
       // }
 
+      // console.log(`Log: [DocsViewer] contructor result=`, result.finalHtml);
 
       if (this.cleanupFn) {
         this.cleanupFn();
         this.cleanupFn = null;
       }
 
+      console.log(`Log: [DocsViewer] result$ subscribe this.hostRef.nativeElement=`, this.hostRef.nativeElement);
+
       this.cleanupFn = this.bridge.run({
         host: this.hostRef.nativeElement,
         docId: this.$currentDocId(),
         reload: this.$currentReload(),
         html,
+        onScrollSpy: (id: string) => {
+          this.$activeHeading.set(id);
+        },
         onNavigate: (newDocId: string) => {
           this.$currentDocId.set(newDocId);
           this.$currentReload.set(true);
-        },
-        onScrollSpy: (id: string) => {
-          this.$activeHeading.set(id);
         }
       });
+
     });
 
     // Add keyboard shortcut
@@ -140,6 +149,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     effect(() => {
       const id = this.$currentDocId();
       if (id && this.$isBrowser()) {
+        // if (id && this.$isBrowser()) {
         this.loadAndRender(id);
       }
     });
@@ -159,7 +169,11 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // const url = `assets/docs/${docId}.md`;
     const url = `assets/${docId}.md`;
     const markdown = await fetch(url).then(r => r.text());
+
+
     await this.ulde.renderMarkdown(markdown);
+
+
   }
 
   // Navigate back to index (placeholder)

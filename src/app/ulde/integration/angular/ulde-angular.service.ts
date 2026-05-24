@@ -23,6 +23,9 @@ export class UldeAngularService {
   readonly result$ = this._result$.asObservable();
 
   async renderMarkdown(markdown: string): Promise<void> {
+
+    // console.log(`Log: [UldeAngularService] rrenderMarkdown raw markdown=`, markdown);
+
     const ctx = await runUldePipeline({
       content: markdown,
       config: {
@@ -32,6 +35,8 @@ export class UldeAngularService {
         highlightLanguages: ['ts', 'js', 'html'],
       },
     });
+
+      // console.log(`Log: [UldeAngularService] rrenderMarkdown runUldePipeline finished ctx=`, ctx);
 
     this._result$.next({
       finalHtml: ctx.artifacts.finalHtml ?? ctx.artifacts.html ?? '',

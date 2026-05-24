@@ -27,13 +27,22 @@ export class UldeDocsViewerBridge {
   }
 
 
-  run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string; onScrollSpy: (id: string) => void ; onNavigate?: (docId: string) => void }) {
+  run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string; onScrollSpy?: (id: string) => void ; onNavigate?: (docId: string) => void }) {
+
     const { host, html, reload, onNavigate, onScrollSpy } = options;
 
     // // TODO: resolve docId → HTML
     // const html = this.resolveHtml(docId);
     if (reload) {
       host.innerHTML = '';
+    }
+
+    // listen for ULDE scrollspy events
+    if (onScrollSpy) {
+    // if (options.onScrollSpy) {
+      host.addEventListener('ulde:scrollspy', (e: any) => {
+        onScrollSpy(e.detail.id);
+      });
     }
 
     // Listen for ULDE navigation events
@@ -43,11 +52,6 @@ export class UldeDocsViewerBridge {
       });
     }
 
-    if (options.onScrollSpy) {
-      host.addEventListener('ulde:scrollspy', (e: any) => {
-        options.onScrollSpy(e.detail.id);
-      });
-    }
     // This returns a Promise<void>
     this.host.run(host, html);
 
