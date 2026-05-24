@@ -1,5 +1,6 @@
 // app/ulde/plugins/browser/ulde-artifacts-panel-browser.plugin.ts (2026-05-21)
 
+import { ɵɵresolveWindow } from '@angular/core';
 import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
 
 export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
@@ -112,12 +113,21 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
 
     // Move ULDE-generated HTML into Angular host container
     const embedded = container.querySelector('.ulde-artifacts-panel-content');
+
+    // console.log(`Log: [UldeArtifactsPanelBrowserPlugin] embedded=`, embedded);
     if (!embedded) return;
 
+    // console.log(`Log: [UldeArtifactsPanelBrowserPlugin] document=`, document);
+
+    // const host = document.createElement('div');
+
     const host = container.querySelector('.dv-artifacts-panel') as HTMLElement | null;
+
     if (!host) return;
 
     host.appendChild(embedded);
+
+    console.log(`Log: [UldeArtifactsPanelBrowserPlugin] host=`, host);
 
     // -----------------------------------------------------
     // Draggable floating panel
@@ -179,6 +189,8 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
         sidebar.classList.toggle('collapsed');
       });
     }
+
+
 
   }
 

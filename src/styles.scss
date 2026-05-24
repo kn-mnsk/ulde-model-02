@@ -860,6 +860,7 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   border-radius: 8px;
   overflow: hidden;
+  // background: var(--ap-hover);
   background: var(--ap-bg, #1e1e1e);
   border: 1px solid var(--ap-border, #333);
 }
@@ -941,10 +942,12 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
 
 .dv-artifacts-panel {
   position: fixed;
-  top: 0;
+  top: 0px;
   left: 0;
   width: 340px;
   height: 100vh;
+  padding-top: 25px;
+  // background: var(--ap-hover);
   background: var(--ap-bg);
   border-right: 1px solid var(--ap-border);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
@@ -966,8 +969,9 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   position: fixed;
   top: 12px;
   left: 12px;
-  width: 28px;
-  height: 28px;
+  width: auto;//50px;
+  height: auto;//28px;
+  color: var(--ap-fg);
   border-radius: 4px;
   background: var(--ap-header-bg);
   border: 1px solid var(--ap-border);

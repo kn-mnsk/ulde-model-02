@@ -27,7 +27,7 @@ export const UldeArtifactsPanelHtmlPlugin: UldePlugin = {
     // -----------------------------------------------------
     // Render grouped HTML
     // -----------------------------------------------------
-    const html = `
+    const artifactsPpanelHtml = `
       <div class="ulde-artifacts-panel-content">
 
         <header class="ulde-ap-header">
@@ -46,7 +46,8 @@ export const UldeArtifactsPanelHtmlPlugin: UldePlugin = {
       </div>
     `;
 
-    ctx.artifacts.finalHtml = (ctx.artifacts.finalHtml ?? '') + html;
+    ctx.artifacts.finalHtml = (ctx.artifacts.finalHtml ?? '') + artifactsPpanelHtml;
+
 
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-artifacts-panel-html',
