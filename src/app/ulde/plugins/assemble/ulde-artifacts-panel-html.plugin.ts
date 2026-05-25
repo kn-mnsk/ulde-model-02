@@ -33,6 +33,7 @@ export const UldeArtifactsPanelHtmlPlugin: UldePlugin = {
         <header class="ulde-ap-header">
           <h2>Artifacts</h2>
           <input
+            name="input"
             type="text"
             class="ulde-ap-search"
             placeholder="Search artifacts…"
