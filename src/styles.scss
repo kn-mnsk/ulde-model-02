@@ -994,3 +994,10 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
 .dv-artifacts-panel.collapsed+.dv-artifacts-panel-toggle .chevron {
   transform: rotate(180deg);
 }
+
+
+.dv-artifacts-panel.hidden {
+  display: none;
+  // opacity: 0;
+  // transform: translateX(8px);
+}

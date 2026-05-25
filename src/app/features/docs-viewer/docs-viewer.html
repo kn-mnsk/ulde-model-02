@@ -54,21 +54,21 @@
   </div>
 
   <!-- Debug Overlay -->
-  @if (debugOverlay && $showDebugOverlay()) {
+  <!-- @if (debugOverlay && $showDebugOverlay()) {
   <div class="dv-debug-overlay" #debugOverlayHost></div>
-  }
-
+  } -->
+  <div class="dv-debug-overlay hidden" #debugOverlayHost></div>
 
   <!-- Artifacts Panel -->
-  @if (artifactsPanel && $showArtifacts()) {
+  <!-- @if (artifactsPanel && $showArtifacts()) {
   <div class="dv-artifacts-panel" #artifactsHost>
     <p>Working!</p>
   </div>
-  }
+  } -->
 
-  <!-- <div class="dv-artifacts-panel" #artifactsHost [hidden]="(artifactsPanel===null && $showArtifacts())">
+  <div class="dv-artifacts-panel hidden" #artifactsHost>
     <p>Working!</p>
-  </div> -->
+  </div>
 
 
 </div>

@@ -84,6 +84,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       this.toc = result.toc ?? [];
       console.log(`Log: [DocsViewer] toc lenghth=`, this.toc.length, this.toc)
       this.debugOverlay = result.debugOverlay;
+      console.log(`Log: [DocsViewer] contructor debugOverlay=`, result.debugOverlay);
+
       // if (this.debugOverlayHost && result.debugOverlay?.html) {
       //   this.debugOverlayHost.nativeElement.innerHTML = result.debugOverlay?.html
       // }
@@ -126,11 +128,12 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     if (this.$isBrowser()) {
       document.addEventListener('keydown', (e) => {
         // e.preventDefault();
-        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
+        if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'd') {
           e.preventDefault();
-
+          const debugOverlay = document.querySelector('.dv-debug-overlay') as HTMLElement | null;
+          debugOverlay?.classList.toggle('hidden');
           this.$showDebugOverlay.update(v => !v);
-          console.log(`Log: [DocsViewer] keydown event`, e, `this.showDebugOverlay=`, this.$showDebugOverlay());
+          console.log(`Log: [DocsViewer] keydown event`, e, `this.debugOverlay=`, debugOverlay);
         }
       });
     }
@@ -199,6 +202,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   toggleArtifacts() {
+    const artifactsPanel = document.querySelector('.dv-artifacts-panel') as HTMLElement | null;
+    artifactsPanel?.classList.toggle('hidden');
     this.$showArtifacts.update(v => !v);
   }
 

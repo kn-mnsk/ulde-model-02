@@ -111,7 +111,7 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
     }
 
 
-    // Move ULDE-generated HTML into Angular host container
+    // Move ULDE-generated artifacts html into Angular host container
     const embedded = container.querySelector('.ulde-artifacts-panel-content');
 
     // console.log(`Log: [UldeArtifactsPanelBrowserPlugin] embedded=`, embedded);
@@ -121,13 +121,14 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
 
     // const host = document.createElement('div');
 
-    const host = container.querySelector('.dv-artifacts-panel') as HTMLElement | null;
-
+    const host = document.querySelector('.dv-artifacts-panel') as HTMLElement | null;
+    // const host = container.querySelector('.dv-artifacts-panel') as HTMLElement | null;
+    // console.log(`Log: [UldeArtifactsPanelBrowserPlugin] host=`, host);
     if (!host) return;
 
     host.appendChild(embedded);
 
-    console.log(`Log: [UldeArtifactsPanelBrowserPlugin] host=`, host);
+    // console.log(`Log: [UldeArtifactsPanelBrowserPlugin] host=`, host);
 
     // -----------------------------------------------------
     // Draggable floating panel
