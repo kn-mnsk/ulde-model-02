@@ -945,6 +945,7 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   top: 0px;
   left: 0;
   width: 340px;
+  // height: auto;
   height: 100vh;
   padding-top: 25px;
   // background: var(--ap-hover);
@@ -997,6 +998,47 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
 
 
 .dv-artifacts-panel.hidden {
+  display: none;
+  // opacity: 0;
+  // transform: translateX(8px);
+}
+
+
+
+/* ---------------------------------------------
+   Debug Overlay — (2026-05-21)
+--------------------------------------------- */
+/* Root container */
+.ulde-debug-overlay-content {
+  font-family: system-ui, sans-serif;
+  padding: 0;
+  margin: 0;
+  color: var(--ap-fg);
+  background: var(--ap-bg);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.dv-debug-overlay {
+  position: fixed;
+  top: 0px;
+  left: 0;
+  width: 340px;
+  // height: auto;
+  height: auto;
+  padding-top: 25px;
+  // background: var(--ap-hover);
+  background: var(--ap-bg);
+  border-right: 1px solid var(--ap-border);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
+  // overflow: hidden;
+  z-index: 1200;
+  transition:
+    width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dv-debug-overlay.hidden {
   display: none;
   // opacity: 0;
   // transform: translateX(8px);

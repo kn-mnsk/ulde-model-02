@@ -21,7 +21,10 @@ export const UldeTocPlugin: UldePlugin = {
   },
 
   run(ctx: UldePhaseContext): void {
-    const lines = ctx.content.split('\n');
+
+    const { content, artifacts } = ctx;
+
+    const lines = content.split('\n');
     const toc: TocEntry[] = [];
 
     for (const line of lines) {
@@ -38,7 +41,13 @@ export const UldeTocPlugin: UldePlugin = {
       toc.push({ level, text, slug });
     }
 
-    ctx.artifacts.toc = toc;
+    artifacts.toc = toc;
+
+    artifacts.diagnostics.add({
+      plugin: 'ulde-toc',
+      message: `TOC parsed with ${toc.length} toc(s).`,
+      severity: 'info',
+    });
 
     // Optional: add TOC to Artifacts Panel
     /**done in app/ulde/plugins/assemble/ulde-artifacts-panel.plugin.ts */

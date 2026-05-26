@@ -22,6 +22,7 @@
 
 import { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
+import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
 
 export const UldeFrontmatterPlugin: UldePlugin = {
   // ---------------------------------------------------------
@@ -53,7 +54,7 @@ export const UldeFrontmatterPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 4. Optional hook: beforeRun
   // ---------------------------------------------------------
-  beforeRun(ctx) {
+  beforeRun(ctx: UldePhaseContext) {
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-frontmatter',
       message: 'Frontmatter plugin starting…',
@@ -64,7 +65,7 @@ export const UldeFrontmatterPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 5. Main plugin logic
   // ---------------------------------------------------------
-  run(ctx) {
+  run(ctx: UldePhaseContext) {
     const { artifacts } = ctx;
 
     let markdown = artifacts.content;
@@ -150,7 +151,7 @@ export const UldeFrontmatterPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 6. Optional hook: afterRun
   // ---------------------------------------------------------
-  afterRun(ctx) {
+  afterRun(ctx: UldePhaseContext) {
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-frontmatter',
       message: 'Frontmatter plugin finished.',

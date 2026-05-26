@@ -3,66 +3,76 @@ import { UldePhase } from '../../core/lifecycle/ulde-phases';
 import type { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
 import type { ProfilerModel, ProfilerPhaseEntry, MemorySnapshot } from '../../core/artifacts/ulde-artifacts';
 
-export function createUldeProfilerPlugin(): UldePlugin {
-  return {
-    meta: {
-      name: 'ulde-profiler',
-      version: '1.0.0',
-      description: 'Aggregates profiling information across phases.',
-    },
-    phase: UldePhase.DIAGNOSTICS,
+export const UldeProfilerPlugin: UldePlugin = {
 
-    run(ctx: UldePhaseContext) {
-      const { artifacts, config } = ctx;
+  meta: {
+    name: 'ulde-profiler',
+    version: '1.0.0',
+    description: 'Aggregates profiling information across phases.',
+  },
 
-      if (!config.enableProfiler) return;
+  phase: UldePhase.ASSEMBLE,
+  // phase: UldePhase.DIAGNOSTICS,
 
-      const timings = artifacts.timings.all();
+  run(ctx: UldePhaseContext) {
+    const { artifacts, config } = ctx;
 
-      const phasesMap = new Map<string, { totalMs: number; plugins: Map<string, number> }>();
+    if (!config.enableProfiler) return;
 
-      for (const t of timings) {
-        if (!phasesMap.has(t.phase)) {
-          phasesMap.set(t.phase, {
-            totalMs: 0,
-            plugins: new Map(),
-          });
-        }
-        const phase = phasesMap.get(t.phase)!;
-        phase.totalMs += t.ms;
-        phase.plugins.set(
-          t.plugin,
-          (phase.plugins.get(t.plugin) ?? 0) + t.ms
-        );
+    const timings = artifacts.timings.all();
+
+    const phasesMap = new Map<string, { totalMs: number; plugins: Map<string, number> }>();
+
+    for (const t of timings) {
+      if (!phasesMap.has(t.phase)) {
+        phasesMap.set(t.phase, {
+          totalMs: 0,
+          plugins: new Map(),
+        });
       }
-
-      const phases: ProfilerPhaseEntry[] = Array.from(phasesMap.entries()).map(
-        ([phase, data]) => ({
-          phase,
-          totalMs: data.totalMs,
-          overheadMs: 0,
-          plugins: Array.from(data.plugins.entries()).map(
-            ([plugin, ms]) => ({ plugin, ms })
-          ),
-        })
+      const phase = phasesMap.get(t.phase)!;
+      phase.totalMs += t.ms;
+      phase.plugins.set(
+        t.plugin,
+        (phase.plugins.get(t.plugin) ?? 0) + t.ms
       );
+    }
 
-      const memorySnapshots: MemorySnapshot[] = [];
+    const phases: ProfilerPhaseEntry[] = Array.from(phasesMap.entries()).map(
+      ([phase, data]) => ({
+        phase,
+        totalMs: data.totalMs,
+        overheadMs: 0,
+        plugins: Array.from(data.plugins.entries()).map(
+          ([plugin, ms]) => ({ plugin, ms })
+        ),
+      })
+    );
 
-      const summary: ProfilerModel['summary'] = {
-        totalPlugins: new Set(timings.map(t => t.plugin)).size,
-        totalPhases: phases.length,
-        totalTimeMs: timings.reduce((sum, t) => sum + t.ms, 0),
-      };
+    const memorySnapshots: MemorySnapshot[] = [];
 
-      const profiler: ProfilerModel = {
-        phases,
-        memorySnapshots,
-        anomalies: [],
-        summary,
-      };
+    const summary: ProfilerModel['summary'] = {
+      totalPlugins: new Set(timings.map(t => t.plugin)).size,
+      totalPhases: phases.length,
+      totalTimeMs: timings.reduce((sum, t) => sum + t.ms, 0),
+    };
 
-      artifacts.profiler = profiler;
-    },
-  };
-}
+    const profiler: ProfilerModel = {
+      phases,
+      memorySnapshots,
+      anomalies: [],
+      summary,
+    };
+
+    artifacts.profiler = profiler;
+
+
+    artifacts.diagnostics.add({
+      plugin: 'ulde-profiler',
+      message: 'Profiler model built.',
+      severity: 'info',
+    });
+
+  },
+};
+

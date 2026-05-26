@@ -27,11 +27,14 @@ export const UldeBrokenLinksPlugin: UldePlugin = {
   },
 
   run(ctx: UldePhaseContext): void {
+    const { config, artifacts } = ctx;
+
+
     // 1. Read config safely (typed)
-    const validDocs = ctx.config.validDocs ?? [];
+    const validDocs = config.validDocs ?? [];
 
     // 2. Read links from artifacts (typed)
-    const links = ctx.artifacts.links ?? [];
+    const links = artifacts.links ?? [];
 
     // 3. Compute broken links
     const broken = links.filter(link => !validDocs.includes(link.href));
