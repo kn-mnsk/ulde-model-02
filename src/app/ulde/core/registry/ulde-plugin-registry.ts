@@ -18,10 +18,10 @@
 // CONTENT PHASE PLUGINS
 // ------------------------------
 import { UldeFrontmatterPlugin } from '../../plugins/content/ulde-frontmatter.plugin';
-import { createUldeLinksPlugin } from '../../plugins/content/ulde-links.plugin';
+import { UldeLinksPlugin } from '../../plugins/content/ulde-links.plugin';
 import { UldeTocPlugin } from '../../plugins/content/ulde-toc.plugin';
 import { UldeCodeblocksPlugin } from '../../plugins/content/ulde-codeblocks.plugin';
-import { createUldeSyntaxHighlightPlugin } from '../../plugins/content/ulde-syntax-highlight.plugin';
+import { UldeSyntaxHighlightPlugin } from '../../plugins/content/ulde-syntax-highlight.plugin';
 import { UldeContainersPlugin } from '../../plugins/content/ulde-containers.plugin';
 
 // ------------------------------
@@ -39,11 +39,12 @@ import { UldeBrokenLinksPlugin } from '../../plugins/diagnostics/ulde-broken-lin
 // ASSEMBLE PHASE PLUGINS
 // ------------------------------
 import { UldeRendererPlugin } from '../../plugins/assemble/ulde-renderer.plugin';
-import { createUldeTimelinePlugin } from '../../plugins/assemble/ulde-timeline.plugin';
-import { createUldeDebugOverlayPlugin } from '../../plugins/assemble/ulde-debug-overlay.plugin';
+import { UldeTimelinePlugin } from '../../plugins/assemble/ulde-timeline.plugin';
+import { UldeDebugOverlayPlugin } from '../../plugins/assemble/ulde-debug-overlay.plugin';
 import { UldeArtifactsPanelPlugin } from '../../plugins/assemble/ulde-artifacts-panel.plugin';
 import { UldeArtifactsPanelHtmlPlugin } from '../../plugins/assemble/ulde-artifacts-panel-html.plugin';
-import { createUldeProfilerPlugin } from '../../plugins/assemble/ulde-profiler.plugin';
+import { UldeProfilerPlugin } from '../../plugins/assemble/ulde-profiler.plugin';
+import { UldeDebugOverlayHtmlPlugin } from '../../plugins/assemble/ulde-debug-overlay-html.plugin';
 
 
 // -----------------------------------------------------
@@ -56,10 +57,10 @@ export function createUldePluginRegistry() {
     // CONTENT PHASE
     // ---------------------------------------------
     UldeFrontmatterPlugin,
-    createUldeLinksPlugin(),
+    UldeLinksPlugin,
     UldeTocPlugin,
     UldeCodeblocksPlugin,
-    createUldeSyntaxHighlightPlugin(),
+    UldeSyntaxHighlightPlugin,
     UldeContainersPlugin,
 
     // ---------------------------------------------
@@ -77,10 +78,19 @@ export function createUldePluginRegistry() {
     // ASSEMBLE PHASE
     // ---------------------------------------------
     UldeRendererPlugin,              // produces base HTML
-    createUldeTimelinePlugin(),      // timeline model
-    createUldeDebugOverlayPlugin(),  // debug overlay model
+    UldeTimelinePlugin,             // timeline model
+    UldeProfilerPlugin,             // profiler model
+    UldeDebugOverlayPlugin,          // debug overlay model
     UldeArtifactsPanelPlugin,        // artifacts panel model
+    UldeDebugOverlayHtmlPlugin,     // debug overlay HTML (NEW)
     UldeArtifactsPanelHtmlPlugin,    // artifacts panel HTML (NEW)
-    createUldeProfilerPlugin(),      // profiler model
+
+    // UldeRendererPlugin,              // produces base HTML
+    // createUldeTimelinePlugin(),      // timeline model
+    // UldeDebugOverlayPlugin,          // debug overlay model
+    // UldeDebugOverlayHtmlPlugin,      // debug overlay HTML (NEW)
+    // UldeArtifactsPanelPlugin,        // artifacts panel model
+    // UldeArtifactsPanelHtmlPlugin,    // artifacts panel HTML (NEW)
+    // UldeProfilerPlugin,              // profiler model
   ];
 }

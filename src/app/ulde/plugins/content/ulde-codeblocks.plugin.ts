@@ -23,6 +23,7 @@
 import { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
 import { CodeblockEntry } from '../../core/artifacts/ulde-artifacts';
+import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
 
 export const UldeCodeblocksPlugin: UldePlugin = {
   // ---------------------------------------------------------
@@ -54,7 +55,7 @@ export const UldeCodeblocksPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 4. Optional hook: beforeRun
   // ---------------------------------------------------------
-  beforeRun(ctx) {
+  beforeRun(ctx: UldePhaseContext) {
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-codeblocks',
       message: 'Codeblocks plugin starting…',
@@ -65,7 +66,7 @@ export const UldeCodeblocksPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 5. Main plugin logic
   // ---------------------------------------------------------
-  run(ctx) {
+  run(ctx: UldePhaseContext) {
     const { artifacts } = ctx;
 
     const markdown = artifacts.content;
@@ -121,7 +122,7 @@ export const UldeCodeblocksPlugin: UldePlugin = {
 
     artifacts.diagnostics.add({
       plugin: 'ulde-codeblocks',
-      message: `Found ${codeblocks.length} code block(s).`,
+      message: `Codeblock(s) Found ${codeblocks.length} code block(s).`,
       severity: 'info',
     });
   },
@@ -129,7 +130,7 @@ export const UldeCodeblocksPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 6. Optional hook: afterRun
   // ---------------------------------------------------------
-  afterRun(ctx) {
+  afterRun(ctx: UldePhaseContext) {
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-codeblocks',
       message: 'Codeblocks plugin finished.',

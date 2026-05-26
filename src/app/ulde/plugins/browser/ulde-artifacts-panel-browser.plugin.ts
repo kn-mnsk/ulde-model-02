@@ -114,7 +114,7 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
     // Move ULDE-generated artifacts html into Angular host container
     const embedded = container.querySelector('.ulde-artifacts-panel-content');
 
-    // console.log(`Log: [UldeArtifactsPanelBrowserPlugin] embedded=`, embedded);
+    console.log(`Log: [UldeArtifactsPanelBrowserPlugin] \nembedded=`, embedded, `\ncontainer=`, container);
     if (!embedded) return;
 
     // console.log(`Log: [UldeArtifactsPanelBrowserPlugin] document=`, document);
@@ -190,8 +190,6 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
         sidebar.classList.toggle('collapsed');
       });
     }
-
-
 
   }
 

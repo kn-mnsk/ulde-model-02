@@ -20,7 +20,9 @@ export const UldeHeadingsCheckPlugin: UldePlugin = {
   },
 
   run(ctx: UldePhaseContext): void {
-    const toc = ctx.artifacts.toc ?? [];
+    const { artifacts } = ctx;
+
+    const toc = artifacts.toc ?? [];
     if (toc.length === 0) return;
 
     let lastLevel = toc[0].level;
@@ -35,7 +37,7 @@ export const UldeHeadingsCheckPlugin: UldePlugin = {
           severity: 'warning',
         };
 
-        ctx.artifacts.diagnostics.add(diagnostic);
+        artifacts.diagnostics.add(diagnostic);
       }
 
       lastLevel = entry.level;

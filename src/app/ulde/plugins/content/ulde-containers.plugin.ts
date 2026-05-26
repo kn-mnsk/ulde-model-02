@@ -30,6 +30,8 @@
 
 import { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
+import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
+
 
 export const UldeContainersPlugin: UldePlugin = {
   // ---------------------------------------------------------
@@ -61,7 +63,7 @@ export const UldeContainersPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 4. Optional hook: beforeRun
   // ---------------------------------------------------------
-  beforeRun(ctx) {
+  beforeRun(ctx: UldePhaseContext) {
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-containers',
       message: 'Containers plugin starting…',
@@ -72,7 +74,7 @@ export const UldeContainersPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 5. Main plugin logic
   // ---------------------------------------------------------
-  run(ctx) {
+  run(ctx: UldePhaseContext) {
     const { artifacts } = ctx;
 
     const markdown = artifacts.content;
@@ -134,7 +136,7 @@ export const UldeContainersPlugin: UldePlugin = {
 
     artifacts.diagnostics.add({
       plugin: 'ulde-containers',
-      message: `Found ${containers.length} container block(s).`,
+      message: `Container(s) Found ${containers.length} container block(s).`,
       severity: 'info',
     });
   },
@@ -142,7 +144,7 @@ export const UldeContainersPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 6. Optional hook: afterRun
   // ---------------------------------------------------------
-  afterRun(ctx) {
+  afterRun(ctx: UldePhaseContext) {
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-containers',
       message: 'Containers plugin finished.',

@@ -142,6 +142,7 @@ export const UldeArtifactsPanelPlugin: UldePlugin = {
   // ---------------------------------------------------------
   capabilities: {
     transformsContent: false,
+    // usesDiagnostics: true,
     usesDiagnostics: false,
     usesDom: false,
     producesRenderArtifacts: true, // produces artifacts panel metadata
@@ -162,9 +163,11 @@ export const UldeArtifactsPanelPlugin: UldePlugin = {
   // 5. Main plugin logic
   // ---------------------------------------------------------
   run(ctx) {
-    const { artifacts } = ctx;
+    const { artifacts, config } = ctx;
 
-  // Build grouped model
+    if (!config.enableArtifactsPanel) return;
+
+    // Build grouped model
     const groups = buildGroupedSections(artifacts);
 
     // Store final grouped model
@@ -178,7 +181,7 @@ export const UldeArtifactsPanelPlugin: UldePlugin = {
       severity: 'info',
     });
 
-    // console.log(`Log: [UldeArtifactsPanelPlugin] run finished`, artifacts.artifactsPanel);
+    console.log(`Log: [UldeArtifactsPanelPlugin] run finished`, artifacts.artifactsPanel);
   },
 
   // ---------------------------------------------------------

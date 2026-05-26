@@ -83,6 +83,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       // NEW: store debug + artifacts
       this.toc = result.toc ?? [];
       console.log(`Log: [DocsViewer] toc lenghth=`, this.toc.length, this.toc)
+
       this.debugOverlay = result.debugOverlay;
       console.log(`Log: [DocsViewer] contructor debugOverlay=`, result.debugOverlay);
 

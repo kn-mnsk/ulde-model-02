@@ -21,7 +21,7 @@
 import MarkdownIt from 'markdown-it';
 import { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
-
+import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
 
 const md = new MarkdownIt({
   html: true,
@@ -59,7 +59,7 @@ export const UldeRendererPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 4. Optional hook: beforeRun
   // ---------------------------------------------------------
-  beforeRun(ctx) {
+  beforeRun(ctx: UldePhaseContext) {
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-renderer',
       message: 'Renderer plugin starting…',
@@ -70,16 +70,20 @@ export const UldeRendererPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 5. Main plugin logic
   // ---------------------------------------------------------
-  run(ctx) {
+  run(ctx: UldePhaseContext) {
+    const { artifacts } = ctx;
 
-    const markdown = ctx.artifacts.content;
+    const markdown = artifacts.content;
 
     // Markdown → HTML
     const html = md.render(markdown);
 
-    ctx.artifacts.html = html;
-    ctx.artifacts.finalHtml = html;
-    ctx.artifacts.diagnostics.add({
+    artifacts.html = html;
+    artifacts.finalHtml = html;
+
+    // console.log(`Log: [UldeRendererPlugin] html=`, html);
+
+    artifacts.diagnostics.add({
       plugin: 'ulde-renderer',
       message: 'HTML rendering complete.',
       severity: 'info',
@@ -89,7 +93,7 @@ export const UldeRendererPlugin: UldePlugin = {
   // ---------------------------------------------------------
   // 6. Optional hook: afterRun
   // ---------------------------------------------------------
-  afterRun(ctx) {
+  afterRun(ctx: UldePhaseContext) {
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-renderer',
       message: 'Renderer plugin finished.',
