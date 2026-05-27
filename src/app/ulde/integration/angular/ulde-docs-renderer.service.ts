@@ -1,7 +1,7 @@
 // app/ulde/integration/angular/ulde-docs-renderer.service.ts
 
 import { Injectable } from '@angular/core';
-import { runUldePipeline } from '../../core/lifecycle/ulde-orchestrator';
+import { runUldeStringPluginPipeline } from '../../core/lifecycle/ulde-orchestrator';
 
 @Injectable({ providedIn: 'root' })
 export class UldeDocsRendererService {
@@ -17,7 +17,7 @@ export class UldeDocsRendererService {
     });
 
     // 3. Run ULDE pipeline
-    const ctx = await runUldePipeline({
+    const ctx = await runUldeStringPluginPipeline({
       content: markdown
     });
 

@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';;
-import { PageNotFound } from './page-not-found/page-not-found';
-import { Error } from './page-error/error';
+// import { PageNotFound } from './page-not-found/page-not-found';
+// import { Error } from './page-error/error';
 
 
 export const routes: Routes = [
@@ -42,10 +42,14 @@ export const routes: Routes = [
       import('./ulde-viewer/ulde-viewer')
         .then(m => m.UldeViewer)
   },
+  {
+    path: 'PageNotFound',
+    loadComponent: () => import('./page-not-found/page-not-found').then(m => m.PageNotFound)
+  },
 
   {
     path: '**',
-    redirectTo: 'configure'
+    redirectTo: 'PageNotFound'
   }
 ];
 

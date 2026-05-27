@@ -2,7 +2,7 @@
 
 import { UldePhase } from './ulde-phases';
 import { UldePhaseContext } from './ulde-phase-context';
-import { createUldePluginRegistry } from '../registry/ulde-plugin-registry';
+import { createUldeStringPluginRegistry } from '../registry/ulde-plugin-registry';
 import { UldeRegistry } from '../registry/ulde-registry';
 import { UldeConfig } from '../config/ulde-config';
 
@@ -25,7 +25,7 @@ export interface UldePipelineInput {
  *
  * Browser DOM plugins are NOT executed here.
  */
-export async function runUldePipeline(
+export async function runUldeStringPluginPipeline(
   input: UldePipelineInput
 ): Promise<UldePhaseContext> {
 
@@ -33,7 +33,7 @@ export async function runUldePipeline(
   // 1. Build plugin registry
   // ---------------------------------------------------------
   const registry = new UldeRegistry();
-  const plugins = createUldePluginRegistry();
+  const plugins = createUldeStringPluginRegistry();
 
   for (const plugin of plugins) {
     registry.register(plugin);

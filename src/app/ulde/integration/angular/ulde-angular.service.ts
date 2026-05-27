@@ -2,7 +2,7 @@
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { runUldePipeline } from '../../core/lifecycle/ulde-orchestrator';
+import { runUldeStringPluginPipeline } from '../../core/lifecycle/ulde-orchestrator';
 import { TocEntry } from '../../core/artifacts/ulde-artifacts';
 
 import {
@@ -26,7 +26,7 @@ export class UldeAngularService {
 
     // console.log(`Log: [UldeAngularService] rrenderMarkdown raw markdown=`, markdown);
 
-    const ctx = await runUldePipeline({
+    const ctx = await runUldeStringPluginPipeline({
       content: markdown,
       config: {
         enableProfiler: true,

@@ -31,6 +31,11 @@
     </nav>
   </header>
 
+  <div class="progress-bar">
+    <!-- <div class="progress-fill" [style.width.%]="scrollService.scrollPercent()"></div> -->
+  </div>
+
+
   <div class="dv-body">
 
     <!-- Table of Contents -->
@@ -57,9 +62,7 @@
   <!-- @if (debugOverlay && $showDebugOverlay()) {
   <div class="dv-debug-overlay" #debugOverlayHost></div>
   } -->
-  <div class="dv-debug-overlay hidden" #debugOverlayHost>
-    <p>Working!</p>
-  </div>
+  <div class="dv-debug-overlay hidden" #debugOverlayHost></div>
 
   <!-- Artifacts Panel -->
   <!-- @if (artifactsPanel && $showArtifacts()) {
@@ -68,9 +71,7 @@
   </div>
   } -->
 
-  <div class="dv-artifacts-panel hidden" #artifactsHost>
-    <p>Working!</p>
-  </div>
+  <div class="dv-artifacts-panel hidden" #artifactsHost></div>
 
 
 </div>

@@ -28,6 +28,7 @@ import { UldeAngularService, UldeRunResult } from '../../ulde/integration/angula
 import { ArtifactsPanelModel, TocEntry } from '../../ulde/core/artifacts/ulde-artifacts';
 import { DebugOverlayModel } from '../../ulde/core/artifacts/ulde-artifacts';
 import { ThemeService } from '../../core/services/theme.service';
+import { abort } from 'process';
 
 // import { isBrowser } from '../../global.utils/global.utils';
 
@@ -79,13 +80,13 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       if (!result) return;
 
       const html = result.finalHtml;
-
+      // console.log(`Log: [DocsViewer] contructor  result.finalHtml=`, html);
       // NEW: store debug + artifacts
       this.toc = result.toc ?? [];
       console.log(`Log: [DocsViewer] toc lenghth=`, this.toc.length, this.toc)
 
       this.debugOverlay = result.debugOverlay;
-      console.log(`Log: [DocsViewer] contructor debugOverlay=`, result.debugOverlay);
+      // console.log(`Log: [DocsViewer] contructor debugOverlay=`, result.debugOverlay);
 
       // if (this.debugOverlayHost && result.debugOverlay?.html) {
       //   this.debugOverlayHost.nativeElement.innerHTML = result.debugOverlay?.html
@@ -107,7 +108,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
         this.cleanupFn = null;
       }
 
-      console.log(`Log: [DocsViewer] result$ subscribe this.hostRef.nativeElement=`, this.hostRef.nativeElement);
+      // console.log(`Log: [DocsViewer] result$ subscribe this.hostRef.nativeElement=`, this.hostRef.nativeElement);
 
       this.cleanupFn = this.bridge.run({
         host: this.hostRef.nativeElement,
@@ -134,7 +135,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
           const debugOverlay = document.querySelector('.dv-debug-overlay') as HTMLElement | null;
           debugOverlay?.classList.toggle('hidden');
           this.$showDebugOverlay.update(v => !v);
-          console.log(`Log: [DocsViewer] keydown event`, e, `this.debugOverlay=`, debugOverlay);
+          // console.log(`Log: [DocsViewer] keydown event`, e, `this.debugOverlay=`, debugOverlay);
         }
       });
     }
@@ -172,10 +173,47 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   private async loadAndRender(docId: string) {
     // const url = `assets/docs/${docId}.md`;
     const url = `assets/${docId}.md`;
-    const markdown = await fetch(url).then(r => r.text());
+    let markdown: string = '';
+
+    try {
+      const response = await fetch(url);
+      // console.log(`Log:`, response)
+      if (response.redirected) {
+        this.hostRef.nativeElement.innerHTML = `
+        <div class="page-not-found">
+          <h1>Page not found</h1>
+          <p><strong>Invalid Url = ${url} </strong></p>
+        </div>
+        `;
+
+        throw new Error(`HTTP error! Status: ${url} is wrong`);
+      }
+      // Parse JSON safely
+      markdown = await response.text();
+      await this.ulde.renderMarkdown(markdown);
+
+    } catch (e) {
+      console.error(`Error: [DocsViewer] loadAndRender \nurl=`, url, e);
+      // throw e;
+    }
 
 
-    await this.ulde.renderMarkdown(markdown);
+    // await fetch(url).then((response: Response) => {
+    //   if (response.status !== 200) {
+    //     console.error(`Error: [DocsViewer] loadAndRender \nurl=`, url,);
+
+    //   }
+    //   return response.text();
+    // })
+    //   .then((text: string) => {
+    //     markdown = text;
+    //     console.log(`Log: [DocsViewer] loadAndRender \nurl=`, url, `\nmarkdown=`, markdown);
+
+    //   });
+
+
+
+    // await this.ulde.renderMarkdown(markdown);
 
 
   }

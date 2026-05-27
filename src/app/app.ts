@@ -13,6 +13,8 @@ import { DocsViewer } from './features/docs-viewer/docs-viewer';
 export class App {
   protected readonly title = signal('ulde-model-01');
 
-  docId = 'docs/index';
+  // docId = 'docs/APPREADME';
+  // docId = 'docs/index';
+  docId = 'docs/test/test.index';
 
 }
