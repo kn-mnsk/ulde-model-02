@@ -181,7 +181,7 @@ export const UldeArtifactsPanelPlugin: UldePlugin = {
       severity: 'info',
     });
 
-    console.log(`Log: [UldeArtifactsPanelPlugin] run finished`, artifacts.artifactsPanel);
+    // console.log(`Log: [UldeArtifactsPanelPlugin] run finished`, artifacts.artifactsPanel);
   },
 
   // ---------------------------------------------------------

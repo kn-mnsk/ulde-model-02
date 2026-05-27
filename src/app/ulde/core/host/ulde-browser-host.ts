@@ -1,6 +1,6 @@
 // ulde/core/host/ulde-browser-host.ts
 
-import { runUldePipeline } from '../lifecycle/ulde-orchestrator';
+// import { runUldePipeline } from '../lifecycle/ulde-orchestrator';
 
 /**
  * Browser DOM Plugin Interface
@@ -41,17 +41,20 @@ export class UldeBrowserHost {
    * Run ULDE end-to-end in the browser.
    */
   async run(container: HTMLElement, content: string) {
-    // 1. Run ULDE pipeline (string world)
-    const ctx = await runUldePipeline({ content });
+    // // 1. Run ULDE pipeline (string world)
+    // const ctx = await runUldePipeline({ content });
 
-    // 2. Insert final HTML into the DOM
-    const html =
-      ctx.artifacts.finalHtml ??
-      ctx.artifacts.html ??
-      ctx.artifacts.content ??
-      '';
+    // // 2. Insert final HTML into the DOM
+    // const html =
+    //   ctx.artifacts.finalHtml ??
+    //   ctx.artifacts.html ??
+    //   ctx.artifacts.content ??
+    //   '';
 
-    container.innerHTML = html;
+    // container.innerHTML = html;
+
+    container.innerHTML = content;
+
 
     // 3. Run browser DOM plugins (real DOM world)
     for (const plugin of this.browserDomPlugins) {

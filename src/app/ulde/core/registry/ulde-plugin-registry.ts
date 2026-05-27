@@ -48,9 +48,9 @@ import { UldeDebugOverlayHtmlPlugin } from '../../plugins/assemble/ulde-debug-ov
 
 
 // -----------------------------------------------------
-// BUILD REGISTRY (ORDER MATTERS)
+// BUILD REGISTRY (ORDER MATTERS) - String World
 // -----------------------------------------------------
-export function createUldePluginRegistry() {
+export function createUldeStringPluginRegistry() {
   return [
 
     // ---------------------------------------------
@@ -93,4 +93,5 @@ export function createUldePluginRegistry() {
     // UldeArtifactsPanelHtmlPlugin,    // artifacts panel HTML (NEW)
     // UldeProfilerPlugin,              // profiler model
   ];
+
 }

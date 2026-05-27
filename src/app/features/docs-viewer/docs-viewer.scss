@@ -1,78 +1,113 @@
-// app/docs-viewer/docs-viewer.acss
+// // app/docs-viewer/docs-viewer.acss
 
-.docs-viewer {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
+// // app-docs-viewer {
+// .docs-viewer {
+//   position: relative;
 
-.dv-header {
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+//   padding: 2rem 2rem 2rem 10rem;
+//   display: flex;
+//   flex-direction: column;
+//   height: auto;
+//   // height: 100%;
+//   overflow:hidden;
+// }
 
-.dv-body {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
+// .dv-header {
+//   padding: 2rem 2rem 2rem 2rem;
+//   border-bottom: 1px solid #ddd;
+//   display: flex;
+//   flex-direction: column;//flex;
+//   justify-content: flex-start; //space-between;
+//   align-items: center;
+//   height: auto;
+// }
 
-.dv-toc {
-  width: 240px;
-  border-right: 1px solid #eee;
-  padding: 1rem;
-  overflow-y: auto;
-}
-.dv-toc li.active > a {
-  font-weight: bold;
-  color: var(--accent-color);
-}
+// /*---------------------------------------------------------
+//    PROGRESS BAR
+// --------------------------------------------------------- */
+
+// .progress-bar {
+//   position: relative;
+//   width: 100%;
+//   height: 4px;
+//   background: red; //#eee;
+//   margin-top: 15px;
+//   // top: 15px;
+//   // margin: 0;
+// }
+
+// .progress-fill {
+//   height: 100%;
+//   // margin: 0;
+//   background: #3f51b5;
+//   transition: width 0.1s ease-out;
+// }
+
+// .dv-body {
+//   position: relative;
+//   height: 80vh;
+
+//   display: flex;
+//   // flex: 1;
+//   overflow-y: auto;
+//   // overflow: hidden;
+
+// }
+
+// .dv-toc {
+//   width: 240px;
+//   border-right: 1px solid #eee;
+//   padding: 1rem;
+//   overflow-y: auto;
+// }
+// .dv-toc li.active > a {
+//   font-weight: bold;
+//   color: var(--accent-color);
+// }
 
 
-.dv-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 2rem;
-}
+// .dv-content {
+//   flex: 1;
+//   overflow-y: auto;
+//   padding: 2rem;
+// }
 
-.dv-host {
-  width: 100%;
-}
+// .dv-host {
+//   width: 100%;
+// }
 
-.dv-debug-overlay {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  max-height: 40%;
-  overflow-y: auto;
-  background: rgba(0,0,0,0.8);
-  color: white;
-  padding: 1rem;
-}
+// .dv-debug-overlay {
+//   position: fixed;
+//   bottom: 0;
+//   right: 0;
+//   height: 60%;
+//   // max-height: 60%;
+//   overflow-y: auto;
+//   background: rgba(0,0,0,0.8);
+//   color: white;
+//   padding: 1rem;
+// }
 
-.dv-debug-overlay.hidden{
-  display: none;
-}
+// .dv-debug-overlay.hidden{
+//   display: none;
+// }
 
 
-.dv-artifacts-panel {
-  position: fixed;
-  right: 0;
-  top: 0;
-  width: 380px;
-  height: 100vh;
-  background: #fff;
-  border-left: 1px solid #ddd;
-  overflow-y: auto;
-  transform: translateX(0);
-  transition: transform 0.25s ease;
-  padding: 1rem;
-  z-index: 9999;
-}
+// .dv-artifacts-panel {
+//   position: fixed;
+//   right: 0;
+//   top: 0;
+//   width: 380px;
+//   height: 100vh;
+//   background: #fff;
+//   border-left: 1px solid #ddd;
+//   overflow-y: auto;
+//   transform: translateX(0);
+//   transition: transform 0.25s ease;
+//   padding: 1rem;
+//   z-index: 9999;
+// }
 
-.dv-artifacts-panel.hidden {
-  transform: translateX(100%);
-}
+// .dv-artifacts-panel.hidden {
+//   transform: translateX(100%);
+// }
