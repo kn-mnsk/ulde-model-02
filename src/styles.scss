@@ -482,44 +482,70 @@ Source - https://stackoverflow.com/a/79199554
 Posted by grappler
 Retrieved 2026-04-23, License - CC BY-SA 4.0
 */
-.docs-viewer_content .mermaid-container {
+.dv-host .mermaid-container {
   display: block;
   width: auto;
   height: auto;
-  overflow: hidden;
-  border: 2px solid #55db50;
+  overflow: visible;
+  border: 2px solid var(--table-border);
+  // border: 2px solid var(--text-color);
+  // border: 2px solid #55db50;
   position: relative;
   margin-bottom: 10px;
+  // transition: background-color 2s 500ms;
 }
 
-.docs-viewer_content .mermaid-container svg {
-  cursor: grab;
+// .dv-host code.language-mermaid svg{
+//   padding: 0.2rem; // cursor: grab;
+// }
+
+.dv-host code.language-mermaid svg {
+  padding: 0.2rem; // cursor: grab;
+  // animation: fade-in 0.7s forwards ease-in;
+  transition:
+    all 0.7s,
+    opacity 0.4s;
 }
 
-.docs-viewer_content .mermaid-container .language-mermaid {
-  position: relative;
-  padding: 1rem;
-  margin: 0.5rem;
-  border: 0.5px dashed; // var(--text-color);
-  color: var(--text-color);
-  display: block;
-  // flex-direction: row;
-  justify-content: center;
+// .dv-host .mermaid-container .language-mermaid {
+//   position: relative;
+//   padding: 1rem;
+//   margin: 0.5rem;
+//   border: 0.5px dashed; // var(--text-color);
+//   color: var(--text-color);
+//   display: block;
+//   flex-direction: row;
+//   justify-content: center;
+
+// }
+
+.dv-host code.language-mermaid svg.theme-enter {
+
+  // &.theme-enter {
+
+  background-color: red;
+  // display: block;
+  border: 1px red; //var(--table-border);
+  // width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+  // transform 4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // }
 
 }
 
-.docs-viewer_content .langauge-mermaid g text {
-  // word-wrap: normal;
-  word-wrap: break-word;
-  // font-size: 10px;
+
+.dv-host code.langauge-mermaid svg g text {
+  word-wrap: normal;
+  // word-wrap: break-word;
 }
 
-.docs-viewer_content .mermaid-container .mermaid-button-container {
+.dv-host .mermaid-container .mermaid-button-container {
   position: relative;
   display: block;
   align-items: flex-end;
-  margin: 0.5rem;
-
+  margin: 0.2rem;
+  z-index: 1000;
+  margin-bottom: 50px;
   transition: background-color 0.3s ease;
   // z-index: 1000;
   /* Ensure it stays on top */
@@ -531,7 +557,10 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   position: relative;
   background-color: var(--bg-color);
   color: var(--text-color);
-
+  font-weight: bolder;
+  margin: 0.2rem;
+  opacity: 0.7;
+  border: 2px solid var(--table-border);
 }
 
 [data-theme="light"] .mermaid-reset-button:hover,
@@ -553,6 +582,8 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
   transform: scale(1.2);
   transition: transform 0.2s ease-in-out;
 }
+
+
 
 /* ---------------------------------------------------------
    Debug Tools for docs-viewer_content
@@ -594,7 +625,7 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
    docs-viewer header
 --------------------------------------------------------- */
 app-docs-viewer {
-// .docs-viewer {
+  // .docs-viewer {
   // position: relative;
 
   // padding: 2rem 2rem 2rem 2rem;
@@ -602,15 +633,16 @@ app-docs-viewer {
   flex-direction: column;
   height: auto;
   // height: 100%;
-  overflow:hidden;
+  overflow: hidden;
 }
+
 .dv-header {
   padding-top: 1rem;
   padding-bottom: 1rem;
   // padding: 2rem 2rem 2rem 2rem;
   border-bottom: 5px solid #ddd;
   display: flex;
-  flex-direction: column;//flex;
+  flex-direction: column; //flex;
   justify-content: flex-start; //space-between;
   align-items: center;
   height: auto;
@@ -678,7 +710,7 @@ app-docs-viewer {
 
   display: flex;
   // flex: 1;
-  overflow-y: auto;
+  // overflow-y: auto;
   // overflow: hidden;
 
 }
@@ -689,7 +721,8 @@ app-docs-viewer {
   padding: 1rem;
   overflow-y: auto;
 }
-.dv-toc li.active > a {
+
+.dv-toc li.active>a {
   font-weight: bold;
   color: var(--accent-color);
 }
@@ -871,7 +904,8 @@ app-docs-viewer {
   // transition: opacity 0.2s ease, transform 0.2s ease;
   border-top: solid var(--ap-hover);
 }
-.ulde-ap-item:hover{
+
+.ulde-ap-item:hover {
   background: var(--ap-hover);
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
@@ -1034,24 +1068,44 @@ app-docs-viewer {
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   z-index: 900;
-  transition:
-    width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.theme-enter {
+    transition:
+      width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &.collapsed {
+
+    width: 0;
+    transform: translateX(-100%);
+  }
+
+  &.hidden {
+    display: none;
+  }
+
 }
 
+
+// .dv-artifacts-panel.hidden {
+//   display: none;
+//   // opacity: 0;
+//   // transform: translateX(8px);
+// }
 /* Collapsed state */
-.dv-artifacts-panel.collapsed {
-  width: 0;
-  transform: translateX(-100%);
-}
+// .dv-artifacts-panel.collapsed {
+//   width: 0;
+//   transform: translateX(-100%);
+// }
 
 /* Collapse toggle button */
 .dv-artifacts-panel-toggle {
   position: fixed;
   top: 12px;
   left: 12px;
-  width: auto;//50px;
-  height: auto;//28px;
+  width: auto; //50px;
+  height: auto; //28px;
   color: var(--ap-fg);
   border-radius: 4px;
   background: var(--ap-header-bg);
@@ -1072,16 +1126,11 @@ app-docs-viewer {
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dv-artifacts-panel.collapsed+.dv-artifacts-panel-toggle .chevron {
+.dv-artifacts-panel.collapsed.dv-artifacts-panel-toggle .chevron {
   transform: rotate(180deg);
 }
 
 
-.dv-artifacts-panel.hidden {
-  display: none;
-  // opacity: 0;
-  // transform: translateX(8px);
-}
 
 
 

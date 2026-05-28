@@ -4,10 +4,49 @@
 
 
 ```mermaid
+---
+config:
+  htmlLabels: false
+---
+flowchart LR
+    markdown["`This **is** _Markdown_  This **is** _Markdown_ This **is** _Markdown_`"]
+    newLines["`Line1
+    Line 2
+    Line 3`"]
+    markdown --> newLines
+
+
+```
+
+
+```mermaid
+---
+title: Sequence Diagram
+---
+sequenceDiagram
+    participant JS as JavaScript
+    participant L as Layout
+    participant P as Paint
+    participant RAF as requestAnimationFrame
+
+    JS->>L: scrollTop applied
+    L->>P: layout complete
+    P->>RAF: rAF #1 fires (before next paint)
+    RAF->>RAF: schedule rAF #2
+    P->>RAF: rAF #2 fires (before next paint)
+    RAF->>JS: hide overlay (safe)
+```
+
+---
+
+
+```mermaid
+---
+title: State Diagram V2
+---
 
 stateDiagram-v2
-  direction TB
-  
+
   [*] --> input_signal: docId
   reload_signal: reload signal
   input_signal: input signal
@@ -30,11 +69,11 @@ stateDiagram-v2
 
   Listeners: Global Listeners
   state Listeners {
-    keydown: keydown event <br>per document<br>Ctrl+C
-    beforeunload: beforeunload event<br>per window<br>Browser Refresh
+    keydown: Ctrl+C: keydown event per document 
+    beforeunload: beforeunload event per window Browser Refresh
   }
   note left of Listeners
-    Global Listeners <br> registered in App
+    Global Listeners registered in App
   end note
 
   Load: call LoadAndRender function
@@ -81,10 +120,12 @@ stateDiagram-v2
   end note
 
 ```
-
-
+---
 
 ```mermaid
+---
+title: Sequence Diagram
+---
 sequenceDiagram
     participant JS as JavaScript
     participant L as Layout
@@ -98,26 +139,7 @@ sequenceDiagram
     P->>RAF: rAF #2 fires (before next paint)
     RAF->>JS: hide overlay (safe)
 ```
-
-
-
-
-
-```mermaid
-sequenceDiagram
-    participant JS as JavaScript
-    participant L as Layout
-    participant P as Paint
-    participant RAF as requestAnimationFrame
-
-    JS->>L: scrollTop applied
-    L->>P: layout complete
-    P->>RAF: rAF #1 fires (before next paint)
-    RAF->>RAF: schedule rAF #2
-    P->>RAF: rAF #2 fires (before next paint)
-    RAF->>JS: hide overlay (safe)
-```
-
+---
 
 ## Preview: Curvature Flow
 <!-- 
