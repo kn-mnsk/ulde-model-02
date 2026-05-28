@@ -4,12 +4,15 @@
 import { Injectable } from '@angular/core';
 import { isBrowser } from '../../global.utils/global.utils';
 
+import mermaid from 'mermaid';
+
 type ThemeName = 'light' | 'dark';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private readonly storageKey = 'app-theme';
   private readonly attrName = 'data-theme';
+  // private readonly mermaidName = 'data-theme';
 
   constructor() {
     if (!isBrowser()) return;
@@ -49,6 +52,10 @@ export class ThemeService {
     if (opts.animate) {
       this.animateArtifactsPanelTheme();
     }
+    // Mermaid micro animation
+    if (opts.animate) {
+      this.animateMermaid();
+    }
   }
 
   private animateBodyFade() {
@@ -69,5 +76,19 @@ export class ThemeService {
 
     panel.classList.add('theme-enter');
     setTimeout(() => panel.classList.remove('theme-enter'), 180);
+  }
+
+  private animateMermaid() {
+    const mermaidSvgs = document.querySelectorAll('code.language-mermaid svg');
+    mermaidSvgs.forEach(s => {
+      s.classList.add('theme-enter');
+
+      // console.log(`Log: mermaidSvg=`, s);
+
+      setTimeout(() => s.classList.remove('theme-enter'), 700);
+    });
+    // console.log(`Log: mermaidSvgs=`, mermaidSvgs)
+    // setTimeout(() => mermaidSvgs.forEach(s => s.classList.remove('theme-enter'), 50000));
+
   }
 }

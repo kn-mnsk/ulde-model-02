@@ -15,6 +15,6 @@ export class App {
 
   // docId = 'docs/APPREADME';
   // docId = 'docs/index';
-  docId = 'docs/test/test.index';
+  docId = 'docs/test/test.katex';
 
 }
