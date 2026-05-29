@@ -6,7 +6,8 @@ import { isBrowser } from '../../global.utils/global.utils';
 
 import mermaid from 'mermaid';
 
-type ThemeName = 'light' | 'dark';
+// export ThemeName:  'light' | 'dark';
+export type ThemeName = 'light' | 'dark';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
@@ -16,12 +17,15 @@ export class ThemeService {
 
   constructor() {
     if (!isBrowser()) return;
-    // const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'light';
-    const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'dark';
+    const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'light';
+    // const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'dark';
     this.applyTheme(saved, { animate: false });
   }
 
   get currentTheme(): ThemeName {
+    if (!isBrowser()) {
+      return 'light';// default for SSR
+    };
     const attr = document.documentElement.getAttribute(this.attrName) as ThemeName | null;
     return attr ?? 'light';
   }
@@ -30,18 +34,25 @@ export class ThemeService {
     const next: ThemeName = this.currentTheme === 'light' ? 'dark' : 'light';
     this.applyTheme(next, { animate: true });
     sessionStorage.setItem(this.storageKey, next);
+    // sessionStorage.setItem(this.storageKey, 'dark');
+
+    console.log(`Log: [ThemeService] ToggleTheme new theme=`, next)
   }
 
   setTheme(theme: ThemeName): void {
     this.applyTheme(theme, { animate: true });
-    sessionStorage.setItem(this.storageKey, theme);
+    sessionStorage.setItem(this.storageKey, theme as string);
+    console.log(`Log: [ThemeService] setTheme =`, theme);
   }
 
+  // getTheme(): string{
+  //   return sessionStorage.getItem(this.storageKey)?? 'dark';
+  // }
+
   private applyTheme(theme: ThemeName, opts: { animate: boolean }) {
-    const root = document.documentElement;
 
     // Apply attribute for CSS + Angular Material theming
-    root.setAttribute(this.attrName, theme);
+    document.documentElement.setAttribute(this.attrName, theme);
 
     // Body fade-in (uses your @keyframes fade-in)
     if (opts.animate) {
@@ -79,6 +90,7 @@ export class ThemeService {
   }
 
   private animateMermaid() {
+    // const mermaidSvgs = document.querySelectorAll('.language-mermaid');
     const mermaidSvgs = document.querySelectorAll('code.language-mermaid svg');
     mermaidSvgs.forEach(s => {
       s.classList.add('theme-enter');
@@ -87,8 +99,6 @@ export class ThemeService {
 
       setTimeout(() => s.classList.remove('theme-enter'), 700);
     });
-    // console.log(`Log: mermaidSvgs=`, mermaidSvgs)
-    // setTimeout(() => mermaidSvgs.forEach(s => s.classList.remove('theme-enter'), 50000));
 
   }
 }

@@ -21,7 +21,7 @@ BrowserHost DOM plugins
 Rendered document
  */
 
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, PLATFORM_ID, Inject, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { UldeDocsViewerBridge } from '../../ulde/integration/angular/ulde-docs-viewer-bridge.service';
 import { UldeAngularService, UldeRunResult } from '../../ulde/integration/angular/ulde-angular.service';
@@ -31,6 +31,7 @@ import { ThemeService } from '../../core/services/theme.service';
 import { abort } from 'process';
 // import { isBrowser } from '../../global.utils/global.utils';
 
+import { CURRENT_THEME } from '../../core/tokens/theme.token';
 
 @Component({
   selector: 'app-docs-viewer',
@@ -127,6 +128,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
     // Add keyboard shortcut
     if (this.$isBrowser()) {
+
+      const theme = inject(CURRENT_THEME);
+      (window as any).__APP_THEME__ = this.theme;
+
       document.addEventListener('keydown', (e) => {
         // e.preventDefault();
         if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'd') {
@@ -154,6 +159,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       const id = this.$currentDocId();
       if (id && this.$isBrowser()) {
         // if (id && this.$isBrowser()) {
+
         this.loadAndRender(id);
       }
     });
@@ -247,8 +253,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
 
   onToggleTheme() {
-
     this.theme.toggleTheme();
+    // reload to mermaid theme
+    this.reloadDoc();
   }
 
 }
