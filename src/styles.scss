@@ -499,13 +499,28 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
 //   padding: 0.2rem; // cursor: grab;
 // }
 
-.dv-host code.language-mermaid svg {
-  padding: 0.2rem; // cursor: grab;
+.dv-host code.language-mermaid svg{
+  position: relative;
+  display: inline-box;
+  width: auto;
+  height: auto;
+// .dv-host code.language-mermaid svg {
+  padding: 0.2rem 0.2rem 0.2rem 0.2rem; // cursor: grab;
+  border: 10rem green;
   // animation: fade-in 0.7s forwards ease-in;
-  transition:
-    all 0.7s,
-    opacity 0.4s;
+  // transition: all 0.7s;
+  // opacity 0.4s;
+  &.theme-enter {
+    background-color: var(--table-border);// red;
+  }
 }
+
+// to prevent mouse dragging from conflicting with animation and transition
+.dv-host code.language-mermaid svg.dragging {
+  // animation-play-state: puased;
+  transition: none;
+}
+
 
 // .dv-host .mermaid-container .language-mermaid {
 //   position: relative;
@@ -519,19 +534,19 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
 
 // }
 
-.dv-host code.language-mermaid svg.theme-enter {
+// .dv-host code.language-mermaid svg.theme-enter {
 
-  // &.theme-enter {
+//   // &.theme-enter {
 
-  background-color: red;
-  // display: block;
-  border: 1px red; //var(--table-border);
-  // width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-  // transform 4s cubic-bezier(0.4, 0, 0.2, 1);
+//   background-color: red;
+//   // display: block;
+//   border: 10rem green; //var(--table-border); not working??
+//   // width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+//   // transform 4s cubic-bezier(0.4, 0, 0.2, 1);
 
-  // }
+//   // }
 
-}
+// }
 
 
 .dv-host code.langauge-mermaid svg g text {

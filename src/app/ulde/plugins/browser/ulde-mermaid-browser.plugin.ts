@@ -1,8 +1,60 @@
 // ulde/plugins/browser/ulde-mermaid-browser.plugin.ts
 
-import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
-import mermaid from 'mermaid';
+import { inject } from '@angular/core';
+import mermaid, { MermaidConfig } from 'mermaid';
 import Panzoom from '@panzoom/panzoom'
+import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
+// import { currentTheme } from '../../../global.utils/global.utils';
+
+import { ThemeName, ThemeService } from '../../../core/services/theme.service';
+
+const mermaidConfigDarkTheme: MermaidConfig = {
+  startOnLoad: false,
+  securityLevel: 'strict',
+  theme: 'dark',
+  themeVariables: {
+    fontSize: '18px',
+    fontFamily: 'Trebuchet MS, Verdana, Arial, Sans-Serif',
+    primaryColor: '#2d3748',
+    primaryTextColor: '#e2e8f0',
+    primaryBorderColor: '#63b3ed',
+    secondaryColor: '#4a5568',
+    tertiaryColor: '#2c5282',
+    lineColor: '#63b3ed',
+    nodeTextSize: '20px',
+    edgeLabelFontSize: '14px',
+    labelTextSize: '16px',
+    background: '#1e1e1e',
+    clusterBkg: '#2d3748',
+    clusterBorder: '#63b3ed'
+  },
+  flowchart: { htmlLabels: true, curve: 'linear' },
+  state: {radius: 10},
+  sequence:{noteFontSize: '20px'}
+};
+
+const mermaidConfigLightTheme: MermaidConfig = {
+  startOnLoad: false,
+  securityLevel: 'strict',
+  theme: 'default',
+  themeVariables: {
+    fontSize: '16px',
+    fontFamily: 'Trebuchet MS, Verdana, Arial, Sans-Serif',
+    primaryColor: '#f0f9ff',
+    primaryTextColor: '#1a202c',
+    primaryBorderColor: '#3182ce',
+    secondaryColor: '#bee3f8',
+    tertiaryColor: '#90cdf4',
+    lineColor: '#3182ce',
+    nodeTextSize: '18px',
+    edgeLabelFontSize: '14px',
+    labelTextSize: '16px',
+    background: '#ffffff',
+    clusterBkg: '#edf2f7',
+    clusterBorder: '#3182ce'
+  },
+  flowchart: { htmlLabels: true, curve: 'basis' }
+};
 
 
 let handler!: (event: WheelEvent) => void;
@@ -21,15 +73,24 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
 
     if (!isBrowser) return;
 
-
-
+    const currentTheme = sessionStorage.getItem('app-theme');
+    // const currentTheme = (window as any).__APP_THEME__;
     let mermaidNodes!: NodeListOf<HTMLElement>;
 
+    mermaidNodes = container.querySelectorAll<HTMLElement>('code.language-mermaid');
+    console.log(`Log: [UldeMermaidBrowserPlugin] mermaidNodes=`, mermaidNodes);
+
     try {
-      // Initialize Mermaid (safe to call multiple times)
-      mermaid.initialize({
-        startOnLoad: false
-      });
+
+      // mermaid initializing in sync with docTeme;
+      // const themeName = (window as any).__APP_THEME__;
+      console.log(currentTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme, `\ntheme=`, currentTheme);
+      mermaid.initialize(currentTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme);
+
+      // // Initialize Mermaid (safe to call multiple times)
+      // mermaid.initialize({
+      //   startOnLoad: false
+      // });
 
       /*
       Source - https://stackoverflow.com/a/79199554
@@ -38,8 +99,7 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
       */
 
       // mermaid code block <pre><code class="language-container">...</code></pre> by mardown-it
-      const mermaidNodes = container.querySelectorAll<HTMLElement>('.language-mermaid');
-      // ctx.logger.info(`onDomInit NodeListOf<HTMLElement>`, mermaidNodes);
+
 
       /**
        * A callback to call after each diagram is rendered.
@@ -119,7 +179,7 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
       });
 
     } catch (err) {
-      mermaidNodes.forEach(n => console.log(`Log: `, n.children[0].ariaRoleDescription));
+      // mermaidNodes.forEach(n => console.log(`Log: `, n.children[0].ariaRoleDescription));
       console.error('Error: [ULDE Mermaid Browser Plugin]:', err);
     }
   }
