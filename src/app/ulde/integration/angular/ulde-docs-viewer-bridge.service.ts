@@ -14,7 +14,8 @@ import { UldeArtifactsPanelBrowserPlugin } from '../../plugins/browser/ulde-arti
 
 @Injectable({ providedIn: 'root' })
 export class UldeDocsViewerBridge {
-  private host = new UldeBrowserHost();
+   host = new UldeBrowserHost();
+  // private host = new UldeBrowserHost();
 
   constructor() {
     // Register browser DOM plugins

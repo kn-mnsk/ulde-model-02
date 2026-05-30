@@ -652,13 +652,15 @@ app-docs-viewer {
 }
 
 .dv-header {
+  position: relative;
   padding-top: 1rem;
   padding-bottom: 1rem;
+  flex: 1;
   // padding: 2rem 2rem 2rem 2rem;
   border-bottom: 5px solid #ddd;
-  display: flex;
+  display: flex;//flex;
   flex-direction: column; //flex;
-  justify-content: flex-start; //space-between;
+  // justify-content: flex-start; //space-between;
   align-items: center;
   height: auto;
 }
@@ -724,17 +726,19 @@ app-docs-viewer {
   height: 80vh;
 
   display: flex;
-  // flex: 1;
+  flex: 1;
   // overflow-y: auto;
   // overflow: hidden;
 
 }
 
 .dv-toc {
+  // position: relative;
   width: 240px;
   border-right: 1px solid #eee;
   padding: 1rem;
   overflow-y: auto;
+  cursor: default;
 }
 
 .dv-toc li.active>a {

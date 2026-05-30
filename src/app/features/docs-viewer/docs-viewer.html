@@ -38,7 +38,7 @@
 
   <div class="dv-body">
 
-    <!-- Table of Contents -->
+    <!-- Table of Contents
     @if (toc.length) {
     <aside class="dv-toc">
       <ul>
@@ -49,8 +49,19 @@
         }
       </ul>
     </aside>
+    } -->
+    @if (toc.length) {
+    <aside class="dv-toc">
+      <ul>
+        @for (item of toc; track item.slug) {
+        <li>
+          <!-- <li [class.active]="$activeHeading() === item.slug"> -->
+          <a (click)="scrollTo(item.slug)">{{ item.text }}</a>
+        </li>
+        }
+      </ul>
+    </aside>
     }
-
     <!-- Main content -->
     <main class="dv-content">
       <div #host class="dv-host"></div>

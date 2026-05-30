@@ -78,13 +78,13 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
     let mermaidNodes!: NodeListOf<HTMLElement>;
 
     mermaidNodes = container.querySelectorAll<HTMLElement>('code.language-mermaid');
-    console.log(`Log: [UldeMermaidBrowserPlugin] mermaidNodes=`, mermaidNodes);
+    // console.log(`Log: [UldeMermaidBrowserPlugin] mermaidNodes=`, mermaidNodes);
 
     try {
 
       // mermaid initializing in sync with docTeme;
       // const themeName = (window as any).__APP_THEME__;
-      console.log(currentTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme, `\ntheme=`, currentTheme);
+      // console.log(currentTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme, `\ntheme=`, currentTheme);
       mermaid.initialize(currentTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme);
 
       // // Initialize Mermaid (safe to call multiple times)
