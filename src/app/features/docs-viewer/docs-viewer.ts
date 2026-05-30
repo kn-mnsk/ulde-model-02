@@ -49,6 +49,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   private $currentDocId = signal('');
   private $currentReload = signal(false);
 
+  private finalHtml: string | null = null;
+
   // Placeholder TOC (will be replaced by ULDE TOC later)
   toc: TocEntry[] = [];
   $activeHeading = signal<string | null>(null);
@@ -73,13 +75,14 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   ) {
 
     this.$isBrowser.set(isPlatformBrowser(this.platformId));
-
+    if (!this.$isBrowser()) return;
     // React to ULDE pipeline results
     // if (this.$isBrowser()) {
     this.ulde.result$.subscribe(result => {
       if (!result) return;
 
-      const html = result.finalHtml;
+      const html = this.finalHtml = result.finalHtml;
+      // const html = result.finalHtml;
       // console.log(`Log: [DocsViewer] contructor  result.finalHtml=`, html);
       // NEW: store debug + artifacts
       this.toc = result.toc ?? [];
@@ -129,8 +132,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // Add keyboard shortcut
     if (this.$isBrowser()) {
 
-      const theme = inject(CURRENT_THEME);
-      (window as any).__APP_THEME__ = this.theme;
+      // const theme = inject(CURRENT_THEME);
+      // (window as any).__APP_THEME__ = this.theme;
 
       document.addEventListener('keydown', (e) => {
         // e.preventDefault();
@@ -239,9 +242,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // Scroll to heading
   scrollTo(slug: string) {
+
     const el = document.getElementById(slug);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
   }
 
@@ -252,10 +256,12 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
 
-  onToggleTheme() {
+  async onToggleTheme() {
     this.theme.toggleTheme();
     // reload to mermaid theme
-    this.reloadDoc();
+    // this.reloadDoc();
+    // re-run browser dom plugins to update mermaid theme
+    await this.bridge.host.run(this.hostRef.nativeElement, this.finalHtml as string)
   }
 
 }

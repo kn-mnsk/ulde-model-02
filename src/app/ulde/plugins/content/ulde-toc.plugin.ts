@@ -28,7 +28,11 @@ export const UldeTocPlugin: UldePlugin = {
     const toc: TocEntry[] = [];
 
     for (const line of lines) {
-      const match = /^(#{1,6})\s+(.*)$/.exec(line);
+
+      const regex = /^(#{1,6})\s+(.*)/;
+      // const regex = /^(#{1,6})\s+(.*)$/;
+      const match = regex.exec(line);
+
       if (!match) continue;
 
       const level = match[1].length;
@@ -42,6 +46,8 @@ export const UldeTocPlugin: UldePlugin = {
     }
 
     artifacts.toc = toc;
+
+    // console.log(`Log: [UldeTocPlugin] run toc=`, toc);
 
     artifacts.diagnostics.add({
       plugin: 'ulde-toc',

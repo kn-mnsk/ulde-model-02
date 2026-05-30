@@ -17,17 +17,17 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch()),
     provideClientHydration(withEventReplay()),
     // Call our currentTheme function at startup
-    {
-      provide: CURRENT_THEME,
-      useFactory: () => {
-        const themeService = inject(ThemeService);
+    // {
+    //   provide: CURRENT_THEME,
+    //   useFactory: () => {
+    //     const themeService = inject(ThemeService);
 
-        // SSR-safe: do NOT access document here
-        if (typeof document === 'undefined') {
-          return 'light' as ThemeName; // or your default??
-        }
-        return themeService.currentTheme;
-      }
-    }
+    //     // SSR-safe: do NOT access document here
+    //     if (typeof document === 'undefined') {
+    //       return 'light' as ThemeName; // or your default??
+    //     }
+    //     return themeService.currentTheme;
+    //   }
+    // }
   ]
 };

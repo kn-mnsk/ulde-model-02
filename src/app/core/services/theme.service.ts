@@ -36,13 +36,13 @@ export class ThemeService {
     sessionStorage.setItem(this.storageKey, next);
     // sessionStorage.setItem(this.storageKey, 'dark');
 
-    console.log(`Log: [ThemeService] ToggleTheme new theme=`, next)
+    // console.log(`Log: [ThemeService] ToggleTheme new theme=`, next)
   }
 
   setTheme(theme: ThemeName): void {
     this.applyTheme(theme, { animate: true });
     sessionStorage.setItem(this.storageKey, theme as string);
-    console.log(`Log: [ThemeService] setTheme =`, theme);
+    // console.log(`Log: [ThemeService] setTheme =`, theme);
   }
 
   // getTheme(): string{
