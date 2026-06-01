@@ -32,6 +32,7 @@ import { abort } from 'process';
 // import { isBrowser } from '../../global.utils/global.utils';
 
 import { CURRENT_THEME } from '../../core/tokens/theme.token';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-docs-viewer',
@@ -42,7 +43,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   $docId = input<string>('');
   $reload = input<boolean>(false);
-  private $isBrowser = signal<boolean>(false);
+  $isBrowser = signal<boolean>(false);
 
   private cleanupFn: (() => void) | null = null;
   // Internal writable signals
@@ -67,6 +68,21 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   // @ViewChild('docsViewer', { static: true }) hostRef!: ElementRef<HTMLElement>;
   @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLElement>;
 
+  private dvToc: HTMLElement | undefined = undefined;
+  // @ViewChild('dvToc', { static: true }) dvToc!: ElementRef<HTMLElement>;
+
+  private dvTocResizer: HTMLElement | null = null; undefined = undefined;
+  // @ViewChild('dvTocResizer', { static: true }) dvTocResizer!: ElementRef<HTMLElement>;
+  private isResizing!: boolean;
+  private mouseDownHandler = this.onMouseDown.bind(this);
+  private mouseMoveHandler = this.onMouseMove.bind(this);
+  private mouseUpHandler = this.onMouseUp.bind(this);
+
+
+  private readonly _tocResult$ = new BehaviorSubject<TocEntry[] | []>([]);
+  readonly tocResult$ = this._tocResult$.asObservable();
+
+
   constructor(
     private bridge: UldeDocsViewerBridge,
     private ulde: UldeAngularService,
@@ -85,8 +101,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       // const html = result.finalHtml;
       // console.log(`Log: [DocsViewer] contructor  result.finalHtml=`, html);
       // NEW: store debug + artifacts
-      this.toc = result.toc ?? [];
-      console.log(`Log: [DocsViewer] toc lenghth=`, this.toc.length, this.toc)
+      this._tocResult$.next(result.toc ?? []);
+      // this.toc = result.toc ?? [];
+      // console.log(`Log: [DocsViewer] toc lenghth=`, this.toc.length, this.toc)
 
       this.debugOverlay = result.debugOverlay;
       // console.log(`Log: [DocsViewer] contructor debugOverlay=`, result.debugOverlay);
@@ -130,10 +147,13 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     });
 
     // Add keyboard shortcut
-    if (this.$isBrowser()) {
+    if (this.$isBrowser() === true) {
 
+      this.dvToc = document.querySelector('.dv-toc') as HTMLElement;
+      this.dvTocResizer = document.querySelector('.dv-toc_resizer') as HTMLElement;
       // const theme = inject(CURRENT_THEME);
       // (window as any).__APP_THEME__ = this.theme;
+      console.log(`Log: [DocsViewer] ngAfterViewInit `, this.dvToc, this.dvTocResizer);
 
       document.addEventListener('keydown', (e) => {
         // e.preventDefault();
@@ -169,13 +189,62 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   }
 
-  ngAfterViewInit(): void { }
+  ngAfterViewInit(): void {
+    if (!this.$isBrowser()) return;
+
+    // this.dvToc = document.querySelector('.dv-toc') as HTMLElement;
+    // this.dvTocResizer = document.querySelector('.dv-toc_resizer') as HTMLElement;
+    console.log(`Log: [DocsViewer] ngAfterViewInit `, this.dvToc, this.dvTocResizer);
+    requestAnimationFrame(() => {
+
+      requestAnimationFrame(() => {
+        this.tocResult$.subscribe((toc) => {
+          if (toc.length === 0) return;
+          this.dvToc?.classList.remove('hidden');
+
+          this.toc = toc;
+          console.log(`Log: [DocsViewer] ngAfterViewInit toc=`, toc);
+          // if (this.toc.length > 0) {
+          //   const dvToc = document.querySelector('.dv-toc') as HTMLElement;
+          //   dvToc.classList.remove('hidden');
+          //   console.log(`Log: [DocsViewer] ngAfterViewInit toc=`, toc);
+          // }
+
+
+          // requestAnimationFrame(() => {
+          //   requestAnimationFrame(() => {
+          //     // this.domHost.attach(uldeLayoutMain, this.injector);
+          //     this.eventsRegister();
+          //     // this.restoreScroll(this.$inputDocId(), uldeLayoutMain);
+
+        });
+      });
+
+
+    });
+
+
+    // requestAnimationFrame(() => {
+    //   requestAnimationFrame(() => {
+    //     // this.domHost.attach(uldeLayoutMain, this.injector);
+    //     this.eventsRegister();
+    //     // this.restoreScroll(this.$inputDocId(), uldeLayoutMain);
+
+    //   });
+    // });
+    this.eventsRegister();
+  }
+
+
+
 
   ngOnDestroy(): void {
     if (this.cleanupFn) {
       this.cleanupFn();
       this.cleanupFn = null;
     }
+
+    this.eventsRemove();
   }
 
   private async loadAndRender(docId: string) {
@@ -204,24 +273,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       console.error(`Error: [DocsViewer] loadAndRender \nurl=`, url, e);
       // throw e;
     }
-
-
-    // await fetch(url).then((response: Response) => {
-    //   if (response.status !== 200) {
-    //     console.error(`Error: [DocsViewer] loadAndRender \nurl=`, url,);
-
-    //   }
-    //   return response.text();
-    // })
-    //   .then((text: string) => {
-    //     markdown = text;
-    //     console.log(`Log: [DocsViewer] loadAndRender \nurl=`, url, `\nmarkdown=`, markdown);
-
-    //   });
-
-
-
-    // await this.ulde.renderMarkdown(markdown);
 
 
   }
@@ -263,5 +314,89 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // re-run browser dom plugins to update mermaid theme
     await this.bridge.host.run(this.hostRef.nativeElement, this.finalHtml as string)
   }
+
+
+  private eventsRegister() {
+
+    this.isResizing = false;
+
+    this.dvTocResizer?.addEventListener("mousedown", this.mouseDownHandler);
+    // this.dvTocResizer.nativeElement.addEventListener("mousedown", this.mouseDownHandler);
+    this.dvToc?.addEventListener("mousemove", this.mouseMoveHandler);
+    // this.dvToc.nativeElement.addEventListener("mousemove", this.mouseMoveHandler);
+    this.dvToc?.addEventListener("mouseup", this.mouseUpHandler);
+    // this.dvToc.nativeElement.addEventListener("mouseup", this.mouseUpHandler);
+
+    console.log(`Log: [DocsViewer] eventsRegistered finished`);
+
+    // this.uldeLayoutMain?.nativeElement.addEventListener('ulde-link-click', this.uldeLinkClickHandler);
+    // this.uldeLayoutMain?.nativeElement.addEventListener('ulde-scroll', this.uldeScrollHandler);
+
+  }
+
+  private eventsRemove() {
+    if (this.dvTocResizer) {
+
+      this.dvTocResizer.removeEventListener("mousedown", this.mouseDownHandler);
+    }
+    // this.dvTocResizer.nativeElement.removeEventListener("mousedown", this.mouseDownHandler);
+    if (this.dvToc) {
+      this.dvToc.removeEventListener("mousemove", this.mouseMoveHandler);
+      // this.dvToc.nativeElement.removeEventListener("mousemove", this.mouseMoveHandler);
+      this.dvToc.removeEventListener("mouseup", this.mouseUpHandler);
+    }
+    // this.dvToc.nativeElement.removeEventListener("mouseup", this.mouseUpHandler);
+
+    // this.uldeLayoutMain?.nativeElement.removeEventListener('ulde-link-click', this.uldeLinkClickHandler);
+    // this.uldeLayoutMain?.nativeElement.removeEventListener('ulde-scroll', this.uldeScrollHandler);
+
+
+  }
+
+  private onMouseDown(e: MouseEvent) {
+
+    if (!this.dvToc || !this.dvTocResizer) return;
+    this.isResizing = true;
+    this.dvToc.style.cursor = "e-resize";
+    // this.dvToc.nativeElement.style.cursor = "e-resize";
+    this.dvTocResizer.style.width = "10px";
+    // this.dvTocResizer.nativeElement.style.width = "10px";
+    this.dvTocResizer.style.background = "#4a87f8";
+    // this.dvTocResizer.nativeElement.style.background = "#4a87f8";
+    e.preventDefault();
+
+  }
+
+  private onMouseMove(e: MouseEvent) {
+
+    if (!this.dvToc || !this.dvTocResizer) return;
+    if (!this.isResizing) return;
+
+    this.dvTocResizer.style.width = "10px";
+    // this.dvTocResizer.nativeElement.style.width = "10px";
+    this.dvTocResizer.style.background = " #4a87f8";
+    // this.dvTocResizer.nativeElement.style.background = " #4a87f8";
+    const newWidth = e.clientX;
+    if (newWidth > 150 && newWidth < 500) { // min/max width
+      this.dvToc.style.width = newWidth + "px";
+      // this.dvToc.nativeElement.style.width = newWidth + "px";
+    }
+  }
+
+  private onMouseUp(e: MouseEvent) {
+
+    if (!this.dvToc || !this.dvTocResizer) return;
+    if (this.isResizing) {
+      this.isResizing = false;
+      this.dvToc.style.cursor = "";
+      // this.dvToc.nativeElement.style.cursor = "";
+      this.dvTocResizer.style.background = "transparent";
+      // this.dvTocResizer.nativeElement.style.background = "transparent";
+      this.dvTocResizer.style.width = "10px";
+      // this.dvTocResizer.nativeElement.style.width = "10px";
+
+    }
+  }
+
 
 }
