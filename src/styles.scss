@@ -499,19 +499,20 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
 //   padding: 0.2rem; // cursor: grab;
 // }
 
-.dv-host code.language-mermaid svg{
+.dv-host code.language-mermaid svg {
   position: relative;
   display: inline-box;
   width: auto;
   height: auto;
-// .dv-host code.language-mermaid svg {
+  // .dv-host code.language-mermaid svg {
   padding: 0.2rem 0.2rem 0.2rem 0.2rem; // cursor: grab;
   border: 10rem green;
+
   // animation: fade-in 0.7s forwards ease-in;
   // transition: all 0.7s;
   // opacity 0.4s;
   &.theme-enter {
-    background-color: var(--table-border);// red;
+    background-color: var(--table-border); // red;
   }
 }
 
@@ -658,7 +659,7 @@ app-docs-viewer {
   flex: 1;
   // padding: 2rem 2rem 2rem 2rem;
   border-bottom: 5px solid #ddd;
-  display: flex;//flex;
+  display: flex; //flex;
   flex-direction: column; //flex;
   // justify-content: flex-start; //space-between;
   align-items: center;
@@ -730,22 +731,63 @@ app-docs-viewer {
   // overflow-y: auto;
   // overflow: hidden;
 
+  // & .hidden{
+  //   display: none;
+  // }
 }
 
 .dv-toc {
-  // position: relative;
-  width: 240px;
-  border-right: 1px solid #eee;
-  padding: 1rem;
+  position: relative;
+  border-right: 3px solid var(--ap-border);
+  width: auto;
+  min-width: 150px;
+  max-width: 500px;
+  height: 80vh;
+  padding: 0.2rem;
   overflow-y: auto;
   cursor: default;
+
+  & a {
+    display: block;
+    padding: .2rem;
+    color: var(--link-color);
+  }
+
+  &.hidden{
+    display: none;
+  }
 }
 
-.dv-toc li.active>a {
-  font-weight: bold;
-  color: var(--accent-color);
+// .dv-toc a {
+//   display: block;
+//   padding: .2rem;
+//   color: var(--accent-color);
+// }
+
+/* The draggable handle */
+.dv-toc_resizer {
+  width: 5px;
+  cursor: e-resize;
+  background: transparent;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  &:hover {
+    // scale: 1.5;
+    width: 10px;
+    background: #4a87f8;
+    transition: width 0.1s ease-out;
+  }
 }
 
+// .dv-toc_resizer:hover {
+//   // scale: 1.5;
+//   width: 10px;
+//   background: #4a87f8;
+//   transition: width 0.1s ease-out;
+// }
 
 .dv-content {
   flex: 1;

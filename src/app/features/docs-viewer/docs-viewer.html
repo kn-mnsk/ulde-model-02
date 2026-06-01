@@ -38,30 +38,34 @@
 
   <div class="dv-body">
 
-    <!-- Table of Contents
-    @if (toc.length) {
-    <aside class="dv-toc">
+    <!-- Table of Contents -->
+    <!-- @if (toc.length) { -->
+    <!-- @if (($activeHeading())) { -->
+    <aside class="dv-toc hidden" #dvToc>
+      <div class="dv-toc_resizer" #dvTocResizer></div>
+      <h2>Table of Contents</h2>
       <ul>
         @for (item of toc; track item.slug) {
-        <li [class.active]="$activeHeading() === item.slug">
+        <!-- <li [class.active]="$activeHeading() === item.slug"> -->
+        <li>
           <a (click)="scrollTo(item.slug)">{{ item.text }}</a>
         </li>
         }
       </ul>
     </aside>
-    } -->
-    @if (toc.length) {
-    <aside class="dv-toc">
+    <!-- } -->
+
+    <!-- <aside class="dv-toc ">
       <ul>
         @for (item of toc; track item.slug) {
         <li>
-          <!-- <li [class.active]="$activeHeading() === item.slug"> -->
+          <li [class.active]="$activeHeading() === item.slug">
           <a (click)="scrollTo(item.slug)">{{ item.text }}</a>
         </li>
         }
       </ul>
-    </aside>
-    }
+    </aside> -->
+
     <!-- Main content -->
     <main class="dv-content">
       <div #host class="dv-host"></div>
