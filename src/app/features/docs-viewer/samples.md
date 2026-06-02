@@ -109,14 +109,14 @@ Subject:
 Emits values to subscribers only after they subscribe.
 Does not store the last emitted value.
 Perfect for events that are transient (like “element appeared”).
-BehaviorSubject:
 
+__BehaviorSubject:__
 Requires an initial value.
 Always stores the last emitted value and immediately sends it to new subscribers.
 Better for state that should be available instantly to late subscribers.
 Why Subject is better here
-In our case:
 
+__In our case:__
 The HTMLElement does not exist until the @if condition is true.
 If we used BehaviorSubject, we’d have to give it an initial value (probably null), which means:
 Every subscriber would first get null (or some placeholder) before the real element.
