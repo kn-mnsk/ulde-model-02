@@ -1,4 +1,4 @@
-// app/ulde/plugins/assemble/ulde-adebug-overlay-html.plugin.ts
+// app/ulde/plugins/assemble/ulde-debug-overlay-html.plugin.ts
 
 import { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
@@ -7,8 +7,8 @@ import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
 export const UldeDebugOverlayHtmlPlugin: UldePlugin = {
   meta: {
     name: 'ulde-debug-overlay-html',
-    description: 'Renders HTML for the debug overlay.',
-    version: '2.0.0',
+    description: 'Renders unified devtools HTML for the debug overlay.',
+    version: '3.0.0',
   },
 
   phase: UldePhase.ASSEMBLE,
@@ -21,94 +21,103 @@ export const UldeDebugOverlayHtmlPlugin: UldePlugin = {
   run(ctx: UldePhaseContext) {
     const { artifacts } = ctx;
 
-    const debugOverlay = artifacts.debugOverlay;
-    if (!debugOverlay) return;
+    const model = artifacts.debugOverlay;
+    if (!model) return;
 
-    const diagnostics = debugOverlay.diagnostics
-    const summary = debugOverlay.summary
-    const timings = debugOverlay.timings
+    const { summary, diagnostics, timings } = model;
 
     // -----------------------------------------------------
-    // Render debug overlay HTML
+    // Unified Devtools HTML
     // -----------------------------------------------------
-    const debugOverlayHtml = `
-      <div class="ulde-debug-overlay-content">
+    const html = `
+      <div class="dt-panel-content">
 
-        <header class="ap-header">
-          <h2>Debug Overlay</h2>
-          <input
-            name="input"
-            type="text"
-            class="ulde-ap-search"
-            placeholder="Search artifacts…"
-          />
+        <!-- Header -->
+        <header class="dt-header">
+          <div class="dt-title">Debug Overlay</div>
+          <input class="dt-search" placeholder="Search…" />
+          <div class="dt-drag-handle">⣿</div>
         </header>
 
-        <div class="ulde-debug-overlay-summary">
-          <span>Total Giagnostics: ${summary.totalDiagnostics}</span>
-          <span>Total Plugins: ${summary.totalPlugins}</span>
-          <span>Total Time (ms): ${summary.totalTimeMs.toPrecision(5)}</span>
-        </div>
+        <!-- Summary -->
+        <section class="dt-section" data-section="summary">
+          <div class="dt-section-title">
+            <span>Summary</span>
+          </div>
+          <div class="dt-section-body">
+            <div class="dt-item">Total Diagnostics: ${summary.totalDiagnostics}</div>
+            <div class="dt-item">Total Plugins: ${summary.totalPlugins}</div>
+            <div class="dt-item">Total Time: ${summary.totalTimeMs.toPrecision(5)} ms</div>
+          </div>
+        </section>
 
-        <div class="ulde-debug-overlay-diagnostics">
-          <div class="ulde-debug-overlay-diagnostics-header">
-            <span class="ulde-debug-overlay-diagnostics-title">Diagnostic</span>
+        <!-- Diagnostics -->
+        <section class="dt-section" data-section="diagnostics">
+          <div class="dt-section-title">
+            <span>Diagnostics</span>
           </div>
-          <div class="ulde-debug-overlay-diagnostics-body">
-            ${diagnostics.length === 0
-        ? `<div class="ulde-ap-empty">No Diagnostics Entries</div>`
-        : diagnostics.map(renderEntry).join('')}
+          <div class="dt-section-body">
+            ${
+              diagnostics.length === 0
+                ? `<div class="dt-empty">No diagnostics</div>`
+                : diagnostics.map(renderDiagnostic).join('')
+            }
           </div>
-        </div>
+        </section>
 
-        <div class="ulde-debug-overlay-timings">
-          <div class="ulde-debug-overlay-timings-header">
-            <span class="ulde-debug-overlay-timings-title">Diagnostic</span>
+        <!-- Timings -->
+        <section class="dt-section" data-section="timings">
+          <div class="dt-section-title">
+            <span>Timings</span>
           </div>
-          <div class="ulde-debug-overlay-timings-body">
-            ${timings.length === 0
-        ? `<div class="ulde-ap-empty">No Timings Entries</div>`
-        : timings.map(renderEntry).join('')}
+          <div class="dt-section-body">
+            ${
+              timings.length === 0
+                ? `<div class="dt-empty">No timings</div>`
+                : timings.map(renderTiming).join('')
+            }
           </div>
-        </div>
+        </section>
 
       </div>
     `;
 
-    artifacts.html = (artifacts.html ?? '') + debugOverlayHtml;
-    artifacts.finalHtml = (artifacts.finalHtml ?? '') + debugOverlayHtml;
-
-    // console.log(`Log: [UldeDebugOverlayHtmlPlugin] debugOverlatHtml=`, debugOverlayHtml);
+    artifacts.finalHtml = (artifacts.finalHtml ?? '') + html;
 
     artifacts.diagnostics.add({
       plugin: 'ulde-debug-overlay-html',
-      message: 'Debug Overlay HTML rendered.',
+      message: 'Unified devtools Debug Overlay HTML rendered.',
       severity: 'info',
     });
-
   },
-
 };
-
 
 // ---------------------------------------------------------
 // Render Helpers
 // ---------------------------------------------------------
-function renderEntry(entry: any): string {
+
+function renderDiagnostic(d: any): string {
   return `
-    <div class="ulde-ap-item">
-      <pre>${escapeHtml(JSON.stringify(entry, null, 2))}</pre>
+    <div class="dt-item dt-${d.severity}">
+      <span class="dt-item-plugin">${d.plugin}</span>
+      <span class="dt-item-msg">${escapeHtml(d.message)}</span>
     </div>
   `;
 }
 
-// ---------------------------------------------------------
-// Utility
-// ---------------------------------------------------------
+function renderTiming(t: any): string {
+  return `
+    <div class="dt-item">
+      <span class="dt-item-plugin">${t.plugin}</span>
+      <span class="dt-item-phase">${t.phase}</span>
+      <span class="dt-item-time">${t.ms.toPrecision(5)} ms</span>
+    </div>
+  `;
+}
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 }
-

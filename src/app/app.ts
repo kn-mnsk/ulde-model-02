@@ -3,7 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 
 import { DocsViewer } from './features/docs-viewer/docs-viewer';
-import { CURRENT_THEME } from './core/tokens/theme.token';
+// import { CURRENT_THEME } from './core/tokens/theme.token';
 
 @Component({
   selector: 'app-root',

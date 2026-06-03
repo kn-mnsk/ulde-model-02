@@ -10,7 +10,7 @@
       <div class="dv-actions">
 
         <!-- Theme toggle (should become its own component) -->
-        <theme-toggle (toggle)="onToggleTheme()"></theme-toggle>
+        <app-theme-toggle (toggle)="onToggleTheme()"></app-theme-toggle>
 
         <button (click)="backToIndex()">Back</button>
         <button (click)="reloadDoc()">Reload</button>
@@ -20,6 +20,8 @@
         </button>
 
         <button (click)="toggleArtifacts()">Artifacts</button>
+
+        <button (click)="toggleDebugOverlay()">Debug Overlay</button>
       </div>
     </nav>
   </header>
@@ -32,21 +34,22 @@
 
     <!-- TOC Sidebar -->
     @if (showToc()) {
-      <aside class="dv-toc" #dvToc>
-        <div dvTocResizer class="dv-toc-resizer"></div>
+    <aside class="dv-toc" #dvToc>
+      <div appTocResizerDirective [dvTocResizer]="dvToc" class="dv-toc-resizer"></div>
 
-        <h2>Table of Contents</h2>
 
-        <ul>
-          @for (item of toc(); track item.slug) {
-            <li>
-              <a (click)="scrollTo(item.slug)">
-                {{ item.text }}
-              </a>
-            </li>
-          }
-        </ul>
-      </aside>
+      <h2>Table of Contents</h2>
+
+      <ul>
+        @for (item of toc(); track item.slug) {
+        <li>
+          <a (click)="scrollTo(item.slug)">
+            {{ item.text }}
+          </a>
+        </li>
+        }
+      </ul>
+    </aside>
     }
 
     <!-- Main Content -->
@@ -56,19 +59,10 @@
 
   </div>
 
-  <!-- Debug Overlay -->
-  <dv-debug-overlay
-    [model]="debugOverlay"
-    [visible]="$showDebugOverlay()"
-    #debugOverlayHost>
-  </dv-debug-overlay>
+  <div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()" #debugOverlayHost></div>
 
-  <!-- Artifacts Panel -->
-  <dv-artifacts-panel
-    [model]="artifactsPanel"
-    [visible]="$showArtifacts()"
-    #artifactsHost>
-  </dv-artifacts-panel>
+  <div class="dv-artifacts-panel" [class.visible]="$showArtifacts()" #artifactsHost></div>
+
 
 </div>
 
@@ -103,12 +97,12 @@
   </header> -->
 
 
-  <!-- <div class="progress-bar"> -->
-    <!-- <div class="progress-fill" [style.width.%]="scrollService.scrollPercent()"></div> -->
-  <!-- </div> -->
+<!-- <div class="progress-bar"> -->
+<!-- <div class="progress-fill" [style.width.%]="scrollService.scrollPercent()"></div> -->
+<!-- </div> -->
 
 
-  <!-- <div class="dv-body">
+<!-- <div class="dv-body">
 
     @if (showToc) {
     <aside class="dv-toc" #dvToc>
@@ -124,12 +118,12 @@
     </aside>
     } -->
 
-    <!-- Main content -->
-    <!-- <main class="dv-content">
+<!-- Main content -->
+<!-- <main class="dv-content">
       <div #host class="dv-host"></div>
     </main> -->
 
-  <!-- </div> -->
+<!-- </div> -->
 <!--
   <div class="dv-debug-overlay hidden" #debugOverlayHost></div>
 
