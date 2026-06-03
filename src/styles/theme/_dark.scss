@@ -1,0 +1,25 @@
+// styles/theme/_dark.scss
+
+/* ---------------------------------------------------------
+   🌙 Dark Theme
+--------------------------------------------------------- */
+
+[data-theme="dark"] {
+  --bg-color: #1e1e1e;
+  --text-color: #e0e0e0;
+
+  --link-color: lightblue;
+  --link-hover-color: cyan;
+
+  --table-bg-even: #1e1e1e;
+  --table-bg-odd: #111;
+  --table-border: #555;
+  --table-header-bg: #333;
+
+  /* Devtools alias layer */
+  --ap-bg: var(--bg-color);
+  --ap-fg: var(--text-color);
+  --ap-border: var(--table-border);
+  --ap-header-bg: var(--table-header-bg);
+  --ap-hover: rgba(255, 255, 255, 0.05);
+}

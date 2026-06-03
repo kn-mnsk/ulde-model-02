@@ -1,33 +1,30 @@
 // app/feature/docs-viewer/docs-viewer.ts
-import {
-  Component,
-  ElementRef,
-  ViewChild,
-  AfterViewInit,
-  OnDestroy,
-  effect,
-  input,
-  signal,
-  Inject,
-  PLATFORM_ID
-} from '@angular/core';
 
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
+import { TocResizerDirective } from './toc-resizer.directive';
 import { UldeDocsViewerBridge } from '../../ulde/integration/angular/ulde-docs-viewer-bridge.service';
 import { UldeAngularService } from '../../ulde/integration/angular/ulde-angular.service';
 
-import {
-  TocEntry,
-  ArtifactsPanelModel,
-  DebugOverlayModel
-} from '../../ulde/core/artifacts/ulde-artifacts';
+import { TocEntry, ArtifactsPanelModel, DebugOverlayModel } from '../../ulde/core/artifacts/ulde-artifacts';
 
 import { ThemeService } from '../../core/services/theme.service';
+import { ThemeToggle } from './theme-toggle';
+
+// import { DebugOverlay } from './debug-overlay';
+// import { ArtifactsPanel } from './artifacts-panel';
+
+
 
 @Component({
   selector: 'app-docs-viewer',
   standalone: true,
+  imports: [
+    ThemeToggle, TocResizerDirective,
+    // DebugOverlay,
+    //  ArtifactsPanel
+  ],
   templateUrl: './docs-viewer.html'
 })
 export class DocsViewer implements AfterViewInit, OnDestroy {
@@ -58,7 +55,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   private finalHtml: string | null = null;
 
   @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLElement>;
-  @ViewChild('dvToc') dvToc?: ElementRef<HTMLElement>;
+  @ViewChild('dvToc', { static: true }) dvToc!: ElementRef<HTMLElement>;
 
   constructor(
     private bridge: UldeDocsViewerBridge,
@@ -132,19 +129,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     if (!this.$isBrowser()) return;
-
-    // DOM is fully rendered → safe to attach DOM-dependent logic
-    requestAnimationFrame(() => {
-      // TOC resizer directive will attach itself automatically
-    });
-
-    // Debug overlay keyboard shortcut
-    document.addEventListener('keydown', e => {
-      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'd') {
-        e.preventDefault();
-        this.$showDebugOverlay.update(v => !v);
-      }
-    });
   }
 
   ngOnDestroy() {
@@ -210,6 +194,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   toggleArtifacts() {
     this.$showArtifacts.update(v => !v);
+  }
+
+  toggleDebugOverlay() {
+    this.$showDebugOverlay.update(v => !v);
   }
 }
 

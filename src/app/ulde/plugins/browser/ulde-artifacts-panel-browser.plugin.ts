@@ -1,48 +1,44 @@
-// app/ulde/plugins/browser/ulde-artifacts-panel-browser.plugin.ts (2026-05-21)
+// app/ulde/plugins/browser/ulde-artifacts-panel-browser.plugin.ts
 
-import { ɵɵresolveWindow } from '@angular/core';
 import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
 
 export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
   id: 'browser.artifacts-panel',
 
   init(container: HTMLElement) {
-    const isBrowser =
-      typeof window !== 'undefined' &&
-      typeof document !== 'undefined';
-
-    if (!isBrowser) return;
+    if (typeof window === 'undefined') return;
 
     // -----------------------------------------------------
-    // Collapsible GROUPS
+    // Move ULDE-generated HTML into Angular host container
     // -----------------------------------------------------
-    container.querySelectorAll('.ulde-ap-group-header').forEach(header => {
-      header.addEventListener('click', () => {
-        const group = header.closest('.ulde-ap-group');
-        group?.classList.toggle('collapsed');
-      });
-    });
+    const embedded = container.querySelector('.dt-panel-content');
+    if (!embedded) return;
+
+    const host = document.querySelector('.dv-artifacts-panel') as HTMLElement | null;
+    if (!host) return;
+
+    host.appendChild(embedded);
 
     // -----------------------------------------------------
-    // Collapsible SECTIONS
+    // COLLAPSIBLE SECTIONS (Groups + Subsections)
     // -----------------------------------------------------
-    container.querySelectorAll('.ulde-ap-section-header').forEach(header => {
-      header.addEventListener('click', () => {
-        const section = header.closest('.ulde-ap-section');
+    host.querySelectorAll('.dt-section-title').forEach(title => {
+      title.addEventListener('click', () => {
+        const section = title.closest('.dt-section');
         section?.classList.toggle('collapsed');
       });
     });
 
     // -----------------------------------------------------
-    // Fuzzy Search with Highlight
+    // SEARCH + FUZZY HIGHLIGHT
     // -----------------------------------------------------
-    const searchInput = container.querySelector('.ulde-ap-search') as HTMLInputElement | null;
+    const searchInput = host.querySelector('.dt-search') as HTMLInputElement | null;
 
     if (searchInput) {
       searchInput.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase().trim();
 
-        container.querySelectorAll('.ulde-ap-item').forEach((item) => {
+        host.querySelectorAll('.dt-item').forEach((item) => {
           const pre = item.querySelector('pre');
           if (!pre) return;
 
@@ -66,20 +62,55 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
         });
 
         // Auto-collapse empty sections
-        container.querySelectorAll('.ulde-ap-section').forEach((section) => {
-          const visibleItems = section.querySelectorAll('.ulde-ap-item:not(.hidden)');
+        host.querySelectorAll('.dt-section').forEach((section) => {
+          const visibleItems = section.querySelectorAll('.dt-item:not(.hidden)');
           section.classList.toggle('collapsed', visibleItems.length === 0);
-        });
-
-        // Auto-collapse empty groups
-        container.querySelectorAll('.ulde-ap-group').forEach((group) => {
-          const visibleItems = group.querySelectorAll('.ulde-ap-item:not(.hidden)');
-          group.classList.toggle('collapsed', visibleItems.length === 0);
         });
       });
     }
 
-    // Simple HTML escaper (keep in browser plugin)
+    // -----------------------------------------------------
+    // DRAGGABLE PANEL
+    // -----------------------------------------------------
+    const dragHandle = host.querySelector('.dt-drag-handle') as HTMLElement | null;
+    if (dragHandle) {
+      let dragging = false;
+      let offsetX = 0, offsetY = 0;
+
+      dragHandle.addEventListener('mousedown', e => {
+        dragging = true;
+        offsetX = e.clientX - host.offsetLeft;
+        offsetY = e.clientY - host.offsetTop;
+        document.body.style.userSelect = 'none';
+      });
+
+      document.addEventListener('mousemove', e => {
+        if (!dragging) return;
+        host.style.left = `${e.clientX - offsetX}px`;
+        host.style.top = `${e.clientY - offsetY}px`;
+      });
+
+      document.addEventListener('mouseup', () => {
+        dragging = false;
+        document.body.style.userSelect = '';
+      });
+    }
+
+    // -----------------------------------------------------
+    // LEFT-SIDE COLLAPSIBLE SIDEBAR TOGGLE
+    // -----------------------------------------------------
+    const toggle = document.createElement('div');
+    toggle.className = 'dv-artifacts-panel-toggle';
+    toggle.innerHTML = `<span class="chevron">◂</span>`;
+    document.body.appendChild(toggle);
+
+    toggle.addEventListener('click', () => {
+      host.classList.toggle('collapsed');
+    });
+
+    // -----------------------------------------------------
+    // UTILITIES
+    // -----------------------------------------------------
     function escapeHtml(str: string): string {
       return str
         .replace(/&/g, '&amp;')
@@ -87,7 +118,6 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
         .replace(/>/g, '&gt;');
     }
 
-    // Fuzzy highlight: characters in order, wrapped in span
     function highlightFuzzy(raw: string, lower: string, query: string): { isMatch: boolean; html: string } {
       let qi = 0;
       const qlen = query.length;
@@ -99,98 +129,14 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
         const lch = lower[i];
 
         if (qi < qlen && lch === query[qi]) {
-          out += `<span class="ulde-ap-highlight">${escapeHtml(ch)}</span>`;
+          out += `<span class="dt-highlight">${escapeHtml(ch)}</span>`;
           qi++;
         } else {
           out += escapeHtml(ch);
         }
       }
 
-      const isMatch = qi === qlen;
-      return { isMatch, html: out };
+      return { isMatch: qi === qlen, html: out };
     }
-
-
-    // Move ULDE-generated artifacts html into Angular host container
-    const embedded = container.querySelector('.ulde-artifacts-panel-content');
-
-    // console.log(`Log: [UldeArtifactsPanelBrowserPlugin] \nembedded=`, embedded, `\ncontainer=`, container);
-    if (!embedded) return;
-
-    // console.log(`Log: [UldeArtifactsPanelBrowserPlugin] document=`, document);
-
-    // const host = document.createElement('div');
-
-    const host = document.querySelector('.dv-artifacts-panel') as HTMLElement | null;
-    // const host = container.querySelector('.dv-artifacts-panel') as HTMLElement | null;
-    // console.log(`Log: [UldeArtifactsPanelBrowserPlugin] host=`, host);
-    if (!host) return;
-
-    host.appendChild(embedded);
-
-    // console.log(`Log: [UldeArtifactsPanelBrowserPlugin] host=`, host);
-
-    // -----------------------------------------------------
-    // Draggable floating panel
-    // -----------------------------------------------------
-    const dragHandle = host.querySelector('.ulde-ap-header') as HTMLElement | null;
-    if (!dragHandle) return;
-
-    let isDragging = false;
-    let startX = 0;
-    let startY = 0;
-    let startLeft = 0;
-    let startTop = 0;
-
-    const onMouseDown = (e: MouseEvent) => {
-      isDragging = true;
-      const rect = host.getBoundingClientRect();
-      startX = e.clientX;
-      startY = e.clientY;
-      startLeft = rect.left;
-      startTop = rect.top;
-
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    };
-
-    const onMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
-
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-
-      host.style.left = `${startLeft + dx}px`;
-      host.style.top = `${startTop + dy}px`;
-      host.style.right = 'auto';
-      host.style.bottom = 'auto';
-      host.style.position = 'fixed';
-    };
-
-    const onMouseUp = () => {
-      isDragging = false;
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-
-    dragHandle.addEventListener('mousedown', onMouseDown);
-
-    // -----------------------------------------------------
-    // Left-side collapsible sidebar toggle
-    // -----------------------------------------------------
-    const sidebar = host; // dv-artifacts-panel
-    if (sidebar) {
-      // Create toggle button
-      const toggle = document.createElement('div');
-      toggle.className = 'dv-artifacts-panel-toggle';
-      toggle.innerHTML = `<span class="chevron">◂</span>`;
-      document.body.appendChild(toggle);
-
-      toggle.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-      });
-    }
-
   }
-
 };

@@ -1,0 +1,11 @@
+// styles/devtoos/_devtools.animations.scss
+
+.dt-section-body,
+.dt-item {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.dt-item.hidden {
+  opacity: 0;
+  transform: translateX(8px);
+}

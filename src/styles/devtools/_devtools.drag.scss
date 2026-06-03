@@ -1,0 +1,9 @@
+// styles/devtoos/_devtools.drag.scss
+
+.dt-drag-handle {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}

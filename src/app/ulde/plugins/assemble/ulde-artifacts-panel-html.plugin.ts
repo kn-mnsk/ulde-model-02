@@ -7,8 +7,8 @@ import { ArtifactsPanelGroup } from '../../core/artifacts/ulde-artifacts';
 export const UldeArtifactsPanelHtmlPlugin: UldePlugin = {
   meta: {
     name: 'ulde-artifacts-panel-html',
-    description: 'Renders grouped HTML for the artifacts panel.',
-    version: '2.0.0',
+    description: 'Renders unified devtools HTML for the artifacts panel.',
+    version: '3.0.0',
   },
 
   phase: UldePhase.ASSEMBLE,
@@ -25,34 +25,31 @@ export const UldeArtifactsPanelHtmlPlugin: UldePlugin = {
     const groups = panel.groups as ArtifactsPanelGroup[];
 
     // -----------------------------------------------------
-    // Render grouped HTML
+    // Render unified devtools HTML
     // -----------------------------------------------------
-    const artifactsPpanelHtml = `
-      <div class="ulde-artifacts-panel-content">
+    const html = `
+      <div class="dt-panel-content">
 
-        <header class="ulde-ap-header">
-          <h2>Artifacts</h2>
-          <input
-            name="input"
-            type="text"
-            class="ulde-ap-search"
-            placeholder="Search artifacts…"
-          />
+        <!-- Header -->
+        <header class="dt-header">
+          <div class="dt-title">Artifacts</div>
+          <input class="dt-search" placeholder="Search artifacts…" />
+          <div class="dt-drag-handle">⣿</div>
         </header>
 
-        <div class="ulde-ap-groups">
+        <!-- Groups -->
+        <div class="dt-groups">
           ${groups.map(renderGroup).join('')}
         </div>
 
       </div>
     `;
 
-    ctx.artifacts.finalHtml = (ctx.artifacts.finalHtml ?? '') + artifactsPpanelHtml;
-
+    ctx.artifacts.finalHtml = (ctx.artifacts.finalHtml ?? '') + html;
 
     ctx.artifacts.diagnostics.add({
       plugin: 'ulde-artifacts-panel-html',
-      message: 'Grouped artifacts panel HTML rendered.',
+      message: 'Unified devtools Artifacts Panel HTML rendered.',
       severity: 'info',
     });
   },
@@ -64,14 +61,12 @@ export const UldeArtifactsPanelHtmlPlugin: UldePlugin = {
 
 function renderGroup(group: ArtifactsPanelGroup): string {
   return `
-    <section class="ulde-ap-group" data-group="${group.id}">
-      <div class="ulde-ap-group-header">
-        <span class="ulde-ap-group-icon">${group.icon}</span>
-        <span class="ulde-ap-group-title">${group.title}</span>
-        <span class="chevron">▸</span>
+    <section class="dt-section" data-group="${group.id}">
+      <div class="dt-section-title">
+        <span>${group.icon} ${group.title}</span>
       </div>
 
-      <div class="ulde-ap-group-body">
+      <div class="dt-section-body">
         ${group.sections.map(renderSection).join('')}
       </div>
     </section>
@@ -80,17 +75,17 @@ function renderGroup(group: ArtifactsPanelGroup): string {
 
 function renderSection(sec: any): string {
   return `
-    <div class="ulde-ap-section" data-section="${sec.id}">
-      <div class="ulde-ap-section-header">
-        <span class="ulde-ap-icon">${sec.icon}</span>
-        <span class="ulde-ap-section-title">${sec.title}</span>
-        <span class="chevron">▸</span>
+    <div class="dt-section" data-section="${sec.id}">
+      <div class="dt-section-title">
+        <span>${sec.icon} ${sec.title}</span>
       </div>
 
-      <div class="ulde-ap-section-body">
-        ${sec.items.length === 0
-          ? `<div class="ulde-ap-empty">No items</div>`
-          : sec.items.map(renderItem).join('')}
+      <div class="dt-section-body">
+        ${
+          sec.items.length === 0
+            ? `<div class="dt-empty">No items</div>`
+            : sec.items.map(renderItem).join('')
+        }
       </div>
     </div>
   `;
@@ -98,7 +93,7 @@ function renderSection(sec: any): string {
 
 function renderItem(item: any): string {
   return `
-    <div class="ulde-ap-item">
+    <div class="dt-item">
       <pre>${escapeHtml(JSON.stringify(item, null, 2))}</pre>
     </div>
   `;

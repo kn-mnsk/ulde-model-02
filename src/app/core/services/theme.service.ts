@@ -1,19 +1,14 @@
 // app/core/services/theme.service.ts
 
-
 import { Injectable } from '@angular/core';
 import { isBrowser } from '../../global.utils/global.utils';
 
-import mermaid from 'mermaid';
-
-// export ThemeName:  'light' | 'dark';
 export type ThemeName = 'light' | 'dark';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private readonly storageKey = 'app-theme';
   private readonly attrName = 'data-theme';
-  // private readonly mermaidName = 'data-theme';
 
   constructor() {
     if (!isBrowser()) return;
@@ -44,10 +39,6 @@ export class ThemeService {
     sessionStorage.setItem(this.storageKey, theme as string);
     // console.log(`Log: [ThemeService] setTheme =`, theme);
   }
-
-  // getTheme(): string{
-  //   return sessionStorage.getItem(this.storageKey)?? 'dark';
-  // }
 
   private applyTheme(theme: ThemeName, opts: { animate: boolean }) {
 
@@ -89,6 +80,7 @@ export class ThemeService {
     setTimeout(() => panel.classList.remove('theme-enter'), 180);
   }
 
+  // test implementation
   private animateMermaid() {
     // const mermaidSvgs = document.querySelectorAll('.language-mermaid');
     const mermaidSvgs = document.querySelectorAll('code.language-mermaid svg');

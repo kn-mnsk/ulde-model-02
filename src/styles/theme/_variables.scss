@@ -1,0 +1,26 @@
+// styles/theme/_variables.scss
+
+/* ---------------------------------------------------------
+🎨  Global Theme Variables (Base)
+--------------------------------------------------------- */
+
+:root {
+  /* Core semantic tokens */
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --link-color: blue;
+  --link-hover-color: darkblue;
+
+  /* Table */
+  --table-bg-even: #f9f9f9;
+  --table-bg-odd: #ffffff;
+  --table-border: #333;
+  --table-header-bg: #e0e0e0;
+
+  /* Devtools alias layer */
+  --ap-bg: var(--bg-color);
+  --ap-fg: var(--text-color);
+  --ap-border: var(--table-border);
+  --ap-header-bg: var(--table-header-bg);
+  --ap-hover: rgba(0, 0, 0, 0.05);
+}
