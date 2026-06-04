@@ -1,9 +1,19 @@
 // styles/devtoos/devtools.scss
 
-@use './devtools.variables.scss';
-@use './devtools.panel.scss';
-@use './devtools.header.scss';
-@use './devtools.sections.scss';
-@use './devtools.items.scss';
-@use './devtools.animations.scss';
-@use './devtools.drag.scss';
+// @use './devtools.variables.scss';
+// @use './devtools.panel.scss';
+// @use './devtools.header.scss';
+// @use './devtools.sections.scss';
+// @use './devtools.items.scss';
+// @use './devtools.animations.scss';
+// @use './devtools.drag.scss';
+
+
+@use './devtools.variables' as *;
+@use './devtools.panel' as *;
+@use './devtools.header' as *;
+@use './devtools.sections' as *;
+@use './devtools.items' as *;
+@use './devtools.animations' as *;
+@use './devtools.drag' as *;
+

@@ -1,13 +1,14 @@
 // styles/theme/_variables.scss
 
 /* ---------------------------------------------------------
-🎨  Global Theme Variables (Base)
+🎨  Base Theme Variables (Semantic Tokens)
 --------------------------------------------------------- */
 
 :root {
   /* Core semantic tokens */
   --bg-color: #ffffff;
   --text-color: #000000;
+
   --link-color: blue;
   --link-hover-color: darkblue;
 

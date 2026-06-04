@@ -1,0 +1,199 @@
+// styles/docs-viewer/_theme.aware.layout.scss
+
+/* ---------------------------------------------------------
+   Docs Viewer — Theme‑Aware Layout
+--------------------------------------------------------- */
+
+app-docs-viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* ---------------------------------------------------------
+   Header
+--------------------------------------------------------- */
+
+.dv-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid var(--table-border);
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dv-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+/* ---------------------------------------------------------
+   Body Layout
+--------------------------------------------------------- */
+
+.dv-body {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 120px);
+  overflow: hidden;
+  background: var(--bg-color);
+  transition: background-color 0.4s ease;
+}
+
+/* ---------------------------------------------------------
+   TOC (Left Sidebar)
+--------------------------------------------------------- */
+
+.dv-toc {
+  width: 260px;
+  min-width: 160px;
+  max-width: 420px;
+  padding: 0.5rem;
+  overflow-y: auto;
+
+  border-right: 2px solid var(--table-border);
+  background: var(--bg-color);
+  color: var(--text-color);
+
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease,
+    border-color 0.4s ease;
+
+  & a {
+    display: block;
+    padding: 0.25rem 0.5rem;
+    color: var(--link-color);
+    transition: color 0.25s ease;
+
+    &:hover {
+      color: var(--link-hover-color);
+      text-decoration: underline;
+    }
+  }
+
+  &.hidden {
+    display: none;
+  }
+}
+
+/* Draggable TOC Resizer */
+.dv-toc-resizer {
+  width: 6px;
+  cursor: ew-resize;
+  background: transparent;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: var(--ap-hover);
+  }
+}
+
+/* ---------------------------------------------------------
+   Content Area
+--------------------------------------------------------- */
+
+.dv-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  background: var(--bg-color);
+  color: var(--text-color);
+
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+.dv-host {
+  width: 100%;
+}
+
+/* ---------------------------------------------------------
+   Markdown Tables (Theme‑Aware)
+--------------------------------------------------------- */
+
+.dv-content table {
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 1rem;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.dv-content th {
+  background: var(--table-header-bg);
+  color: var(--text-color);
+}
+
+.dv-content th,
+.dv-content td {
+  border: 1px solid var(--table-border);
+  padding: 0.4rem 0.6rem;
+}
+
+.dv-content tr:nth-child(even) {
+  background: var(--table-bg-even);
+}
+
+.dv-content tr:nth-child(odd) {
+  background: var(--table-bg-odd);
+}
+
+/* ---------------------------------------------------------
+   Inline Highlight (scroll‑to)
+--------------------------------------------------------- */
+
+.inline-highlight {
+  background-color: rgba(255, 208, 0, 0.5);
+  transition: background-color 0.7s ease-in-out;
+}
+
+/* ---------------------------------------------------------
+   Mermaid Container (Theme‑Aware)
+--------------------------------------------------------- */
+
+.dv-host .mermaid-container {
+  border: 2px solid var(--table-border);
+  background: var(--bg-color);
+  transition: background-color 0.4s ease, border-color 0.4s ease;
+  margin-bottom: 1rem;
+}
+
+.dv-host code.language-mermaid svg {
+  padding: 0.25rem;
+  background: var(--bg-color);
+  transition: background-color 0.4s ease;
+}
+
+/* ---------------------------------------------------------
+   Scroll Debug Overlay (Theme‑Aware)
+--------------------------------------------------------- */
+
+.dv-scroll-debug-overlay {
+  position: fixed;
+  top: 12px;
+  right: 250px;
+  background: rgba(35, 35, 35, 0.78);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+
+  &.visible {
+    opacity: 1;
+  }
+}
