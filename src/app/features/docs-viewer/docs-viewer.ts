@@ -1,6 +1,6 @@
 // app/feature/docs-viewer/docs-viewer.ts
 
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, Inject, PLATFORM_ID, computed } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 import { TocResizerDirective } from './toc-resizer.directive';
@@ -49,13 +49,14 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   $activeHeading = signal<string | null>(null);
   $showDebugOverlay = signal(false);
   $showArtifacts = signal(false);
-  showToc = signal(false);
+  $showToc = signal(false);
+  $dvTocRef = signal<ElementRef<HTMLElement> | undefined>(undefined);
 
   private cleanupFn: (() => void) | null = null;
   private finalHtml: string | null = null;
 
   @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLElement>;
-  @ViewChild('dvToc', { static: true }) dvToc!: ElementRef<HTMLElement>;
+  @ViewChild('dvToc', { static: false }) dvTocRef!: ElementRef<HTMLElement>;
 
   constructor(
     private bridge: UldeDocsViewerBridge,
@@ -124,11 +125,14 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
           this.$currentReload.set(true);
         }
       });
+
+      this.$dvTocRef.set(this.dvTocRef);
     });
   }
 
   ngAfterViewInit() {
     if (!this.$isBrowser()) return;
+
   }
 
   ngOnDestroy() {
@@ -181,6 +185,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // Theme toggle
   async onToggleTheme() {
+    // console.log(`Log: [DocsViewer] theme isDark=`, isDark);
     this.theme.toggleTheme();
     if (this.finalHtml) {
       await this.bridge.host.run(this.hostRef.nativeElement, this.finalHtml);
@@ -189,7 +194,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // UI toggles
   toggleShowToc() {
-    this.showToc.update(v => !v);
+    // this.$dvTocRef.set(this.dvTocRef);
+    this.$showToc.update(v => !v);
   }
 
   toggleArtifacts() {

@@ -10,33 +10,33 @@
       <div class="dv-actions">
 
         <!-- Theme toggle (should become its own component) -->
-        <app-theme-toggle (toggle)="onToggleTheme()"></app-theme-toggle>
-
-        <button (click)="backToIndex()">Back</button>
-        <button (click)="reloadDoc()">Reload</button>
-
-        <button (click)="toggleShowToc()">
-          {{ showToc() ? 'Hide TOC' : 'Show TOC' }}
-        </button>
-
-        <button (click)="toggleArtifacts()">Artifacts</button>
-
-        <button (click)="toggleDebugOverlay()">Debug Overlay</button>
+        <app-theme-toggle (toggleTheme)="onToggleTheme()"></app-theme-toggle>
+        <div class="dv-button">
+          <button (click)="backToIndex()">Back</button>
+          <button (click)="reloadDoc()">Reload</button>
+          <button (click)="toggleShowToc()">{{ $showToc() ? 'Hide TOC' : 'Show TOC' }}</button>
+          <button (click)="toggleArtifacts()">Artifacts</button>
+          <button (click)="toggleDebugOverlay()">Debug Overlay</button>
+        </div>
       </div>
     </nav>
   </header>
 
   <!-- Optional progress bar -->
-  <div class="progress-bar"></div>
+  <div class="progress-bar">
+    <div class="progress-bar_fill" [style.width.%]="100">
+      <!-- </div><div class="progress-bar_fill" [style.width.%]="scrollService.scrollPercent()">
+    </div> -->
+    </div>
+  </div>
 
   <!-- Body -->
   <div class="dv-body">
 
     <!-- TOC Sidebar -->
-    @if (showToc()) {
+    @if ($showToc()) {
     <aside class="dv-toc" #dvToc>
-      <div appTocResizerDirective [dvTocResizer]="dvToc" class="dv-toc-resizer"></div>
-
+      <div appTocResizerDirective [dvTocResizer]="$dvTocRef()?.nativeElement" class="dv-toc-resizer"></div>
 
       <h2>Table of Contents</h2>
 
@@ -62,7 +62,6 @@
   <div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()" #debugOverlayHost></div>
 
   <div class="dv-artifacts-panel" [class.visible]="$showArtifacts()" #artifactsHost></div>
-
 
 </div>
 
