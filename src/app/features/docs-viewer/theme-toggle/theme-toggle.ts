@@ -19,5 +19,6 @@ export class ThemeToggle {
   toggle() {
     this.isDark.update(v => !v);
     this.toggleTheme.emit();
+    // console.log(`Log: [ThemeToggle] isDark=`, this.isDark());
   }
 }

@@ -29,8 +29,8 @@ const mermaidConfigDarkTheme: MermaidConfig = {
     clusterBorder: '#63b3ed'
   },
   flowchart: { htmlLabels: true, curve: 'linear' },
-  state: {radius: 10},
-  sequence:{noteFontSize: '20px'}
+  state: { radius: 10 },
+  sequence: { noteFontSize: '20px' }
 };
 
 const mermaidConfigLightTheme: MermaidConfig = {
@@ -83,14 +83,9 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
     try {
 
       // mermaid initializing in sync with docTeme;
-      // const themeName = (window as any).__APP_THEME__;
-      // console.log(currentTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme, `\ntheme=`, currentTheme);
       mermaid.initialize(currentTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme);
+      // console.log(`Log: [UldeMermaidBrowserPlugin] currentTheme=`, currentTheme);
 
-      // // Initialize Mermaid (safe to call multiple times)
-      // mermaid.initialize({
-      //   startOnLoad: false
-      // });
 
       /*
       Source - https://stackoverflow.com/a/79199554
@@ -112,6 +107,7 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
       const postRenderCB = (svgId: any) => {
         const selectorId = "#" + svgId;
         const svg = container.querySelector(selectorId) as SVGElement;
+        // console.log(`Log: [UldeMermaidBrowserPlugin] svg=`, svg);
         if (!svg) return;
 
         // Initialize Panzoom
@@ -171,12 +167,22 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
 
         pre.insertBefore(buttonContainer, codeNode);
 
+        // console.log(`Log: [UldeMermaidBrowserPlugin] final pr=`, pre);
+
       }
 
-      await mermaid.run({
-        nodes: mermaidNodes,
-        postRenderCallback: postRenderCB,
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          mermaid.run({
+            nodes: mermaidNodes,
+            postRenderCallback: postRenderCB,
+          });
+        });
       });
+      // await mermaid.run({
+      //   nodes: mermaidNodes,
+      //   postRenderCallback: postRenderCB,
+      // });
 
     } catch (err) {
       // mermaidNodes.forEach(n => console.log(`Log: `, n.children[0].ariaRoleDescription));
