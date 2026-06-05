@@ -1,12 +1,14 @@
 // ulde/plugins/browser/ulde-mermaid-browser.plugin.ts
 
-import { inject } from '@angular/core';
 import mermaid, { MermaidConfig } from 'mermaid';
 import Panzoom from '@panzoom/panzoom'
 import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
-// import { currentTheme } from '../../../global.utils/global.utils';
+import { first, interval, switchMap, tap } from 'rxjs';
 
-import { ThemeName, ThemeService } from '../../../core/services/theme.service';
+
+/* ---------------------------------------------------------
+   Mermaid Theme Configs
+--------------------------------------------------------- */
 
 const mermaidConfigDarkTheme: MermaidConfig = {
   startOnLoad: false,
@@ -56,12 +58,73 @@ const mermaidConfigLightTheme: MermaidConfig = {
   flowchart: { htmlLabels: true, curve: 'basis' }
 };
 
+/* ---------------------------------------------------------
+   Debug Panel (Hidden by Default)
+--------------------------------------------------------- */
 
-let handler!: (event: WheelEvent) => void;
-let container!: HTMLElement;
-let zoomInHandlers: Array<{ button: HTMLButtonElement, handler: (e: Event) => void }> = [];
-let zoomOutHandlers: Array<{ button: HTMLButtonElement, handler: (e: Event) => void }> = [];
-let resetHandlers: Array<{ button: HTMLButtonElement, handler: (e: Event) => void }> = [];
+function createMermaidDebugPanel(): HTMLDivElement {
+  let panel = document.getElementById('mermaid-debug-panel') as HTMLDivElement;
+
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'mermaid-debug-panel';
+    panel.classList = 'mermaid-debug-panel';
+    // panel.style.position = 'fixed';
+    // panel.style.bottom = '30px';
+    // panel.style.right = '30px';
+    // panel.style.width = '320px';
+    // panel.style.maxHeight = '200px';
+    // panel.style.overflowY = 'auto';
+    // panel.style.background = 'rgba(0,0,0,0.75)';
+    // panel.style.color = '#fff';
+    // panel.style.fontSize = '12px';
+    // panel.style.padding = '8px';
+    // panel.style.borderRadius = '6px';
+    // panel.style.zIndex = '999999';
+    // panel.style.display = 'none'; // hidden by default
+    // panel.style.whiteSpace = 'pre-wrap';
+    // panel.style.fontFamily = 'monospace';
+
+    document.body.appendChild(panel);
+  }
+
+  return panel;
+}
+
+function logMermaidDebug(message: string) {
+  const panel = createMermaidDebugPanel();
+  // panel.style.display = 'none';
+  // panel.style.display = 'block';
+
+  const entry = document.createElement('div');
+  entry.textContent = message;
+  entry.style.marginBottom = '6px';
+
+  panel.appendChild(entry);
+}
+
+// // Optional: toggle panel with Ctrl+Shift+M
+// window.addEventListener('keydown', (e) => {
+//   if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'm') {
+//     const panel = document.getElementById('mermaid-debug-panel') as HTMLDivElement | null;
+//     if (panel) {
+//       panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+//     }
+//   }
+// });
+
+
+/* ---------------------------------------------------------
+   Panzoom Handler Storage
+--------------------------------------------------------- */
+
+let zoomInHandlers: Array<{ button: HTMLButtonElement; handler: (e: Event) => void }> = [];
+let zoomOutHandlers: Array<{ button: HTMLButtonElement; handler: (e: Event) => void }> = [];
+let resetHandlers: Array<{ button: HTMLButtonElement; handler: (e: Event) => void }> = [];
+
+/* ---------------------------------------------------------
+   ULDE Mermaid Browser Plugin
+--------------------------------------------------------- */
 
 export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
   id: 'browser.mermaid',
@@ -73,120 +136,182 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
 
     if (!isBrowser) return;
 
-    const currentTheme = sessionStorage.getItem('app-theme');
-    // const currentTheme = (window as any).__APP_THEME__;
-    let mermaidNodes!: NodeListOf<HTMLElement>;
 
-    mermaidNodes = container.querySelectorAll<HTMLElement>('code.language-mermaid');
+    // Optional: toggle panel with Ctrl+Shift+M
+    window.addEventListener('keydown', (e) => {
+      e.preventDefault();
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'm') {
+
+        const panel = document.getElementById('mermaid-debug-panel') as HTMLDivElement | null;
+        // console.log(`Log: [UldeMermaidBrowserPlugin:] keydown event`, e, panel);
+        if (panel) {
+          panel.classList.toggle('visible');
+
+
+          console.log(`Log: [UldeMermaidBrowserPlugin:] keydown event`, e, panel.classList.length, panel);
+          // panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+
+        // console.log(`Log: [UldeMermaidBrowserPlugin:] keydown event`, e, panel);
+      }
+    });
+
+
+    const currentTheme = sessionStorage.getItem('app-theme');
+    let mermaidNodes: NodeListOf<HTMLElement> = container.querySelectorAll<HTMLElement>('code.language-mermaid');
     // console.log(`Log: [UldeMermaidBrowserPlugin] mermaidNodes=`, mermaidNodes);
 
-    try {
 
-      // mermaid initializing in sync with docTeme;
-      mermaid.initialize(currentTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme);
-      // console.log(`Log: [UldeMermaidBrowserPlugin] currentTheme=`, currentTheme);
+    // Wait until mermaid code blocks actually exist
+    const waitForMermaidNodes = () =>
+      new Promise<void>((resolve) => {
+        const check = () => {
+          mermaidNodes = container.querySelectorAll<HTMLElement>('code.language-mermaid');
+          if (mermaidNodes.length > 0) {
+            resolve();
+            return true;
+          }
+          return false;
+        };
 
+        if (check()) return;
 
-      /*
-      Source - https://stackoverflow.com/a/79199554
-      Posted by grappler
-      Retrieved 2026-04-23, License - CC BY-SA 4.0
-      */
-
-      // mermaid code block <pre><code class="language-container">...</code></pre> by mardown-it
-
-
-      /**
-       * A callback to call after each diagram is rendered.
-       * mermaid code block: <pre><code class="language-mermaid">'mermaid source'</code></pre>, generated by "markdown-it"
-       * this callback changes <pre><code class="language-mermaid"><svg>...</svg></code></pre>to to
-       * <pre class="mermaid-container"><div class="mermaid-button-container"><code class="language-mermaid"><svg>...</svg></code></pre>, also to implement zoomIn, zoomOut, reset evens.
-       * @param svgId
-       * @returns
-       */
-      const postRenderCB = (svgId: any) => {
-        const selectorId = "#" + svgId;
-        const svg = container.querySelector(selectorId) as SVGElement;
-        // console.log(`Log: [UldeMermaidBrowserPlugin] svg=`, svg);
-        if (!svg) return;
-
-        // Initialize Panzoom
-        const panzoom = Panzoom(svg as SVGElement, {
-          maxScale: 5,
-          minScale: 0.5,
-          step: 0.1,
+        const observer = new MutationObserver(() => {
+          if (check()) observer.disconnect();
         });
 
-        // code node
-        const codeNode = svg.parentNode;
-        // pre node
-        const pre = codeNode?.parentElement;
-        if (!pre || !codeNode) return;
-
-        pre.className = "mermaid-container";
-
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = "mermaid-button-container";
-        // zoomin
-        const zoomIn = document.createElement('button');
-        zoomIn.className = "mermaid-zoomin-button";
-        zoomIn.innerText = "+";
-        const handlerIn = (event: Event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          panzoom.zoomIn({ animate: true });
-        };
-        zoomIn.addEventListener('click', handlerIn);
-        zoomInHandlers.push({ button: zoomIn, handler: handlerIn });
-        // zoomout
-        const zoomOut = document.createElement('button');
-        zoomOut.className = "mermaid-zoomout-button";
-        zoomOut.innerText = "-";
-        const handlerOut = (event: Event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          panzoom.zoomOut({ animate: true });
-        };
-        zoomOut.addEventListener('click', handlerOut);
-        zoomOutHandlers.push({ button: zoomOut, handler: handlerOut });
-        // rset
-        const reset = document.createElement('button');
-        reset.className = "mermaid-reset-button";
-        reset.innerText = "reset";
-        const handlerReset = (event: Event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          panzoom.reset({ animate: false });
-        };
-        reset.addEventListener('click', handlerReset);
-        resetHandlers.push({ button: reset, handler: handlerReset });
-
-        buttonContainer.appendChild(zoomIn);
-        buttonContainer.appendChild(zoomOut);
-        buttonContainer.appendChild(reset);
-
-        pre.insertBefore(buttonContainer, codeNode);
-
-        // console.log(`Log: [UldeMermaidBrowserPlugin] final pr=`, pre);
-
-      }
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          mermaid.run({
-            nodes: mermaidNodes,
-            postRenderCallback: postRenderCB,
-          });
-        });
+        observer.observe(container, { childList: true, subtree: true });
       });
-      // await mermaid.run({
-      //   nodes: mermaidNodes,
-      //   postRenderCallback: postRenderCB,
-      // });
 
-    } catch (err) {
-      // mermaidNodes.forEach(n => console.log(`Log: `, n.children[0].ariaRoleDescription));
-      console.error('Error: [ULDE Mermaid Browser Plugin]:', err);
+    /*
+    Source - https://stackoverflow.com/a/79199554
+    Posted by grappler
+    Retrieved 2026-04-23, License - CC BY-SA 4.0
+    */
+
+    // mermaid code block <pre><code class="language-container">...</code></pre> by mardown-it
+
+
+    /**
+     * A callback to call after each diagram is rendered.
+     * mermaid code block: <pre><code class="language-mermaid">'mermaid source'</code></pre>, generated by "markdown-it"
+     * this callback changes <pre><code class="language-mermaid"><svg>...</svg></code></pre>to to
+     * <pre class="mermaid-container"><div class="mermaid-button-container"><code class="language-mermaid"><svg>...</svg></code></pre>, also to implement zoomIn, zoomOut, reset evens.
+     * @param svgId
+     * @returns
+     */
+    const postRenderCB = (svgId: any) => {
+      const selectorId = "#" + svgId;
+      const svg = container.querySelector(selectorId) as SVGElement;
+      // console.log(`Log: [UldeMermaidBrowserPlugin] svg=`, svg);
+      if (!svg) return;
+
+      // Initialize Panzoom
+      const panzoom = Panzoom(svg as SVGElement, {
+        maxScale: 5,
+        minScale: 0.5,
+        step: 0.1,
+      });
+
+      // code node
+      const codeNode = svg.parentNode;
+      // pre node
+      const pre = codeNode?.parentElement;
+      if (!pre || !codeNode) return;
+
+      pre.className = "mermaid-container";
+
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = "mermaid-button-container";
+      // zoomin
+      const zoomIn = document.createElement('button');
+      zoomIn.className = "mermaid-zoomin-button";
+      zoomIn.innerText = "+";
+      const handlerIn = (event: Event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        panzoom.zoomIn({ animate: true });
+      };
+      zoomIn.addEventListener('click', handlerIn);
+      zoomInHandlers.push({ button: zoomIn, handler: handlerIn });
+      // zoomout
+      const zoomOut = document.createElement('button');
+      zoomOut.className = "mermaid-zoomout-button";
+      zoomOut.innerText = "-";
+      const handlerOut = (event: Event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        panzoom.zoomOut({ animate: true });
+      };
+      zoomOut.addEventListener('click', handlerOut);
+      zoomOutHandlers.push({ button: zoomOut, handler: handlerOut });
+      // rset
+      const reset = document.createElement('button');
+      reset.className = "mermaid-reset-button";
+      reset.innerText = "reset";
+      const handlerReset = (event: Event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        panzoom.reset({ animate: false });
+      };
+      reset.addEventListener('click', handlerReset);
+      resetHandlers.push({ button: reset, handler: handlerReset });
+
+      buttonContainer.appendChild(zoomIn);
+      buttonContainer.appendChild(zoomOut);
+      buttonContainer.appendChild(reset);
+
+      pre.insertBefore(buttonContainer, codeNode);
+
+      // console.log(`Log: [UldeMermaidBrowserPlugin] final pr=`, pre);
+
+    }
+
+    try {
+      // Patch Mermaid internal async error handler → log to debug panel
+      mermaid.parseError = (err: any, hash: any) => {
+        logMermaidDebug(
+          `[Mermaid internal error]\n${err?.message || err}\nHash: ${hash ?? 'n/a'}`
+        );
+      };
+
+      // Also catch global Mermaid-related errors
+      window.addEventListener('error', (event: any) => {
+        const error = event.error;
+        if (error && typeof error.stack === 'string' && error.stack.includes('mermaid')) {
+          logMermaidDebug(`[Window error]\n${error.message}`);
+          // Do not preventDefault globally; just log
+        }
+      });
+
+      window.addEventListener('unhandledrejection', (event: any) => {
+        const reason: any = event.reason;
+        if (reason && typeof reason.stack === 'string' && reason.stack.includes('mermaid')) {
+          logMermaidDebug(`[Unhandled Promise Rejection]\n${reason.message}`);
+        }
+      });
+
+      // Wait until mermaid code blocks exist
+      await waitForMermaidNodes();
+
+      // Initialize Mermaid AFTER nodes exist
+      mermaid.initialize({
+        ...(currentTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme),
+        // suppressErrorRendering: true // avoid red "Syntax error" diagrams
+      });
+
+      // Run Mermaid
+      await mermaid.run({
+        nodes: mermaidNodes,
+        postRenderCallback: postRenderCB
+      });
+
+    } catch (err: any) {
+      // Only log to debug panel, not console
+      logMermaidDebug(
+        `[ULDE Mermaid Browser Plugin caught error]\n${err?.message || String(err)}`
+      );
     }
   }
 };
