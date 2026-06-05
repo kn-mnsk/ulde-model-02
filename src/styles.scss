@@ -486,6 +486,35 @@ Retrieved 2026-04-23, License - CC BY-SA 4.0
 }
 
 
+/* ---------------------------------------------------------
+   Mermaid Debug Panel (Hidden by Default)
+--------------------------------------------------------- */
+
+.mermaid-debug-panel {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 320px;
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--bg-color);//rgba(0, 0, 0, 0.75);
+  color: var(--text-color);// #fff;
+  font-size: 12px;
+  padding: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: solid 5px var(--ap-border);
+  z-index: 2000;//999999;
+  display: block; // hidden by default
+  white-space: pre-wrap;
+  font-family: monospace;
+  // opacity: 0.8;
+  &.visible {
+    display: none;
+  }
+
+}
+
 
 /* ---------------------------------------------------------
    Debug Tools for docs-viewer_content
@@ -680,7 +709,7 @@ app-docs-viewer {
 --------------------------------------------- */
 
 /* Root container */
-.ulde-artifacts-panel-content {
+.ulde-artifacts- {
   font-family: system-ui, sans-serif;
   padding: 0;
   margin: 0;
@@ -897,9 +926,8 @@ app-docs-viewer {
 
 
 /* -------------------------------------------------------
-   draggable artifacts panel
-------------------------------------------------------- */
-/* Floating draggable artifacts panel container */
+   draggable artifacts */
+/* Floating draggable artifacts */
 .dv-artifacts-panel {
   position: fixed;
   right: 24px;
@@ -916,13 +944,13 @@ app-docs-viewer {
 }
 
 /* Make header the drag handle */
-.dv-artifacts-panel .ulde-ap-header {
+.dv-artifacts-ap-header {
   cursor: move;
   border-bottom: 1px solid var(--ap-border, #333);
 }
 
 /* Optional: subtle resize affordance */
-.dv-artifacts-panel::after {
+.dv-artifacts-after {
   content: '';
   position: absolute;
   right: 6px;
@@ -1029,19 +1057,19 @@ app-docs-viewer {
 }
 
 
-// .dv-artifacts-panel.hidden {
+// .dv-artifacts-{
 //   display: none;
 //   // opacity: 0;
 //   // transform: translateX(8px);
 // }
 /* Collapsed state */
-// .dv-artifacts-panel.collapsed {
+// .dv-artifacts-{
 //   width: 0;
 //   transform: translateX(-100%);
 // }
 
 /* Collapse toggle button */
-.dv-artifacts-panel-toggle {
+.dv-artifacts- {
   position: fixed;
   top: 12px;
   left: 12px;
@@ -1059,15 +1087,15 @@ app-docs-viewer {
   transition: background 0.2s ease;
 }
 
-.dv-artifacts-panel-toggle:hover {
+.dv-artifacts-hover {
   background: var(--ap-hover);
 }
 
-.dv-artifacts-panel-toggle .chevron {
+.dv-artifacts-chevron {
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dv-artifacts-panel.collapsed.dv-artifacts-panel-toggle .chevron {
+.dv-artifacts-dv-artifacts-chevron {
   transform: rotate(180deg);
 }
 

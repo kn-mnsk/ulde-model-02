@@ -47,6 +47,7 @@ export const UldeAnchorsBrowserPlugin: BrowserDomPlugin = {
     //
     const internalLinks = container.querySelectorAll('a[href^="#docId:"]');
 
+    try {
     internalLinks.forEach(a => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
@@ -60,6 +61,9 @@ export const UldeAnchorsBrowserPlugin: BrowserDomPlugin = {
         }));
       });
     });
+    } catch(err){
+        console.error('Error: [UldeAnchorsBrowserPlugin]:', err);
+    }
 
   }
 

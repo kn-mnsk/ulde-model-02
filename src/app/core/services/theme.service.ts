@@ -21,8 +21,14 @@ export class ThemeService {
     if (!isBrowser()) {
       return 'light';// default for SSR
     };
-    const attr = document.documentElement.getAttribute(this.attrName) as ThemeName | null;
+    let attr:ThemeName | null = null;
+    try {
+      attr = document.documentElement.getAttribute(this.attrName) as ThemeName | null;
+    } catch (err) {
+      console.error('Error: [ThemeService]:', err);
+    }
     return attr ?? 'light';
+
   }
 
   toggleTheme(): void {
