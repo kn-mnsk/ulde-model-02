@@ -14,6 +14,8 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
     const embedded = container.querySelector('.dt-panel-content');
     if (!embedded) return;
 
+    const panelHeader = embedded.querySelector('.dt-header');
+
     const host = document.querySelector('.dv-artifacts-panel') as HTMLElement | null;
     if (!host) return;
 
@@ -102,7 +104,9 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
     const toggle = document.createElement('div');
     toggle.className = 'dv-artifacts-panel-toggle';
     toggle.innerHTML = `<span class="chevron">◂</span>`;
-    document.body.appendChild(toggle);
+    panelHeader?.appendChild(toggle);
+    // embedded.insertBefore(toggle, panelHeader as Node);
+    // document.body.appendChild(toggle);
 
     toggle.addEventListener('click', () => {
       host.classList.toggle('collapsed');

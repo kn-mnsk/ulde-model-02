@@ -7,7 +7,7 @@
 app-docs-viewer {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 99vh;
   overflow: hidden;
   background: var(--bg-color);
   color: var(--text-color);
@@ -19,8 +19,9 @@ app-docs-viewer {
 --------------------------------------------------------- */
 
 .dv-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 2px solid var(--table-border);
+  padding: 5px 5px;
+  // padding: 2.0rem 1.5rem;
+  // border-bottom: 2px solid var(--table-border);
   background: var(--bg-color);
   color: var(--text-color);
   transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
@@ -28,23 +29,61 @@ app-docs-viewer {
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  height: 12vh;
+  // margin-bottom: 2.5vh;
 }
 
 .dv-title {
   font-size: 24px;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  bottom: 3px;
+  // margin-bottom: 0.1rem;
   color: var(--text-color);
 }
+
+
+.dv-button button {
+  position: relative;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  border: 2px solid var(--ap-border);
+  bottom: 3px;
+
+  &:hover {
+    background-color: --link-hover-color;
+    transform: scale(1.2);
+    transition: transform 0.2s ease-in-out;
+  }
+}
+
+.progress-bar {
+  position: relative;
+  width: 100%;
+  height: 1.0vh;
+  background: var(--ap-border); //red; //#eee;
+  // margin-top: 5px;
+  // top: 15px;
+  // margin: 0;
+}
+
+.progress-bar_fill {
+  height: 100%;
+  // margin: 0;
+  background: #3f51b5;
+  transition: width 0.1s ease-out;
+}
+
 
 /* ---------------------------------------------------------
    Body Layout
 --------------------------------------------------------- */
 
 .dv-body {
+  position: relative;
   display: flex;
   flex: 1;
-  height: calc(100vh - 120px);
+  height: 84vh; //calc(100vh - 120px);
   overflow: hidden;
   background: var(--bg-color);
   transition: background-color 0.4s ease;
@@ -55,15 +94,18 @@ app-docs-viewer {
 --------------------------------------------------------- */
 
 .dv-toc {
-  width: 260px;
+  position: relative;
+  width: 300px;
   min-width: 160px;
   max-width: 420px;
-  padding: 0.5rem;
+  height: 80vh;
+  padding: 0.2rem;
   overflow-y: auto;
 
-  border-right: 2px solid var(--table-border);
+  border-right: 3px solid var(--ap-border);
   background: var(--bg-color);
   color: var(--text-color);
+  cursor: default;
 
   transition:
     background-color 0.4s ease,
@@ -89,12 +131,18 @@ app-docs-viewer {
 
 /* Draggable TOC Resizer */
 .dv-toc-resizer {
+  // position: absolute;
   width: 6px;
   cursor: ew-resize;
   background: transparent;
   transition: background-color 0.2s ease;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
 
   &:hover {
+    width: 10px;
     background: var(--ap-hover);
   }
 }
@@ -175,6 +223,58 @@ app-docs-viewer {
   background: var(--bg-color);
   transition: background-color 0.4s ease;
 }
+
+
+.dv-host code.langauge-mermaid svg g text {
+  word-wrap: normal;
+  // word-wrap: break-word;
+}
+
+.dv-host .mermaid-container .mermaid-button-container {
+  position: relative;
+  display: block;
+  align-items: flex-end;
+  margin: 0.2rem;
+  z-index: 1000;
+  margin-bottom: 50px;
+  transition: background-color 0.3s ease;
+  // z-index: 1000;
+  /* Ensure it stays on top */
+}
+
+.mermaid-reset-button,
+.mermaid-zoomin-button,
+.mermaid-zoomout-button {
+  position: relative;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-weight: bolder;
+  margin: 0.2rem;
+  opacity: 0.7;
+  border: 2px solid var(--table-border);
+}
+
+[data-theme="light"] .mermaid-reset-button:hover,
+[data-theme="light"] .mermaid-zoomin-button:hover,
+[data-theme="light"] .mermaid-zoomout-button:hover {
+  // position: relative;
+  background-color: red;
+  color: var(--text-color);
+  transform: scale(1.2);
+  transition: transform 0.2s ease-in-out;
+}
+
+[data-theme="dark"] .mermaid-reset-button:hover,
+[data-theme="dark"] .mermaid-zoomin-button:hover,
+[data-theme="dark"] .mermaid-zoomout-button:hover {
+  // position: relative;
+  background-color: rgb(126, 238, 122);
+  color: var(--text-color);
+  transform: scale(1.2);
+  transition: transform 0.2s ease-in-out;
+}
+
+
 
 /* ---------------------------------------------------------
    Scroll Debug Overlay (Theme‑Aware)

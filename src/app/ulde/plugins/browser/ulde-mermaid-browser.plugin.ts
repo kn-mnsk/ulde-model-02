@@ -62,37 +62,37 @@ const mermaidConfigLightTheme: MermaidConfig = {
    Debug Panel (Hidden by Default)
 --------------------------------------------------------- */
 
-function createMermaidDebugPanel(): HTMLDivElement {
-  let panel = document.getElementById('mermaid-debug-panel') as HTMLDivElement;
+function getMermaidDebugPanel(): HTMLDivElement{
+  return document.querySelector('.dv-mermaid-debug-panel') as HTMLDivElement;
 
-  if (!panel) {
-    panel = document.createElement('div');
-    panel.id = 'mermaid-debug-panel';
-    panel.classList = 'mermaid-debug-panel';
-    // panel.style.position = 'fixed';
-    // panel.style.bottom = '30px';
-    // panel.style.right = '30px';
-    // panel.style.width = '320px';
-    // panel.style.maxHeight = '200px';
-    // panel.style.overflowY = 'auto';
-    // panel.style.background = 'rgba(0,0,0,0.75)';
-    // panel.style.color = '#fff';
-    // panel.style.fontSize = '12px';
-    // panel.style.padding = '8px';
-    // panel.style.borderRadius = '6px';
-    // panel.style.zIndex = '999999';
-    // panel.style.display = 'none'; // hidden by default
-    // panel.style.whiteSpace = 'pre-wrap';
-    // panel.style.fontFamily = 'monospace';
+  // if (!panel) {
+  //   panel = document.createElement('div');
+  //   panel.id = 'mermaid-debug-panel';
+  //   panel.classList = 'mermaid-debug-panel';
+  //   // panel.style.position = 'fixed';
+  //   // panel.style.bottom = '30px';
+  //   // panel.style.right = '30px';
+  //   // panel.style.width = '320px';
+  //   // panel.style.maxHeight = '200px';
+  //   // panel.style.overflowY = 'auto';
+  //   // panel.style.background = 'rgba(0,0,0,0.75)';
+  //   // panel.style.color = '#fff';
+  //   // panel.style.fontSize = '12px';
+  //   // panel.style.padding = '8px';
+  //   // panel.style.borderRadius = '6px';
+  //   // panel.style.zIndex = '999999';
+  //   // panel.style.display = 'none'; // hidden by default
+  //   // panel.style.whiteSpace = 'pre-wrap';
+  //   // panel.style.fontFamily = 'monospace';
 
-    document.body.appendChild(panel);
-  }
+  //   document.body.appendChild(panel);
+  // }
 
-  return panel;
+  // return panel;
 }
 
 function logMermaidDebug(message: string) {
-  const panel = createMermaidDebugPanel();
+  const panel = getMermaidDebugPanel();
   // panel.style.display = 'none';
   // panel.style.display = 'block';
 
@@ -137,25 +137,25 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
     if (!isBrowser) return;
 
 
-    // Optional: toggle panel with Ctrl+Shift+M
-    window.addEventListener('keydown', (e) => {
-      e.preventDefault();
-      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'm') {
+    // // Optional: toggle panel with Ctrl+Shift+M
+    // window.addEventListener('keydown', (e) => {
+    //   e.preventDefault();
+    //   if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'm') {
 
-        const panel = document.getElementById('mermaid-debug-panel') as HTMLDivElement | null;
-        // console.log(`Log: [UldeMermaidBrowserPlugin:] keydown event`, e, panel);
-        if (panel) {
-          panel.classList.toggle('visible');
-
-
-          console.log(`Log: [UldeMermaidBrowserPlugin:] keydown event`, e, panel.classList.length, panel);
-          // panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        }
+    //     const panel = document.getElementById('mermaid-debug-panel') as HTMLDivElement | null;
+    //     // console.log(`Log: [UldeMermaidBrowserPlugin:] keydown event`, e, panel);
+    //     if (panel) {
+    //       panel.classList.toggle('visible');
 
 
-        // console.log(`Log: [UldeMermaidBrowserPlugin:] keydown event`, e, panel);
-      }
-    });
+    //       console.log(`Log: [UldeMermaidBrowserPlugin:] keydown event`, e, panel.classList.length, panel);
+    //       // panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    //     }
+
+
+    //     // console.log(`Log: [UldeMermaidBrowserPlugin:] keydown event`, e, panel);
+    //   }
+    // });
 
 
     const currentTheme = sessionStorage.getItem('app-theme');
@@ -293,7 +293,7 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
       });
 
       // Wait until mermaid code blocks exist
-      await waitForMermaidNodes();
+      // await waitForMermaidNodes();
 
       // Initialize Mermaid AFTER nodes exist
       mermaid.initialize({

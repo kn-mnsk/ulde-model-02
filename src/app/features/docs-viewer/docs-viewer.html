@@ -17,6 +17,7 @@
           <button (click)="toggleShowToc()">{{ $showToc() ? 'Hide TOC' : 'Show TOC' }}</button>
           <button (click)="toggleArtifacts()">Artifacts</button>
           <button (click)="toggleDebugOverlay()">Debug Overlay</button>
+          <button (click)="toggleDebugMermaid()">Debug Mermaid</button>
         </div>
       </div>
     </nav>
@@ -58,16 +59,22 @@
     </main>
 
   </div>
-
+  <!--
   <div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()" #debugOverlayHost></div>
 
-  <div class="dv-artifacts-panel" [class.visible]="$showArtifacts()" #artifactsHost></div>
+  <div class="dv-artifacts-panel" [class.visible]="$showArtifacts()" #artifactsHost></div> -->
 
 </div>
 
+<div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()"></div>
+<!-- <div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()" #debugOverlayHost></div> -->
+
+<div class="dv-artifacts-panel" [class.visible]="$showArtifacts()"></div>
+<!-- <div class="dv-artifacts-panel" [class.visible]="$showArtifacts()" #artifactsHost></div> -->
 
 
-
+<div class="dv-mermaid-debug-panel" [class.visible]="$showDebugMermaid()"></div>
+<!-- <div class="dv-debug-mermaid" [class.visible]="$showDebugMermaid()" #debugMermaid></div> -->
 
 
 <!--
