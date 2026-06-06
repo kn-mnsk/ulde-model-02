@@ -171,10 +171,17 @@ $\lbrace\space \frac{\mathrm{d^2}\theta}{\mathrm{d}s^2} = \frac{\mathrm{d^2}\phi
 
 $=-a\left(\sin(\theta)\cos(\phi)\mathbf{l_{1}} + \cos(\theta)\mathbf{l_{2}} + \sin(\theta)\sin(\phi)\mathbf{l_{3}}\right)$  
 
-|First Header | Second Header|
-|-------------|--------------|
-|Content Cell | Content Cell |
-|Content Cell | Content Cell |
+## 5. Summary (the crisp version)
+Concept	|queueMicrotask()	|Signals 
+---------|-----------------|--------
+Purpose	|Schedule ASAP after stack	|Reactive state system
+Knows about dependencies	|❌ No	|✅ Yes
+Batching	|❌ No	|✅ Yes
+Deduplication	|❌ No	|✅ Yes
+Propagation	|❌ No	|✅ Yes
+Runs before paint	|Yes	|Usually (via microtasks)
+Similarity	|Timing	|Timing + scheduling
+
 
 Ah yes, the good old Gaussian surface—Gauss’s Law’s best friend. Let’s dive in.
 

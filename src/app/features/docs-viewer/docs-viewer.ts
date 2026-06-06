@@ -49,6 +49,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   $activeHeading = signal<string | null>(null);
   $showDebugOverlay = signal(false);
   $showArtifacts = signal(false);
+  $showDebugMermaid = signal(false);
   $showToc = signal(false);
   $dvTocRef = signal<ElementRef<HTMLElement> | undefined>(undefined);
 
@@ -205,6 +206,12 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   toggleDebugOverlay() {
     this.$showDebugOverlay.update(v => !v);
   }
+
+    toggleDebugMermaid() {
+
+    this.$showDebugMermaid.update(v => !v);
+  }
+
 }
 
 

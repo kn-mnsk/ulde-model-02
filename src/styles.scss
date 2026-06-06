@@ -18,6 +18,11 @@
 @use './styles/devtools/devtools';
 
 /* ---------------------------------------------------------
+   DocsViewer Theme Aware Layout (SCSS partials)
+--------------------------------------------------------- */
+@use './styles/docs-viewer/theme.aware.layout.scss';
+
+/* ---------------------------------------------------------
    Angular Material Core (after theme definitions)
 --------------------------------------------------------- */
 @include mat.core();
@@ -258,777 +263,23 @@ body[data-theme="light"] {
 }
 
 
-/* ---------------------------------------------------------
-   Marked
---------------------------------------------------------- */
-
-// .docs-viewer_content table {
-//   border-collapse: collapse;
-//   width: fit-content; //100%;
-//   margin-top: 1rem;
-//   margin-bottom: 1rem;
-//   // padding: 5px;
-//   font-size: 1rem;
-//   border-radius: 3em;
-// }
-
-// .docs-viewer_content table th {
-//   // background-color: rgb(206, 14, 78);
-//   background-color: var(--table-header-bg);
-// }
-
-// .docs-viewer_content table th,
-// .docs-viewer_content table td {
-//   // border: 1rem solid var(--table-border);
-//   // border: 1px solid var(--table-border);
-//   border: 2px solid #1bee22;
-//   padding: 0.3rem;
-//   vertical-align: top;
-// }
-
-
-// .docs-viewer_content table tr:nth-child(even) {
-//   // background-color: yellow;
-//   // background-color: #05252e;
-//   border-bottom: solid 1px rgb(227, 219, 219);
-// }
-
-// .docs-viewer_content table tr:nth-child(odd) {
-//   // background-color: green;
-//   // background-color: #ce164a;
-//   border-bottom: solid 1px rgb(227, 219, 219);
-// }
-
-
-// // temporary class: scroll by onClick function
-// .docs-viewer_content .inline-highlight {
-//   background-color: rgb(219, 219, 22);
-//   transition: background-color 0.7s ease-in-out, color 0.7s ease-in-out;
-//   // transition: background-color 1.5s ease;
-// }
-
-
-.ulde-layout-main_content table {
-  border-collapse: collapse;
-  width: fit-content; //100%;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  // padding: 5px;
-  font-size: 1rem;
-  border-radius: 3em;
-}
-
-.ulde-layout-main_content table th {
-  // background-color: rgb(206, 14, 78);
-  background-color: var(--table-header-bg);
-}
-
-.ulde-layout-main_content table th,
-.ulde-layout-main_content table td {
-  // border: 1rem solid var(--table-border);
-  // border: 1px solid var(--table-border);
-  border: 2px solid #1bee22;
-  padding: 0.3rem;
-  vertical-align: top;
-}
-
-
-.ulde-layout-main_content table tr:nth-child(even) {
-  // background-color: yellow;
-  // background-color: #05252e;
-  border-bottom: solid 1px rgb(227, 219, 219);
-}
-
-.ulde-layout-main_content table tr:nth-child(odd) {
-  // background-color: green;
-  // background-color: #ce164a;
-  border-bottom: solid 1px rgb(227, 219, 219);
-}
-
-
-// temporary class: scroll by onClick function
-.ulde-layout-main_content .inline-highlight {
-  background-color: rgb(219, 219, 22);
-  transition: background-color 0.7s ease-in-out, color 0.7s ease-in-out;
-  // transition: background-color 1.5s ease;
-}
-
-
-
-
-// @import './app/features/docs-viewer/docs-viewer.scss';
-// @use './app/features/docs-viewer/docs-viewer.scss';
-
-
-/* ---------------------------------------------------------
-   Mermaid
---------------------------------------------------------- */
-/*
-Source - https://stackoverflow.com/a/79199554
-Posted by grappler
-Retrieved 2026-04-23, License - CC BY-SA 4.0
-*/
-.dv-host .mermaid-container {
-  display: block;
-  width: auto;
-  height: auto;
-  overflow: visible;
-  border: 2px solid var(--table-border);
-  // border: 2px solid var(--text-color);
-  // border: 2px solid #55db50;
-  position: relative;
-  margin-bottom: 10px;
-  // transition: background-color 2s 500ms;
-}
-
-// .dv-host code.language-mermaid svg{
-//   padding: 0.2rem; // cursor: grab;
-// }
-
-.dv-host code.language-mermaid svg {
-  position: relative;
-  display: inline-box;
-  width: auto;
-  height: auto;
-  // .dv-host code.language-mermaid svg {
-  padding: 0.2rem 0.2rem 0.2rem 0.2rem; // cursor: grab;
-  border: 10rem green;
-
-  // animation: fade-in 0.7s forwards ease-in;
-  // transition: all 0.7s;
-  // opacity 0.4s;
-  &.theme-enter {
-    background-color: var(--table-border); // red;
-  }
-}
-
-// to prevent mouse dragging from conflicting with animation and transition
-.dv-host code.language-mermaid svg.dragging {
-  // animation-play-state: puased;
-  transition: none;
-}
-
-
-// .dv-host .mermaid-container .language-mermaid {
-//   position: relative;
-//   padding: 1rem;
-//   margin: 0.5rem;
-//   border: 0.5px dashed; // var(--text-color);
-//   color: var(--text-color);
-//   display: block;
-//   flex-direction: row;
-//   justify-content: center;
-
-// }
-
-// .dv-host code.language-mermaid svg.theme-enter {
-
-//   // &.theme-enter {
-
-//   background-color: red;
-//   // display: block;
-//   border: 10rem green; //var(--table-border); not working??
-//   // width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-//   // transform 4s cubic-bezier(0.4, 0, 0.2, 1);
-
-//   // }
-
-// }
-
-
-.dv-host code.langauge-mermaid svg g text {
-  word-wrap: normal;
-  // word-wrap: break-word;
-}
-
-.dv-host .mermaid-container .mermaid-button-container {
-  position: relative;
-  display: block;
-  align-items: flex-end;
-  margin: 0.2rem;
-  z-index: 1000;
-  margin-bottom: 50px;
-  transition: background-color 0.3s ease;
-  // z-index: 1000;
-  /* Ensure it stays on top */
-}
-
-.mermaid-reset-button,
-.mermaid-zoomin-button,
-.mermaid-zoomout-button {
-  position: relative;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-weight: bolder;
-  margin: 0.2rem;
-  opacity: 0.7;
-  border: 2px solid var(--table-border);
-}
-
-[data-theme="light"] .mermaid-reset-button:hover,
-[data-theme="light"] .mermaid-zoomin-button:hover,
-[data-theme="light"] .mermaid-zoomout-button:hover {
-  // position: relative;
-  background-color: red;
-  color: var(--text-color);
-  transform: scale(1.2);
-  transition: transform 0.2s ease-in-out;
-}
-
-[data-theme="dark"] .mermaid-reset-button:hover,
-[data-theme="dark"] .mermaid-zoomin-button:hover,
-[data-theme="dark"] .mermaid-zoomout-button:hover {
-  // position: relative;
-  background-color: rgb(126, 238, 122);
-  color: var(--text-color);
-  transform: scale(1.2);
-  transition: transform 0.2s ease-in-out;
-}
-
-
-/* ---------------------------------------------------------
-   Mermaid Debug Panel (Hidden by Default)
---------------------------------------------------------- */
-
-.mermaid-debug-panel {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 320px;
-  max-height: 200px;
-  overflow-y: auto;
-  background: var(--bg-color);//rgba(0, 0, 0, 0.75);
-  color: var(--text-color);// #fff;
-  font-size: 12px;
-  padding: 8px;
-  padding: 8px;
-  border-radius: 6px;
-  border: solid 5px var(--ap-border);
-  z-index: 2000;//999999;
-  display: block; // hidden by default
-  white-space: pre-wrap;
-  font-family: monospace;
-  // opacity: 0.8;
-  &.visible {
-    display: none;
-  }
-
-}
-
-
-/* ---------------------------------------------------------
-   Debug Tools for docs-viewer_content
---------------------------------------------------------- */
-.dv-scroll-debug-overlay {
-  // :root .dv-scroll-debug-overlay {
-  // html .dv-scroll-debug-overlay {
-  position: fixed;
-  top: 12px;
-  right: 250px;
-  background: rgba(35, 35, 35, 0.78);
-  color: #fff;
-  padding: 12px 16px;
-  border-radius: 6px;
-  font-size: 12px;
-  line-height: 1.4;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
-  z-index: 99999;
-
-
-
-  .dv-title {
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-
-  .dv-subtitle {
-    margin-top: 8px;
-    font-weight: 600;
-  }
-
-  &.visible {
-    opacity: 1;
-  }
-}
-
-/* ---------------------------------------------------------
-   docs-viewer
---------------------------------------------------------- */
-app-docs-viewer {
-  // .docs-viewer {
-  // position: relative;
-
-  // padding: 2rem 2rem 2rem 2rem;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  // height: 100%;
-
-}
-
-/* ---------------------------------------------
-   Header
---------------------------------------------- */
-.dv-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  background-color: var(--bg-color);
-  // border-bottom: 1px solid var(--ap-border);
-  flex-direction: column; //flex;
-  // justify-content: flex-start; //space-between;
-  // align-items: center;
-  height: 16h;
-  overflow: hidden;
-}
-
-.dv-title {
-  font-size: 25px;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.dv-button button {
-  position: relative;
-  color: var(--text-color);
-  background-color: var(--bg-color);
-  border: 2px solid var(--ap-border);
-
-  &:hover {
-    background-color: --link-hover-color;
-    transform: scale(1.2);
-    transition: transform 0.2s ease-in-out;
-  }
-}
-
-.progress-bar {
-  position: relative;
-  width: 100%;
-  height: 4px;
-  background: var(--ap-border); //red; //#eee;
-  margin-top: 15px;
-  // top: 15px;
-  // margin: 0;
-}
-
-.progress-bar_fill {
-  height: 100%;
-  // margin: 0;
-  background: #3f51b5;
-  transition: width 0.1s ease-out;
-}
-
-
-/* ---------------------------------------------
-   dv- body
---------------------------------------------- */
-.dv-body {
-  position: relative;
-  height: 79vh;
-
-  display: flex;
-  flex: 1;
-  // overflow-y: auto;
-  overflow: hidden;
-
-  // & .hidden{
-  //   display: none;
-  // }
-}
-
-.dv-toc {
-  position: relative;
-  border-right: 3px solid var(--ap-border);
-  width: auto;
-  min-width: 150px;
-  max-width: 500px;
-  height: 80vh;
-  padding: 0.2rem;
-  overflow: auto;
-  // overflow-y: auto;
-  cursor: default;
-
-  & a {
-    display: block;
-    padding: .2rem;
-    color: var(--link-color);
-  }
-
-  &.hidden {
-    display: none;
-  }
-}
-
-// .dv-toc a {
-//   display: block;
-//   padding: .2rem;
-//   color: var(--accent-color);
-// }
-
-/* The draggable handle */
-.dv-toc-resizer {
-  width: 5px;
-  cursor: e-resize;
-  background: transparent;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-
-  &:hover {
-    // scale: 1.5;
-    width: 10px;
-    background: #4a87f8;
-    transition: width 0.1s ease-out;
-  }
-}
-
-// .dv-toc_resizer:hover {
-//   // scale: 1.5;
-//   width: 10px;
-//   background: #4a87f8;
-//   transition: width 0.1s ease-out;
-// }
-
-.dv-content {
-  flex: 1;
-  overflow: auto;
-  padding: 2rem;
-}
-
-.dv-host {
-  width: 100%;
-}
-
-
-/* ---------------------------------------------
-   ARTIFACTS PANEL — GROUPED MODEL (2026-05-21)
---------------------------------------------- */
-
-/* Root container */
-.ulde-artifacts- {
-  font-family: system-ui, sans-serif;
-  padding: 0;
-  margin: 0;
-  color: var(--ap-fg);
-  background: var(--ap-bg);
-  height: 100%;
-  overflow-y: auto;
-}
-
-/* Light / Dark theme variables */
-[data-theme="light"] {
-  --ap-bg: #fafafa;
-  --ap-fg: #222;
-  --ap-border: #ddd;
-  --ap-header-bg: #f0f0f0;
-  --ap-hover: rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="dark"] {
-  --ap-bg: #1e1e1e;
-  --ap-fg: #e0e0e0;
-  --ap-border: #333;
-  --ap-header-bg: #252525;
-  --ap-hover: rgba(255, 255, 255, 0.05);
-}
-
-/* ---------------------------------------------
-   HEADER + SEARCH BAR
---------------------------------------------- */
-.ulde-ap-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: var(--ap-header-bg);
-  padding: 10px;
-  border-bottom: 1px solid var(--ap-border);
-  backdrop-filter: blur(6px);
-}
-
-.ulde-ap-header h2 {
-  margin: 0 0 8px 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.ulde-ap-search {
-  width: 100%;
-  padding: 6px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--ap-border);
-  background: var(--ap-bg);
-  color: var(--ap-fg);
-  font-size: 13px;
-}
-
-/* Highlighted fuzzy match */
-.ulde-ap-highlight {
-  background: rgba(255, 208, 0, 0.25);
-  border-radius: 2px;
-}
-
-/* ---------------------------------------------
-   GROUPS
---------------------------------------------- */
-.ulde-ap-group {
-  border-bottom: 1px solid var(--ap-border);
-}
-
-.ulde-ap-group-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 10px;
-  font-weight: 700;
-  cursor: pointer;
-  background: var(--ap-header-bg);
-  position: sticky;
-  top: 42px;
-  /* below main header */
-  z-index: 15;
-  backdrop-filter: blur(6px);
-}
-
-.ulde-ap-group-header:hover {
-  background: var(--ap-hover);
-}
-
-.ulde-ap-group-icon {
-  opacity: 0.85;
-}
-
-.ulde-ap-group.collapsed .ulde-ap-group-body {
-  display: none;
-}
-
-.ulde-ap-group.collapsed .chevron {
-  transform: rotate(-90deg);
-}
-
-/* ---------------------------------------------
-   SECTIONS
---------------------------------------------- */
-.ulde-ap-section {
-  border-top: 1px solid var(--ap-border);
-}
-
-.ulde-ap-section-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  // padding: 6px 12px;
-  // padding: 6px 5%;
-  padding-top: 6px;
-  padding-right: 10px;
-  padding-bottom: 6px;
-  padding-left: 5%;
-  cursor: pointer;
-  font-weight: 500;
-  position: sticky;
-  top: 2px;
-  /* below group header */
-  z-index: 10;
-  background: var(--ap-bg);
-  backdrop-filter: blur(4px);
-}
-
-.ulde-ap-section-header:hover {
-  background: var(--ap-hover);
-}
-
-.ulde-ap-section.collapsed .ulde-ap-section-body {
-  display: none;
-}
-
-.ulde-ap-section.collapsed .chevron {
-  transform: rotate(-90deg);
-}
-
-.ulde-ap-icon {
-  margin-right: 6px;
-  font-size: 1.1rem;
-  opacity: 0.85;
-}
-
-/* ---------------------------------------------
-   ITEMS
---------------------------------------------- */
-.ulde-ap-section-body {
-  padding: 6px 12px 10px 12px;
-}
-
-.ulde-ap-item {
-  padding: 6px 8px;
-  margin-bottom: 6px;
-  border-radius: 4px;
-  // background: var(--ap-hover);
-  // transition: opacity 0.2s ease, transform 0.2s ease;
-  border-top: solid var(--ap-hover);
-}
-
-.ulde-ap-item:hover {
-  background: var(--ap-hover);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-
-.ulde-ap-item.hidden {
-  opacity: 0;
-  transform: translateX(8px);
-  height: 0;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.ulde-ap-empty {
-  opacity: 0.6;
-  font-style: italic;
-  padding: 4px 0;
-}
-
-/* ---------------------------------------------
-   CHEVRON
---------------------------------------------- */
-.chevron {
-  margin-left: auto;
-  transition: transform 0.2s ease;
-  opacity: 0.7;
-}
-
-/* ---------------------------------------------
-   PRE BLOCKS
---------------------------------------------- */
-.ulde-ap-item pre {
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-  font-size: 12px;
-}
-
-/* ---------------------------------------------
-   TRANSITIONS
---------------------------------------------- */
-.ulde-ap-group,
-.ulde-ap-group-header,
-.ulde-ap-section,
-.ulde-ap-section-header,
-.ulde-ap-section-body,
-.ulde-ap-item,
-.ulde-ap-field {
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-
-/* -------------------------------------------------------
-   draggable artifacts */
-/* Floating draggable artifacts */
-.dv-artifacts-panel {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  width: 420px;
-  max-height: 70vh;
-  z-index: 1000;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  border-radius: 8px;
-  overflow: hidden;
-  // background: var(--ap-hover);
-  background: var(--ap-bg, #1e1e1e);
-  border: 1px solid var(--ap-border, #333);
-}
-
-/* Make header the drag handle */
-.dv-artifacts-ap-header {
-  cursor: move;
-  border-bottom: 1px solid var(--ap-border, #333);
-}
-
-/* Optional: subtle resize affordance */
-.dv-artifacts-after {
-  content: '';
-  position: absolute;
-  right: 6px;
-  bottom: 6px;
-  width: 12px;
-  height: 12px;
-  border-right: 2px solid rgba(255, 255, 255, 0.3);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-  opacity: 0.7;
-}
-
-
-/* -------------------------------------------------------
-   VS CODE–STYLE COLLAPSE / EXPAND ANIMATIONS (2026-05-22)
-------------------------------------------------------- */
-/* Smooth height animation */
-.ulde-ap-group-body,
-.ulde-ap-section-body {
-  overflow: hidden;
-  transition:
-    height 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.18s ease,
-    transform 0.22s ease;
-}
-
-/* Expanded state */
-.ulde-ap-group:not(.collapsed) .ulde-ap-group-body,
-.ulde-ap-section:not(.collapsed) .ulde-ap-section-body {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Collapsed state */
-.ulde-ap-group.collapsed .ulde-ap-group-body,
-.ulde-ap-section.collapsed .ulde-ap-section-body {
-  opacity: 0;
-  transform: translateY(-4px);
-  height: 0 !important;
-}
-
-/* Chevron rotation animation */
-.chevron {
-  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.ulde-ap-group.collapsed .chevron,
-.ulde-ap-section.collapsed .chevron {
-  transform: rotate(-90deg);
-}
-
-/* Fade + slide for items */
-.ulde-ap-item {
-  transition:
-    opacity 0.18s ease,
-    transform 0.18s ease;
-}
-
-.ulde-ap-item.hidden {
-  opacity: 0;
-  transform: translateX(8px);
-}
-
-
 /* ---------------------------------------------
    LEFT-SIDE COLLAPSIBLE SIDEBAR
 --------------------------------------------- */
 
 .dv-artifacts-panel {
   position: fixed;
-  top: 0px;
-  left: 0;
-  width: 340px;
+  top: 120px; //0px;
+  // right: 24px;
+  left: 50px;
+  width: 350px;
   // height: auto;
   max-height: 70vh;
   padding-top: 25px;
   // background: var(--ap-hover);
   background: var(--ap-bg);
-  border-right: 1px solid var(--ap-border);
+  border: 5px solid var(--ap-border);
+  // border-right: 5px solid var(--ap-border);
   border-radius: 8px;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
   overflow-y: auto;
@@ -1045,7 +296,8 @@ app-docs-viewer {
 
   &.collapsed {
 
-    width: 0;
+    width: 50px;
+    left: 100px;
     transform: translateX(-100%);
   }
 
@@ -1056,23 +308,11 @@ app-docs-viewer {
 
 }
 
-
-// .dv-artifacts-{
-//   display: none;
-//   // opacity: 0;
-//   // transform: translateX(8px);
-// }
-/* Collapsed state */
-// .dv-artifacts-{
-//   width: 0;
-//   transform: translateX(-100%);
-// }
-
 /* Collapse toggle button */
-.dv-artifacts- {
+.dv-artifacts-panel-toggle {
   position: fixed;
-  top: 12px;
-  left: 12px;
+  // top: 12px;
+  // left: 12px;
   width: auto; //50px;
   height: auto; //28px;
   color: var(--ap-fg);
@@ -1085,19 +325,36 @@ app-docs-viewer {
   cursor: pointer;
   z-index: 1001;
   transition: background 0.2s ease;
+
+  &:hover {
+    background: var(--ap-hover);
+  }
 }
 
-.dv-artifacts-hover {
-  background: var(--ap-hover);
+.chevron {
+  // position: fixed;
+  z-index: 2000;
+  background: red; //var(--ap-color);
+
+  &:hover {
+    scale: 2.0;
+    background: red;//var(--ap-hover);
+  }
 }
 
-.dv-artifacts-chevron {
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
+// .dv-artifacts-hover {
+//   background: var(--ap-hover);
+// }
 
-.dv-artifacts-dv-artifacts-chevron {
-  transform: rotate(180deg);
-}
+// .dv-artifacts-chevron {
+//   background: red;
+//   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+// }
+
+//
+// .dv-artifacts-dv-artifacts-chevron {
+//   transform: rotate(180deg);
+// }
 
 
 
@@ -1118,13 +375,13 @@ app-docs-viewer {
 
 .dv-debug-overlay {
   position: fixed;
-  top: 20px;
-  left: 20px;
+  top: 120px;
+  left: 100px; //20px;
   width: 320px;
   max-height: 70%;
   overflow: hidden;
   background: var(--ap-bg);
-  border: 1px solid var(--ap-border);
+  border: 5px solid var(--ap-border);
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
   font-size: 13px;
@@ -1140,132 +397,35 @@ app-docs-viewer {
   }
 }
 
-/* ---------------------------------------------
-   Header
---------------------------------------------- */
+/* ---------------------------------------------------------
+   Mermaid Debug Panel (Hidden by Default)
+--------------------------------------------------------- */
 
-// .dv-header {
-//   display: flex;
-//   align-items: center;
-//   gap: 8px;
-//   padding: 8px 10px;
-//   background: var(--ap-hover);
-//   border-bottom: 1px solid var(--ap-border);
-//   cursor: default;
-// }
-
-// .dv-title {
-//   font-weight: 600;
-//   flex: 1;
-// }
-
-.dv-search {
-  flex: 1;
-  padding: 4px 6px;
-  font-size: 12px;
-  border-radius: 4px;
-  border: 1px solid var(--ap-border);
-  background: var(--ap-bg);
-  color: var(--ap-fg);
-}
-
-.dv-drag-handle {
-  cursor: grab;
-  padding: 4px;
-  font-size: 14px;
-  opacity: 0.7;
-  user-select: none;
-}
-
-.dv-drag-handle:active {
-  cursor: grabbing;
-}
-
-/* ---------------------------------------------
-   Sections
---------------------------------------------- */
-
-.dv-section {
-  border-bottom: 1px solid var(--ap-border);
-}
-
-.dv-section-title {
-  padding: 8px 10px;
-  font-weight: 600;
-  background: var(--ap-hover);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dv-section-title::after {
-  content: "▾";
-  font-size: 10px;
-  opacity: 0.7;
-}
-
-.dv-section.collapsed .dv-section-title::after {
-  content: "▸";
-}
-
-.dv-section-body {
-  padding: 8px 10px;
-  max-height: 400px;
+.dv-mermaid-debug-panel {
+  position: fixed;
+  top: 120px;
+  // bottom: 60%;
+  right: 50px;
+  width: 320px;
+  max-height: 200px;
   overflow-y: auto;
-  transition: max-height 0.25s ease;
-}
-
-.dv-section.collapsed .dv-section-body {
-  max-height: 0;
-  overflow: hidden;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-/* ---------------------------------------------
-   Items (Diagnostics + Timings)
---------------------------------------------- */
-
-.dv-item {
-  display: flex;
-  flex-direction: column;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.dv-item.hidden {
-  display: none;
-}
-
-.dv-item-plugin {
-  font-weight: 600;
-  opacity: 0.9;
-}
-
-.dv-item-msg,
-.dv-item-phase,
-.dv-item-time {
-  opacity: 0.8;
+  background: var(--bg-color); //rgba(0, 0, 0, 0.75);
+  color: var(--text-color); // #fff;
   font-size: 12px;
-}
+  padding: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: solid 5px var(--ap-border);
+  border-radius: 8px;
+  z-index: 2000; //999999;
+  opacity: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
 
-/* Severity colors */
-.dv-item.error {
-  color: #ff6b6b;
-}
+  // opacity: 0.8;
+  &.visible {
+    opacity: 1;
+    // pointer-events: auto;
+  }
 
-.dv-item.warning {
-  color: #ffd166;
-}
-
-.dv-item.info {
-  color: #6ec6ff;
-}
-
-/* Empty state */
-.dv-empty {
-  opacity: 0.6;
-  font-style: italic;
-  padding: 6px 0;
 }
