@@ -27,7 +27,11 @@ export class UldeDocsViewerBridge {
     this.host.registerBrowserDomPlugin(UldeArtifactsPanelBrowserPlugin);
   }
 
-
+  /**
+   *
+   * @param options 
+   * @returns
+   */
   run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string; onScrollSpy?: (id: string) => void ; onNavigate?: (docId: string) => void }) {
 
     const { host, html, reload, onNavigate, onScrollSpy } = options;

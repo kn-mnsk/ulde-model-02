@@ -189,7 +189,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // console.log(`Log: [DocsViewer] theme isDark=`, isDark);
     this.theme.toggleTheme();
     if (this.finalHtml) {
-      await this.bridge.host.run(this.hostRef.nativeElement, this.finalHtml);
+      await this.bridge.host.update(this.hostRef.nativeElement, this.finalHtml);
     }
   }
 

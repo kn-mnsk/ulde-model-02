@@ -111,120 +111,120 @@ body[data-theme="light"] {
    Theme Toggle Buttons (unchanged)
 --------------------------------------------------------- */
 
-.theme-toggle-btn {
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.25s ease;
-}
+// .theme-toggle-btn {
+//   width: 36px;
+//   height: 36px;
+//   border: none;
+//   border-radius: 50%;
+//   background: transparent;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   cursor: pointer;
+//   transition: background 0.25s ease;
+// }
 
-.theme-toggle-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
+// .theme-toggle-btn:hover {
+//   background: rgba(0, 0, 0, 0.1);
+// }
 
-[data-theme="dark"] .theme-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
+// [data-theme="dark"] .theme-toggle-btn:hover {
+//   background: rgba(255, 255, 255, 0.1);
+// }
 
-.theme-icon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  position: relative;
-  transition: background 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
-}
+// .theme-icon {
+//   width: 22px;
+//   height: 22px;
+//   border-radius: 50%;
+//   position: relative;
+//   transition: background 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+// }
 
-[data-theme="light"] .theme-icon {
-  background: #ffcc33;
-  box-shadow:
-    0 -8px 0 #ffcc33,
-    0 8px 0 #ffcc33,
-    8px 0 0 #ffcc33,
-    -8px 0 0 #ffcc33,
-    6px 6px 0 #ffcc33,
-    -6px 6px 0 #ffcc33,
-    6px -6px 0 #ffcc33,
-    -6px -6px 0 #ffcc33;
-}
+// [data-theme="light"] .theme-icon {
+//   background: #ffcc33;
+//   box-shadow:
+//     0 -8px 0 #ffcc33,
+//     0 8px 0 #ffcc33,
+//     8px 0 0 #ffcc33,
+//     -8px 0 0 #ffcc33,
+//     6px 6px 0 #ffcc33,
+//     -6px 6px 0 #ffcc33,
+//     6px -6px 0 #ffcc33,
+//     -6px -6px 0 #ffcc33;
+// }
 
-[data-theme="dark"] .theme-icon {
-  background: #f0f0f0;
-  box-shadow: inset -6px -6px 0 0 #000;
-}
+// [data-theme="dark"] .theme-icon {
+//   background: #f0f0f0;
+//   box-shadow: inset -6px -6px 0 0 #000;
+// }
 
 /* ---------------------------------------------------------
    VS Code Toggle (unchanged)
 --------------------------------------------------------- */
 
-.vscode-toggle {
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-}
+// .vscode-toggle {
+//   border: none;
+//   background: transparent;
+//   padding: 0;
+//   cursor: pointer;
+// }
 
-.vscode-toggle-track {
-  width: 48px;
-  height: 24px;
-  border-radius: 24px;
-  display: flex;
-  align-items: center;
-  background: var(--toggle-track-bg);
-  transition: background 0.25s ease;
-}
+// .vscode-toggle-track {
+//   width: 48px;
+//   height: 24px;
+//   border-radius: 24px;
+//   display: flex;
+//   align-items: center;
+//   background: var(--toggle-track-bg);
+//   transition: background 0.25s ease;
+// }
 
-.vscode-toggle-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--toggle-thumb-bg);
-  position: absolute;
-  left: 1px;
-  top: 1px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s ease;
-}
+// .vscode-toggle-thumb {
+//   width: 22px;
+//   height: 22px;
+//   border-radius: 50%;
+//   background: var(--toggle-thumb-bg);
+//   position: absolute;
+//   left: 1px;
+//   top: 1px;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s ease;
+// }
 
-.vscode-toggle-thumb .icon {
-  position: absolute;
-  font-size: 14px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
+// .vscode-toggle-thumb .icon {
+//   position: absolute;
+//   font-size: 14px;
+//   opacity: 0;
+//   transition: opacity 0.2s ease;
+// }
 
-[data-theme="light"] {
-  --toggle-track-bg: #e0e0e0;
-  --toggle-thumb-bg: #ffffff;
-}
+// [data-theme="light"] {
+//   --toggle-track-bg: #e0e0e0;
+//   --toggle-thumb-bg: #ffffff;
+// }
 
-[data-theme="light"] .vscode-toggle-thumb {
-  transform: translateX(0);
-}
+// [data-theme="light"] .vscode-toggle-thumb {
+//   transform: translateX(0);
+// }
 
-[data-theme="light"] .vscode-toggle-thumb .sun {
-  opacity: 1;
-}
+// [data-theme="light"] .vscode-toggle-thumb .sun {
+//   opacity: 1;
+// }
 
-[data-theme="dark"] {
-  --toggle-track-bg: #3a3a3a;
-  --toggle-thumb-bg: #1e1e1e;
-}
+// [data-theme="dark"] {
+//   --toggle-track-bg: #3a3a3a;
+//   --toggle-thumb-bg: #1e1e1e;
+// }
 
-[data-theme="dark"] .vscode-toggle-thumb {
-  transform: translateX(24px);
-}
+// [data-theme="dark"] .vscode-toggle-thumb {
+//   transform: translateX(24px);
+// }
 
-[data-theme="dark"] .vscode-toggle-thumb .moon {
-  opacity: 1;
-}
+// [data-theme="dark"] .vscode-toggle-thumb .moon {
+//   opacity: 1;
+// }
 
 /* ---------------------------------------------------------
    Katex

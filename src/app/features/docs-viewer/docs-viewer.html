@@ -10,7 +10,8 @@
       <div class="dv-actions">
 
         <!-- Theme toggle (should become its own component) -->
-        <app-theme-toggle (toggleTheme)="onToggleTheme()"></app-theme-toggle>
+        <app-theme-toggle (toggleTheme)="onToggleTheme()">
+        </app-theme-toggle>
         <div class="dv-button">
           <button (click)="backToIndex()">Back</button>
           <button (click)="reloadDoc()">Reload</button>
@@ -59,80 +60,12 @@
     </main>
 
   </div>
-  <!--
-  <div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()" #debugOverlayHost></div>
 
-  <div class="dv-artifacts-panel" [class.visible]="$showArtifacts()" #artifactsHost></div> -->
 
 </div>
 
 <div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()"></div>
-<!-- <div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()" #debugOverlayHost></div> -->
 
 <div class="dv-artifacts-panel" [class.visible]="$showArtifacts()"></div>
-<!-- <div class="dv-artifacts-panel" [class.visible]="$showArtifacts()" #artifactsHost></div> -->
-
 
 <div class="dv-mermaid-debug-panel" [class.visible]="$showDebugMermaid()"></div>
-<!-- <div class="dv-debug-mermaid" [class.visible]="$showDebugMermaid()" #debugMermaid></div> -->
-
-
-<!--
-<div class="docs-viewer" #docsViewer>
-
-  <header class="dv-header">
-    <div class="dv-title">{{ $docId() }}</div>
-
-    <nav class="dv-nav">
-      <div class="div-button">
-        <button class="vscode-toggle" (click)="onToggleTheme()">
-          <div class="vscode-toggle-track">
-            <div class="vscode-toggle-thumb">
-              <span class="icon sun">☀️</span>
-              <span class="icon moon">🌙</span>
-            </div>
-          </div>
-        </button>
-
-        <button (click)="backToIndex()">Back to Index</button>
-        <button (click)="reloadDoc()">Reload</button>
-        <button (click)="toggleShowToc()">Show TOC</button>
-        <button class="dv-artifacts-panel-toggle" (click)="toggleArtifacts()">Artifacts</button>
-      </div>
-    </nav>
-  </header> -->
-
-
-<!-- <div class="progress-bar"> -->
-<!-- <div class="progress-fill" [style.width.%]="scrollService.scrollPercent()"></div> -->
-<!-- </div> -->
-
-
-<!-- <div class="dv-body">
-
-    @if (showToc) {
-    <aside class="dv-toc" #dvToc>
-      <div class="dv-toc_resizer" #dvTocResizer></div>
-      <h2>Table of Contents</h2>
-      <ul>
-        @for (item of tocState$.value; track item.slug) {
-        <li>
-          <a (click)="scrollTo(item.slug)">{{ item.text }}</a>
-        </li>
-      }
-      </ul>
-    </aside>
-    } -->
-
-<!-- Main content -->
-<!-- <main class="dv-content">
-      <div #host class="dv-host"></div>
-    </main> -->
-
-<!-- </div> -->
-<!--
-  <div class="dv-debug-overlay hidden" #debugOverlayHost></div>
-
-  <div class="dv-artifacts-panel hidden" #artifactsHost></div> -->
-
-<!-- </div> -->
