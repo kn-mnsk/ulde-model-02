@@ -8,12 +8,8 @@
 /* Angular Material Dark Theme */
 $dark-primary-text: white;
 
-$dark-theme: mat.m2-define-dark-theme((
-  color: (
-    primary: mat.m2-define-palette(mat.$m2-blue-palette, 700),
-    accent: mat.m2-define-palette(mat.$m2-pink-palette, A200)
-  )
-));
+$dark-theme: mat.m2-define-dark-theme((color: (primary: mat.m2-define-palette(mat.$m2-blue-palette, 700),
+        accent: mat.m2-define-palette(mat.$m2-pink-palette, A200))));
 
 [data-theme="dark"] {
   --bg-color: #1e1e1e;
@@ -26,6 +22,10 @@ $dark-theme: mat.m2-define-dark-theme((
   --table-bg-odd: #111;
   --table-border: #555;
   --table-header-bg: #333;
+
+  /*Theme toggle*/
+  --toggle-track-bg: #3a3a3a;
+  --toggle-thumb-bg: #1e1e1e;
 
   /* Devtools alias layer */
   --ap-bg: var(--bg-color);
