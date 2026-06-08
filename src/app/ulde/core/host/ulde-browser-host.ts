@@ -17,7 +17,7 @@
 export interface BrowserDomPlugin {
   id: string;
   init(container: HTMLElement): Promise<void> | void;
-  update?(container: HTMLElement): Promise<void> | void;
+  // update?(container: HTMLElement): Promise<void> | void;
   destroy?(container: HTMLElement): Promise<void> | void;
 }
 
@@ -69,20 +69,20 @@ export class UldeBrowserHost {
   }
 
 
-  async update(container: HTMLElement, content: string) {
+  // async update(container: HTMLElement, content: string) {
 
-    container.innerHTML = content;
+  //   container.innerHTML = content;
 
 
-    // 3. Run browser DOM plugins (real DOM world)
-    for (const plugin of this.browserDomPlugins) {
-      // if (plugin === undefined) return;
-      try {
-        plugin.update?.(container);
-      } catch (err) {
-        console.error(`[ULDE Browser Plugin Error] ${plugin.id}`, err);
-      }
-    }
-  }
+  //   // 3. Run browser DOM plugins (real DOM world)
+  //   for (const plugin of this.browserDomPlugins) {
+  //     // if (plugin === undefined) return;
+  //     try {
+  //       plugin.update?.(container);
+  //     } catch (err) {
+  //       console.error(`[ULDE Browser Plugin Error] ${plugin.id}`, err);
+  //     }
+  //   }
+  // }
 
 }

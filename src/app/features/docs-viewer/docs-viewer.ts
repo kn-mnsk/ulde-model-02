@@ -41,9 +41,34 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   $isBrowser = signal(false);
 
   // ULDE outputs
-  toc = signal<TocEntry[]>([]);
-  debugOverlay = signal<DebugOverlayModel | null>(null);
-  artifactsPanel = signal<ArtifactsPanelModel | null>(null);
+  $toc = signal<TocEntry[]>([]);
+  $debugOverlay = signal<DebugOverlayModel | null>(null);
+  $artifactsPanel = signal<ArtifactsPanelModel | null>(null);
+  // $isMermaidpanelFilled = signal<boolean>(false);
+  // $checkMermaidPanelContent = signal<number>(0);
+  // $mermaidPanel = computed<{ isFilled: boolean, check: number }>(() => {
+  //   const isBrowser =
+  //     typeof window !== 'undefined' &&
+  //     typeof document !== 'undefined';
+
+  //   let isfilled: boolean = true;
+  //   let panel: HTMLDivElement | null = null;
+  //   if (!isBrowser) {
+  //     // isfilled = false;
+  //     console.log(`Log: [DocsViewer] isBrowser= `, isBrowser);
+  //   } else {
+  //     panel = document.querySelector('.dv-mermaid-debug-panel') as HTMLDivElement;
+  //     isfilled = (!panel.innerHTML) ? false : true;
+  //   }
+
+  //   const result = {
+  //     isFilled: isfilled, check: this.$checkMermaidPanelContent()
+  //   };
+
+  //   console.log(`Log: [DocsViewer] $mermaidPanel= `, result, panel);
+  //   return result;
+  // });
+  $isMermaidPanelFilled = signal<boolean>(true);
 
   // UI state
   $activeHeading = signal<string | null>(null);
@@ -91,6 +116,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       const id = this.$currentDocId();
       if (id && this.$isBrowser()) {
         this.loadAndRender(id);
+        // this.$checkMermaidPanelContent.update(n => n + 1);
       }
     });
 
@@ -98,6 +124,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     effect(() => {
       if (this.$currentReload() && this.$isBrowser()) {
         this.loadAndRender(this.$currentDocId());
+        // this.$checkMermaidPanelContent.update(n => n + 1);
       }
     });
 
@@ -106,9 +133,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       if (!result) return;
 
       this.finalHtml = result.finalHtml;
-      this.toc.set(result.toc ?? []);
-      this.debugOverlay.set(result.debugOverlay);
-      this.artifactsPanel.set(result.artifactsPanel);
+      this.$toc.set(result.toc ?? []);
+      this.$debugOverlay.set(result.debugOverlay);
+      this.$artifactsPanel.set(result.artifactsPanel);
+      // this.$checkMermaidPanelContent.update(n => n + 1);
 
       if (this.cleanupFn) {
         this.cleanupFn();
@@ -128,12 +156,18 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       });
 
       this.$dvTocRef.set(this.dvTocRef);
+      // this.checkMermaidPanelContent()
     });
   }
 
   ngAfterViewInit() {
     if (!this.$isBrowser()) return;
 
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this.checkMermaidPanelContent()
+      });
+    });
   }
 
   ngOnDestroy() {
@@ -163,9 +197,25 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       const markdown = await response.text();
       await this.ulde.renderMarkdown(markdown);
 
+      // this.checkMermaidPanelContent()
+
+
     } catch (err) {
       console.error('[DocsViewer] loadAndRender error:', err);
     }
+  }
+
+  private async checkMermaidPanelContent(): Promise<void> {
+    if (!this.$isBrowser()) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const panel = document.querySelector('.dv-mermaid-debug-panel');
+        panel?.childNodes.length;
+        console.log(`Log: [DocsViewer] checkMermaidPanelContent() panel=`, panel?.innerHTML);
+        this.$isMermaidPanelFilled.set((panel?.childNodes) ? false : true);
+      });
+    });
+
   }
 
   // Navigation
@@ -189,7 +239,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // console.log(`Log: [DocsViewer] theme isDark=`, isDark);
     this.theme.toggleTheme();
     if (this.finalHtml) {
-      await this.bridge.host.update(this.hostRef.nativeElement, this.finalHtml);
+      await this.bridge.host.run(this.hostRef.nativeElement, this.finalHtml);
+      await this.checkMermaidPanelContent()
     }
   }
 
@@ -207,7 +258,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     this.$showDebugOverlay.update(v => !v);
   }
 
-    toggleDebugMermaid() {
+  toggleDebugMermaid() {
 
     this.$showDebugMermaid.update(v => !v);
   }
