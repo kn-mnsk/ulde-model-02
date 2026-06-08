@@ -17,6 +17,11 @@ export const UldeDebugOverlayBrowserPlugin: BrowserDomPlugin = {
     const host = document.querySelector('.dv-debug-overlay') as HTMLElement | null;
     if (!host) return;
 
+    // to prevent duplication in case of re-run;
+    const panelContent = host.querySelector('.dt-panel-content') as HTMLElement;
+    if (panelContent!==null) {
+      host.removeChild<HTMLElement>(panelContent);
+    }
     host.appendChild(embedded);
 
     // -----------------------------------------------------

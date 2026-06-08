@@ -72,6 +72,13 @@ app-theme-toggle {
   }
 }
 
+.dv-button button.mermaid-debug-button {
+  opacity: 0;
+  &.visible {
+    opacity: 1;
+  }
+}
+
 .progress-bar {
   position: relative;
   width: 100%;

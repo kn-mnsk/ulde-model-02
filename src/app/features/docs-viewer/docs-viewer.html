@@ -18,7 +18,10 @@
           <button (click)="toggleShowToc()">{{ $showToc() ? 'Hide TOC' : 'Show TOC' }}</button>
           <button (click)="toggleArtifacts()">Artifacts</button>
           <button (click)="toggleDebugOverlay()">Debug Overlay</button>
-          <button (click)="toggleDebugMermaid()">Debug Mermaid</button>
+          <button class="mermaid-debug-button"
+          [class.visible]="$isMermaidPanelFilled()"
+          (click)="toggleDebugMermaid()"
+          [disabled]="!$isMermaidPanelFilled()">Debug Mermaid</button>
         </div>
       </div>
     </nav>
@@ -43,7 +46,7 @@
       <h2>Table of Contents</h2>
 
       <ul>
-        @for (item of toc(); track item.slug) {
+        @for (item of $toc(); track item.slug) {
         <li>
           <a (click)="scrollTo(item.slug)">
             {{ item.text }}
