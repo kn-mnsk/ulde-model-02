@@ -18,10 +18,14 @@
           <button (click)="toggleShowToc()">{{ $showToc() ? 'Hide TOC' : 'Show TOC' }}</button>
           <button (click)="toggleArtifacts()">Artifacts</button>
           <button (click)="toggleDebugOverlay()">Debug Overlay</button>
+
+          <button (click)="toggleDebugMermaid()">Debug Mermaid</button>
+          <!--
           <button class="mermaid-debug-button"
           [class.visible]="$isMermaidPanelFilled()"
           (click)="toggleDebugMermaid()"
-          [disabled]="!$isMermaidPanelFilled()">Debug Mermaid</button>
+          [disabled]="!$isMermaidPanelFilled()">Debug Mermaid</button> -->
+
         </div>
       </div>
     </nav>
@@ -42,9 +46,8 @@
     @if ($showToc()) {
     <aside class="dv-toc" #dvToc>
       <div appTocResizerDirective [dvTocResizer]="$dvTocRef()?.nativeElement" class="dv-toc-resizer"></div>
-
-      <h2>Table of Contents</h2>
-
+      <!-- <h2>Table of Contents</h2> -->
+      <span>Table of Contents</span>
       <ul>
         @for (item of $toc(); track item.slug) {
         <li>
@@ -57,6 +60,7 @@
     </aside>
     }
 
+
     <!-- Main Content -->
     <main class="dv-content">
       <div #host class="dv-host"></div>
@@ -64,11 +68,15 @@
 
   </div>
 
-
 </div>
 
 <div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()"></div>
 
 <div class="dv-artifacts-panel" [class.visible]="$showArtifacts()"></div>
 
-<div class="dv-mermaid-debug-panel" [class.visible]="$showDebugMermaid()"></div>
+<div class="dv-mermaid-debug-panel" [class.visible]="$showDebugMermaid()? true: false">
+  <header>
+    {{"Debug Mermaid Panel"}}
+  </header>
+  <ol class="dv-mermaid-debug-panel-content"></ol>
+</div>

@@ -210,7 +210,7 @@ function genPostRenderCB(container: HTMLElement): (id: any) => void {
   };
 }
 
-
+let counter: number = 0;
 /* ---------------------------------------------------------
    ULDE Mermaid Browser Plugin
 --------------------------------------------------------- */
@@ -226,10 +226,10 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
     if (!isBrowser) return;
 
     // clear the contents as initializing to prevent duplication in case of re-run;
-    const panel = document.querySelector('.dv-mermaid-debug-panel') as HTMLDivElement;
-    panel.innerHTML= '';
+    const panel = document.querySelector('.dv-mermaid-debug-panel-content') as HTMLDivElement;
+    panel.innerHTML = '';
 
-    console.log(`Log: [UldeMermaidBrowserPlugin] init, panelContent=`, panel);
+    // console.log(`Log: [UldeMermaidBrowserPlugin] init, \ncounter(called)=`, counter++, `\ncontainer=`, container, `\npanel=`, panel);
 
 
     const currentTheme = sessionStorage.getItem('app-theme');
@@ -259,74 +259,8 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
       });
 
 
-    // const postRenderCB = (svgId: any) => {
-    //   const selectorId = "#" + svgId;
-    //   const svg = container.querySelector(selectorId) as SVGElement;
-    //   // console.log(`Log: [UldeMermaidBrowserPlugin] svg=`, svg);
-    //   if (!svg) return;
-
-    //   // Initialize Panzoom
-    //   const panzoom = Panzoom(svg as SVGElement, {
-    //     maxScale: 5,
-    //     minScale: 0.5,
-    //     step: 0.1,
-    //   });
-
-    //   // code node
-    //   const codeNode = svg.parentNode;
-    //   // pre node
-    //   const pre = codeNode?.parentElement;
-    //   if (!pre || !codeNode) return;
-
-    //   pre.className = "mermaid-container";
-
-    //   const buttonContainer = document.createElement('div');
-    //   buttonContainer.className = "mermaid-button-container";
-    //   // zoomin
-    //   const zoomIn = document.createElement('button');
-    //   zoomIn.className = "mermaid-zoomin-button";
-    //   zoomIn.innerText = "+";
-    //   const handlerIn = (event: Event) => {
-    //     event.preventDefault();
-    //     event.stopPropagation();
-    //     panzoom.zoomIn({ animate: true });
-    //   };
-    //   zoomIn.addEventListener('click', handlerIn);
-    //   zoomInHandlers.push({ button: zoomIn, handler: handlerIn });
-    //   // zoomout
-    //   const zoomOut = document.createElement('button');
-    //   zoomOut.className = "mermaid-zoomout-button";
-    //   zoomOut.innerText = "-";
-    //   const handlerOut = (event: Event) => {
-    //     event.preventDefault();
-    //     event.stopPropagation();
-    //     panzoom.zoomOut({ animate: true });
-    //   };
-    //   zoomOut.addEventListener('click', handlerOut);
-    //   zoomOutHandlers.push({ button: zoomOut, handler: handlerOut });
-    //   // rset
-    //   const reset = document.createElement('button');
-    //   reset.className = "mermaid-reset-button";
-    //   reset.innerText = "reset";
-    //   const handlerReset = (event: Event) => {
-    //     event.preventDefault();
-    //     event.stopPropagation();
-    //     panzoom.reset({ animate: false });
-    //   };
-    //   reset.addEventListener('click', handlerReset);
-    //   resetHandlers.push({ button: reset, handler: handlerReset });
-
-    //   buttonContainer.appendChild(zoomIn);
-    //   buttonContainer.appendChild(zoomOut);
-    //   buttonContainer.appendChild(reset);
-
-    //   pre.insertBefore(buttonContainer, codeNode);
-
-    //   // console.log(`Log: [UldeMermaidBrowserPlugin] final pr=`, pre);
-
-    // }
     const logMermaidDebug = (message: string) => {
-      const entry = document.createElement('div');
+      const entry = document.createElement('li');
       entry.textContent = message;
       entry.style.marginBottom = '6px';
 
@@ -358,6 +292,8 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
         }
       });
 
+
+
       // Wait until mermaid code blocks exist
       // await waitForMermaidNodes();
 
@@ -372,6 +308,10 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
         nodes: mermaidNodes,
         postRenderCallback: postRenderCB
       });
+
+      if (panel.innerHTML == '') {
+        panel.append('No Debug Entries Found');
+      }
 
     } catch (err: any) {
       // Only log to debug panel, not console
