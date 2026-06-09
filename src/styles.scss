@@ -271,14 +271,14 @@ body[data-theme="light"] {
   position: fixed;
   top: 120px; //0px;
   // right: 24px;
-  left: 50px;
+  left: 5%;
   width: 350px;
   // height: auto;
   max-height: 70vh;
   padding-top: 25px;
   // background: var(--ap-hover);
   background: var(--ap-bg);
-  border: 5px solid var(--ap-border);
+  border: 3px solid var(--ap-border);
   // border-right: 5px solid var(--ap-border);
   border-radius: 8px;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
@@ -317,13 +317,13 @@ body[data-theme="light"] {
   height: auto; //28px;
   color: var(--ap-fg);
   border-radius: 4px;
-  background: var(--ap-header-bg);
+  background: var(--ap-bg);
   border: 1px solid var(--ap-border);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 1001;
+  z-index: 1000;
   transition: background 0.2s ease;
 
   &:hover {
@@ -338,7 +338,7 @@ body[data-theme="light"] {
 
   &:hover {
     scale: 2.0;
-    background: red;//var(--ap-hover);
+    background: red; //var(--ap-hover);
   }
 }
 
@@ -363,32 +363,33 @@ body[data-theme="light"] {
    Debug Overlay Root
 --------------------------------------------- */
 
-.ulde-debug-overlay-content {
-  font-family: system-ui, sans-serif;
-  padding: 0;
-  margin: 0;
-  color: var(--ap-fg);
-  background: var(--ap-bg);
-  height: 100%;
-  overflow-y: auto;
-}
+// .ulde-debug-overlay-content {
+//   font-family: system-ui, sans-serif;
+//   padding: 0;
+//   margin: 0;
+//   color: var(--ap-fg);
+//   background: var(--ap-bg);
+//   height: 100%;
+//   overflow-y: auto;
+// }
 
 .dv-debug-overlay {
   position: fixed;
   top: 120px;
-  left: 100px; //20px;
-  width: 320px;
-  max-height: 70%;
-  overflow: hidden;
+  left: 40%; //20px;
+  width: 350px;
+  // height: auto;
+  height: 70vh;
+  overflow-y: auto;
   background: var(--ap-bg);
-  border: 5px solid var(--ap-border);
+  border: 3px solid var(--ap-border);
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
   font-size: 13px;
   line-height: 1.4;
   opacity: 0;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 1000;
   transition: opacity 0.25s ease;
 
   &.visible {
@@ -417,7 +418,7 @@ body[data-theme="light"] {
   border-radius: 6px;
   border: solid 5px var(--ap-border);
   border-radius: 8px;
-  z-index: 2000; //999999;
+  z-index: 1000; //999999;
   opacity: 0;
   white-space: pre-wrap;
   font-family: monospace;
@@ -425,7 +426,18 @@ body[data-theme="light"] {
   // opacity: 0.8;
   &.visible {
     opacity: 1;
-    // pointer-events: auto;
+    pointer-events: auto;
   }
 
+}
+
+.dv-mermaid-debug-panel header {
+  position: relative;
+  display: block;
+  text-align: center;
+  background: var(--bg-color);
+  font-size: 13px;
+  font-weight: bolder;
+  border-bottom: solid 2px var(--ap-border);
+  margin: 0.5rem;
 }

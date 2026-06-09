@@ -1,6 +1,6 @@
 // app/feature/docs-viewer/docs-viewer.ts
 
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, Inject, PLATFORM_ID, computed } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, Inject, PLATFORM_ID, afterEveryRender, afterRenderEffect, AfterViewChecked } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 import { TocResizerDirective } from './toc-resizer.directive';
@@ -27,12 +27,11 @@ import { ThemeToggle } from './theme-toggle';
   ],
   templateUrl: './docs-viewer.html'
 })
-export class DocsViewer implements AfterViewInit, OnDestroy {
+export class DocsViewer implements AfterViewInit, OnDestroy{
 
   // External readonly inputs
   $docId = input<string>('');
   $reload = input<boolean>(false);
-
   // Internal writable signals
   private $currentDocId = signal('');
   private $currentReload = signal(false);
@@ -44,37 +43,14 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   $toc = signal<TocEntry[]>([]);
   $debugOverlay = signal<DebugOverlayModel | null>(null);
   $artifactsPanel = signal<ArtifactsPanelModel | null>(null);
-  // $isMermaidpanelFilled = signal<boolean>(false);
-  // $checkMermaidPanelContent = signal<number>(0);
-  // $mermaidPanel = computed<{ isFilled: boolean, check: number }>(() => {
-  //   const isBrowser =
-  //     typeof window !== 'undefined' &&
-  //     typeof document !== 'undefined';
 
-  //   let isfilled: boolean = true;
-  //   let panel: HTMLDivElement | null = null;
-  //   if (!isBrowser) {
-  //     // isfilled = false;
-  //     console.log(`Log: [DocsViewer] isBrowser= `, isBrowser);
-  //   } else {
-  //     panel = document.querySelector('.dv-mermaid-debug-panel') as HTMLDivElement;
-  //     isfilled = (!panel.innerHTML) ? false : true;
-  //   }
-
-  //   const result = {
-  //     isFilled: isfilled, check: this.$checkMermaidPanelContent()
-  //   };
-
-  //   console.log(`Log: [DocsViewer] $mermaidPanel= `, result, panel);
-  //   return result;
-  // });
-  $isMermaidPanelFilled = signal<boolean>(true);
 
   // UI state
   $activeHeading = signal<string | null>(null);
   $showDebugOverlay = signal(false);
   $showArtifacts = signal(false);
   $showDebugMermaid = signal(false);
+  $isMermaidPanelFilled = signal<boolean>(true);
   $showToc = signal(false);
   $dvTocRef = signal<ElementRef<HTMLElement> | undefined>(undefined);
 
@@ -83,6 +59,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLElement>;
   @ViewChild('dvToc', { static: false }) dvTocRef!: ElementRef<HTMLElement>;
+  // @ViewChild('mermaidPanel', { static: false }) mermaidPanelRef!: ElementRef<HTMLElement>;
 
   constructor(
     private bridge: UldeDocsViewerBridge,
@@ -95,12 +72,21 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     this.$isBrowser.set(isPlatformBrowser(this.platformId));
     if (!this.$isBrowser()) return;
 
+    // afterRenderEffect({
+    //   read: () => {
+    //     console.log(`Log: [DocsViewer] toc haschildeNodes=`, this.dvTocRef?.nativeElement);
+    //   }
+    // }
+    // )
+
+
+
     // Sync external docId → internal writable docId
     effect(() => {
       const id = this.$docId();
       if (id) {
         this.$currentDocId.set(id);
-        this.$currentReload.set(true);
+        // this.$currentReload.set(true);
       }
     });
 
@@ -163,12 +149,17 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     if (!this.$isBrowser()) return;
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        this.checkMermaidPanelContent()
-      });
-    });
+    // requestAnimationFrame(() => {
+    //   requestAnimationFrame(() => {
+    //     this.checkMermaidPanelContent()
+    //   });
+    // });
   }
+
+  // ngAfterViewChecked(): void {
+  //       console.log(`Log: [DocsViewer] toc haschildeNodes=`, this.dvTocRef?.nativeElement.hasChildNodes());
+  //       console.log(`Log: [DocsViewer] mermaid panel haschildeNodes=`, this.mermaidPanelRef?.nativeElement.hasChildNodes());
+  // }
 
   ngOnDestroy() {
     if (this.cleanupFn) {
@@ -205,23 +196,23 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     }
   }
 
-  private async checkMermaidPanelContent(): Promise<void> {
-    if (!this.$isBrowser()) return;
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const panel = document.querySelector('.dv-mermaid-debug-panel');
-        panel?.childNodes.length;
-        console.log(`Log: [DocsViewer] checkMermaidPanelContent() panel=`, panel?.innerHTML);
-        this.$isMermaidPanelFilled.set((panel?.childNodes) ? false : true);
-      });
-    });
+  // private async checkMermaidPanelContent(): Promise<void> {
+  //   if (!this.$isBrowser()) return;
+  //   // requestAnimationFrame(() => {
+  //   //   requestAnimationFrame(() => {
+  //   const panel = this.mermaidPanelRef.nativeElement;
+  //   // const panel = document.querySelector('.dv-mermaid-debug-panel');
+  //   console.log(`Log: [DocsViewer] checkMermaidPanelContent() panel hasChildeNodes=`, panel.hasChildNodes());
+  //   this.$isMermaidPanelFilled.set(panel.hasChildNodes() ? true : false);
+  //   //   });
+  //   // });
 
-  }
+  // }
 
   // Navigation
   backToIndex() {
     this.$currentDocId.set('docs/index');
-    this.$currentReload.set(true);
+    // this.$currentReload.set(true);
   }
 
   reloadDoc() {
@@ -240,7 +231,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     this.theme.toggleTheme();
     if (this.finalHtml) {
       await this.bridge.host.run(this.hostRef.nativeElement, this.finalHtml);
-      await this.checkMermaidPanelContent()
+      // await this.checkMermaidPanelContent()
     }
   }
 

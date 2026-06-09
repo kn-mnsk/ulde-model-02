@@ -53,8 +53,7 @@ export class UldeBrowserHost {
     //   ctx.artifacts.content ??
     //   '';
 
-    // container.innerHTML = "";
-
+    container.innerHTML = "";
     container.innerHTML = content;
 
 
