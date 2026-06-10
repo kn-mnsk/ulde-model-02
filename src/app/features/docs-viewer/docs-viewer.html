@@ -43,22 +43,24 @@
   <div class="dv-body">
 
     <!-- TOC Sidebar -->
-    @if ($showToc()) {
+    <!-- @if ($showToc()) { -->
     <aside class="dv-toc" #dvToc>
       <div appTocResizerDirective [dvTocResizer]="$dvTocRef()?.nativeElement" class="dv-toc-resizer"></div>
-      <!-- <h2>Table of Contents</h2> -->
-      <span>Table of Contents</span>
+      <h2>{{`${$currentDocId()}.md`}}</h2>
+      <h3 [style.padding-left.px]="7"> Table of Contents</h3>
+      <!-- <span>Table of Contents</span> -->
       <ul>
         @for (item of $toc(); track item.slug) {
-        <li>
+        <li class="toc-item" [style.padding-left.px]="(item.level - 1) * 16" [class.active]="$activeHeading() === item.slug">
           <a (click)="scrollTo(item.slug)">
             {{ item.text }}
           </a>
         </li>
         }
       </ul>
+      <h2>{{`${previousDocId}.md`}}</h2>
     </aside>
-    }
+    <!-- } -->
 
 
     <!-- Main Content -->

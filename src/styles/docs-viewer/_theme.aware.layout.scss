@@ -112,7 +112,6 @@ app-theme-toggle {
 
 .dv-toc {
   position: relative;
-
   width: 250px;
   min-width: 200px;
   max-width: 350px;
@@ -132,10 +131,9 @@ app-theme-toggle {
 
   & a {
     display: inline-table;
-
-    padding-bottom: 0.3rem;
-    padding-left: 0.05rem;
-    padding-right: 0.2rem;
+    // padding-bottom: 0.3rem;
+    // padding-left: 0.05rem;
+    // padding-right: 0.2rem;
     color: var(--link-color);
     transition: color 0.25s ease;
 
@@ -145,9 +143,9 @@ app-theme-toggle {
     }
   }
 
-  &.hidden {
-    display: none;
-  }
+  // &.hidden {
+  //   display: none;
+  // }
 }
 
 /* Draggable TOC Resizer */
@@ -166,6 +164,22 @@ app-theme-toggle {
     width: 15px;
     background: var(--ap-color);
   }
+}
+
+.toc-item {
+  list-style: none;
+  margin: 5px 0px;
+}
+
+.toc-item a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.toc-item.active a {
+  scale: 1.1;
+  font-weight: bold;
+  color: #0078d4;
 }
 
 /* ---------------------------------------------------------
@@ -193,7 +207,7 @@ app-theme-toggle {
   padding: 10px 10px;
   // width: auto;
   width: 100%;
-  // height:100%;
+  height: 100%;
 }
 
 /* ---------------------------------------------------------
@@ -242,24 +256,31 @@ app-theme-toggle {
 
 .dv-host .mermaid-container {
   position: relative;
-  display: flex;
+  // display: flex;
   border: 2px solid var(--table-border);
   background: var(--bg-color);
   transition: background-color 0.4s ease, border-color 0.4s ease;
   margin-bottom: 1rem;
+  // align-content: center;
+
 }
 
 .dv-host code.language-mermaid svg {
-  padding: 0.25rem;
+  width: fit-content;
+  height: fit-content;
+  padding: 1rem;
   background: var(--bg-color);
+  border: 1px solid var(--ap-border);
   transition: background-color 0.4s ease;
+  z-index: 900;
+  margin: 1rem;
 }
 
 
-.dv-host code.langauge-mermaid svg g text {
-  word-wrap: normal;
-  // word-wrap: break-word;
-}
+// .dv-host code.langauge-mermaid svg g text {
+//   word-wrap: normal;
+//   // word-wrap: break-word;
+// }
 
 .dv-host .mermaid-container .mermaid-button-container {
   position: relative;
