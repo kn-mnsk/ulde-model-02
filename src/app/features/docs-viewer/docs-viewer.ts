@@ -27,13 +27,14 @@ import { ThemeToggle } from './theme-toggle';
   ],
   templateUrl: './docs-viewer.html'
 })
-export class DocsViewer implements AfterViewInit, OnDestroy{
+export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // External readonly inputs
   $docId = input<string>('');
   $reload = input<boolean>(false);
   // Internal writable signals
-  private $currentDocId = signal('');
+  $currentDocId = signal('');
+  previousDocId: string = '';
   private $currentReload = signal(false);
 
   // Environment
@@ -41,6 +42,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy{
 
   // ULDE outputs
   $toc = signal<TocEntry[]>([]);
+  // activeHeading = signal<string | null>(null);
   $debugOverlay = signal<DebugOverlayModel | null>(null);
   $artifactsPanel = signal<ArtifactsPanelModel | null>(null);
 
@@ -55,6 +57,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy{
   $dvTocRef = signal<ElementRef<HTMLElement> | undefined>(undefined);
 
   private cleanupFn: (() => void) | null = null;
+  private scrollSpyHandler?: (e: any) => void;
   private finalHtml: string | null = null;
 
   @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLElement>;
@@ -85,6 +88,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy{
     effect(() => {
       const id = this.$docId();
       if (id) {
+        // this.$previousDocId.set(this.$currentDocId());
         this.$currentDocId.set(id);
         // this.$currentReload.set(true);
       }
@@ -100,6 +104,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy{
     // React to internal docId changes
     effect(() => {
       const id = this.$currentDocId();
+      // this.previousDocId = id;
       if (id && this.$isBrowser()) {
         this.loadAndRender(id);
         // this.$checkMermaidPanelContent.update(n => n + 1);
@@ -136,10 +141,15 @@ export class DocsViewer implements AfterViewInit, OnDestroy{
         html: result.finalHtml,
         onScrollSpy: id => this.$activeHeading.set(id),
         onNavigate: newDocId => {
+          // const preDocId = this.$currentDocId();
+          // this.previousDocId = this.$currentDocId(); //
           this.$currentDocId.set(newDocId);
-          this.$currentReload.set(true);
+          // this.$currentReload.set(true);
         }
       });
+
+      // 2. Attach ScrollSpy event listener
+      this.attachScrollSpy();
 
       this.$dvTocRef.set(this.dvTocRef);
       // this.checkMermaidPanelContent()
@@ -165,6 +175,13 @@ export class DocsViewer implements AfterViewInit, OnDestroy{
     if (this.cleanupFn) {
       this.cleanupFn();
       this.cleanupFn = null;
+    }
+
+    if (this.scrollSpyHandler) {
+      this.hostRef.nativeElement.removeEventListener(
+        'ulde:scrollspy',
+        this.scrollSpyHandler
+      );
     }
   }
 
@@ -211,6 +228,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy{
 
   // Navigation
   backToIndex() {
+    this.previousDocId = this.$currentDocId(); //
     this.$currentDocId.set('docs/index');
     // this.$currentReload.set(true);
   }
@@ -219,6 +237,28 @@ export class DocsViewer implements AfterViewInit, OnDestroy{
     this.$currentReload.set(true);
   }
 
+  attachScrollSpy() {
+    if (!this.hostRef?.nativeElement) return;
+
+    // Remove old handler
+    if (this.scrollSpyHandler) {
+      this.hostRef.nativeElement.removeEventListener(
+        'ulde:scrollspy',
+        this.scrollSpyHandler
+      );
+    }
+
+    // Add new handler
+    this.scrollSpyHandler = (e: any) => {
+      const slug = e.detail?.id;
+      this.$activeHeading.set(slug);
+    };
+
+    this.hostRef.nativeElement.addEventListener(
+      'ulde:scrollspy',
+      this.scrollSpyHandler
+    );
+  }
   // Scroll to heading
   scrollTo(slug: string) {
     const el = document.getElementById(slug);

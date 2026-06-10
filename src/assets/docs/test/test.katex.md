@@ -1,8 +1,6 @@
 # TEST KATEX
 
-## Chapter 2 Section 2 Geometry of Space Curve  
-
-
+## Mermaid Diagram 1  
 ```mermaid
 ---
 config:
@@ -18,7 +16,8 @@ flowchart LR
 
 ```
 
-
+---
+## Mermaid Diagram 2  
 ```mermaid
 ---
 title: Sequence Diagram
@@ -39,7 +38,7 @@ sequenceDiagram
 
 ---
 
-
+## Mermaid Diagram 3
 ```mermaid
 ---
 title: State Diagram V2
@@ -120,8 +119,9 @@ stateDiagram-v2
   end note
 
 ```
----
 
+---
+## Mermaid Diagram 4
 ```mermaid
 ---
 title: Sequence Diagram
@@ -139,9 +139,9 @@ sequenceDiagram
     P->>RAF: rAF #2 fires (before next paint)
     RAF->>JS: hide overlay (safe)
 ```
----
 
-## Preview: Curvature Flow
+---
+# Preview: Curvature Flow
 <!-- 
 <div class="canvas-trigger" data-scene="EG04">
   <button>View Loxodrome</button>
@@ -171,7 +171,7 @@ $\lbrace\space \frac{\mathrm{d^2}\theta}{\mathrm{d}s^2} = \frac{\mathrm{d^2}\phi
 
 $=-a\left(\sin(\theta)\cos(\phi)\mathbf{l_{1}} + \cos(\theta)\mathbf{l_{2}} + \sin(\theta)\sin(\phi)\mathbf{l_{3}}\right)$  
 
-## 5. Summary (the crisp version)
+# 5. Summary (the crisp version)
 Concept	|queueMicrotask()	|Signals 
 ---------|-----------------|--------
 Purpose	|Schedule ASAP after stack	|Reactive state system

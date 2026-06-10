@@ -1,21 +1,10 @@
-[1st]:#inlineId:1-folder-structure "§1. Folder Structure(Main Part Only)"
-[2nd]:#inlineId:2-key-features "§2. Key Features"
-[3rd]:#inlineId:3-architecture-diagram "§3. Architecture Diagram"
+# Application README (ID: application-readme)
 
-Application README (ID: application-readme)
-=============================
----
 __This document is the master reference for the entire documentation rendering system. It explains how Markdown is parsed, enhanced, rendered to html, and synchronized with user navigation.__
 
----
-  
-<!-- ## 1. Folder Structure(Main Part Only) [next > 2. Key Features](#inlineId:2-key-features) -->
-<h2 id="1-folder-structure">§1. Folder Structure(Main Part Only)</h2>
+## 1. Folder Structure(Main Part Only)
 
-**[last section][3rd] &emsp; [next section][2nd]**
-
-> ----
-> The Docs-Vierwer folder contains the documentation viewer and the Markdown rendering pipeline used throughout the project. It includes the viewer component, the renderer service, enhancement logic, lifecycle coordination, and documentation.
+The Docs-Vierwer folder contains the documentation viewer and the Markdown rendering pipeline used throughout the project. It includes the viewer component, the renderer service, enhancement logic, lifecycle coordination, and documentation.
 
 ```folder
 Folder Structure
@@ -62,30 +51,25 @@ app/
 
 ```
 
-[(*1) See DocsList in th the docs-meta.ts](#docId:docs-meta)
-
 --- 
 
-<h2 id="2-key-features">§2. Key Features</h2>
+## 2. Key Features
 
-**[previous section][1st] &emsp; [next section][3rd]**  
-> ---
-> This is the markdown documentation system, which complies with Katex  and Mermaid renderings. Therefore a user views the most recentlty updated markdown file while editting it, through the browser refersh recovery management.
+This is the markdown documentation system, which complies with Katex  and Mermaid renderings. Therefore a user views the most recentlty updated markdown file while editting it, through the browser refersh recovery management.
 The system is designed to follow a clear async pipeline that ensures stable layout, correct scroll restoration, and accurate anchor navigation.
     
->1. __App__
+### App
 
->> displays main screen(currently blank, though):
+displays main screen(currently blank, though):
+- Adds Render2 listeners - beforeunload and keydown
+- Detects browser refresh  
+- Restores Session State
+- Controls visibility of App and DocsViewer templates
+- Does NOT manage docId or scrollPos
 
->>- Adds Render2 listeners - beforeunload and keydown
->>- Detects browser refresh  
->>- Restores Session State
->>- Controls visibility of App and DocsViewer templates
->>- Does NOT manage docId or scrollPos
+[ref-1: app.ts](#docId:docs/application-readme)
 
->> [ref-1: app.ts](#docId:app)
-
->> [ref-2: Browser Refresh Recovery](#docId:doc10-app-0140)
+[ref-2: Browser Refresh Recovery](#docId:docs/supplements/doc10-app-0140)
 
 
 >2. __DocsViewer__
