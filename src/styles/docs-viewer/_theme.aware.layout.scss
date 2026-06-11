@@ -99,7 +99,7 @@ app-theme-toggle {
 .dv-body {
   position: relative;
   display: flex;
-  flex: 1;
+  // flex: 1;
   height: 85vh; //calc(100vh - 120px);
   // overflow: hidden;
   background: var(--bg-color);
@@ -111,6 +111,7 @@ app-theme-toggle {
 --------------------------------------------------------- */
 
 .dv-toc {
+  z-index: 20; // new
   position: relative;
   width: 250px;
   min-width: 200px;
@@ -161,8 +162,8 @@ app-theme-toggle {
   bottom: 0;
 
   &:hover {
-    width: 15px;
-    background: var(--ap-color);
+    // width: 8px;
+    background:  #0078d4;//var(--ap-color);
   }
 }
 
@@ -187,27 +188,55 @@ app-theme-toggle {
 --------------------------------------------------------- */
 
 .dv-content {
+  z-index: 10; // new
+  position: relative; // new
   display: flex;
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
+  // overflow: hidden;
   // overflow-y: auto;
   // padding: 2rem;
   background: var(--bg-color);
   color: var(--text-color);
-  height: 100%;
+  height: 85vh;
+  min-width: 0; // new
   transition:
     background-color 0.4s ease,
     color 0.4s ease;
 }
 
+.dv-content .host-wrapper {
+  overflow-y: auto;
+}
+
+.host-overlay {
+  position: absolute;
+  height: 0;
+  // overflow: hidden;
+  inset: 0;
+  background: var(--dv-background, #fff);
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 180ms ease-out;
+  pointer-events: none;
+
+  &.hidden {
+    opacity: 0;
+  }
+}
+
+// .host-overlay.hidden {
+//   opacity: 0;
+// }
+
 .dv-host {
   position: relative;
   flex: 1;
-  overflow: auto;
+  overflow-y: auto;
   padding: 10px 10px;
-  // width: auto;
-  width: 100%;
-  height: 100%;
+  // width: 100%;
+  width: fit-content;
+  // height: 85vh;
 }
 
 /* ---------------------------------------------------------

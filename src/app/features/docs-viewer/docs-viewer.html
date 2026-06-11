@@ -20,11 +20,6 @@
           <button (click)="toggleDebugOverlay()">Debug Overlay</button>
 
           <button (click)="toggleDebugMermaid()">Debug Mermaid</button>
-          <!--
-          <button class="mermaid-debug-button"
-          [class.visible]="$isMermaidPanelFilled()"
-          (click)="toggleDebugMermaid()"
-          [disabled]="!$isMermaidPanelFilled()">Debug Mermaid</button> -->
 
         </div>
       </div>
@@ -43,15 +38,16 @@
   <div class="dv-body">
 
     <!-- TOC Sidebar -->
+    @if (true) {
     <!-- @if ($showToc()) { -->
     <aside class="dv-toc" #dvToc>
       <div appTocResizerDirective [dvTocResizer]="$dvTocRef()?.nativeElement" class="dv-toc-resizer"></div>
       <h2>{{`${$currentDocId()}.md`}}</h2>
       <h3 [style.padding-left.px]="7"> Table of Contents</h3>
-      <!-- <span>Table of Contents</span> -->
       <ul>
         @for (item of $toc(); track item.slug) {
-        <li class="toc-item" [style.padding-left.px]="(item.level - 1) * 16" [class.active]="$activeHeading() === item.slug">
+        <li class="toc-item" [style.padding-left.px]="(item.level - 1) * 16"
+          [class.active]="$activeHeading() === item.slug">
           <a (click)="scrollTo(item.slug)">
             {{ item.text }}
           </a>
@@ -60,12 +56,15 @@
       </ul>
       <h2>{{`${previousDocId}.md`}}</h2>
     </aside>
-    <!-- } -->
+    }
 
 
     <!-- Main Content -->
     <main class="dv-content">
-      <div #host class="dv-host"></div>
+      <div class="host-wrapper">
+        <div #overlay class="host-overlay hidden"></div>
+        <div #host class="dv-host"></div>
+      </div>
     </main>
 
   </div>

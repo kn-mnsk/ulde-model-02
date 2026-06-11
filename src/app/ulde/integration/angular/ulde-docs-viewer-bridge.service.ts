@@ -7,7 +7,7 @@ import { UldeBrowserHost } from '../../core/host/ulde-browser-host';
 import { UldeMermaidBrowserPlugin } from '../../plugins/browser/ulde-mermaid-browser.plugin';
 import { UldeKatexBrowserPlugin } from '../../plugins/browser/ulde-katex-browser.plugin';
 import { UldeAnchorsBrowserPlugin } from '../../plugins/browser/ulde-anchors-browser.plugin';
-import { UldeScrollSpyBrowserPlugin } from '../../plugins/browser/ulde-scrollspy-browser.plugin';
+import { UldeScrollBrowserPlugin } from '../../plugins/browser/ulde-scroll-browser.plugin';
 import { UldeDebugOverlayBrowserPlugin } from '../../plugins/browser/ulde-debug-overlay-browser.plugin';
 import { UldeArtifactsPanelBrowserPlugin } from '../../plugins/browser/ulde-artifacts-panel-browser.plugin';
 
@@ -22,19 +22,19 @@ export class UldeDocsViewerBridge {
     this.host.registerBrowserDomPlugin(UldeMermaidBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeKatexBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
-    this.host.registerBrowserDomPlugin(UldeScrollSpyBrowserPlugin);
+    this.host.registerBrowserDomPlugin(UldeScrollBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeDebugOverlayBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeArtifactsPanelBrowserPlugin);
   }
 
   /**
    *
-   * @param options 
+   * @param options
    * @returns
    */
-  run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string; onScrollSpy?: (id: string) => void ; onNavigate?: (docId: string) => void }) {
+  run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string; onScrollSpy?: (id: string) => void ; onScrollPos?: (pos: number) => void ; onNavigate?: (docId: string) => void }) {
 
-    const { host, html, reload, onNavigate, onScrollSpy } = options;
+    const { host, html, reload, onScrollSpy, onScrollPos, onNavigate } = options;
 
     // // TODO: resolve docId → HTML
     // const html = this.resolveHtml(docId);
@@ -44,9 +44,15 @@ export class UldeDocsViewerBridge {
 
     // listen for ULDE scrollspy events
     if (onScrollSpy) {
-    // if (options.onScrollSpy) {
       host.addEventListener('ulde:scrollspy', (e: any) => {
         onScrollSpy(e.detail.id);
+      });
+    }
+
+    // listen for ULDE scrollpos events
+    if (onScrollPos) {
+      host.addEventListener('ulde:scrollpos', (e: any) => {
+        onScrollPos(e.detail.scrollTop);
       });
     }
 
