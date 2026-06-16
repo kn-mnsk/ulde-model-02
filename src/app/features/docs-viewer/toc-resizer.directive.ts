@@ -21,15 +21,13 @@ export class TocResizerDirective {
     private renderer: Renderer2
   ) { }
 
+  // -------------------------------
   // Start resizing
+  // -------------------------------
   @HostListener('mousedown', ['$event'])
   onMouseDown(event: MouseEvent) {
     this.resizer = this.el.nativeElement;
     this.toc = this.resizer.parentElement as HTMLElement;
-
-    // this.resizer = event.currentTarget as HTMLElement;
-    // this.toc = this.resizer.parentNode;
-    // console.log(`Log: [TocResizerDirective] onMouseDown dvTocResizer`, this.dvTocResizer(), this.resizer, this.toc);
 
     this.isResizing = true;
 
@@ -40,15 +38,14 @@ export class TocResizerDirective {
     event.preventDefault();
   }
 
+   // -------------------------------
   // Resize as mouse moves
-  // @HostListener('document:mousemove', ['$event'])
+  // (document-level listener)
+  // -------------------------------
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent) {
 
     if (!this.isResizing) return;
-
-    // this.renderer.setStyle(this.resizer, 'background', '#4a87f8');
-    // this.renderer.setStyle(this.resizer, 'width', '5px');
 
     const newWidth = event.clientX;
     if (newWidth > this.minWidth && newWidth < this.maxWidth) {
@@ -58,7 +55,10 @@ export class TocResizerDirective {
     }
   }
 
+  // -------------------------------
   // Stop resizing
+  // (document-level listener)
+  // -------------------------------
   @HostListener('document:mouseup')
   onMouseUp() {
 

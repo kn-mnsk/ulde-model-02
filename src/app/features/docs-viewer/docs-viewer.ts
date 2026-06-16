@@ -1,13 +1,13 @@
 // app/feature/docs-viewer/docs-viewer.ts
 
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, Inject, PLATFORM_ID, } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, Inject, PLATFORM_ID, computed } from '@angular/core';
+import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
 
 import { TocResizerDirective } from './toc-resizer.directive';
 import { UldeDocsViewerBridge } from '../../ulde/integration/angular/ulde-docs-viewer-bridge.service';
 import { UldeAngularService } from '../../ulde/integration/angular/ulde-angular.service';
 
-import { TocEntry, ArtifactsPanelModel, DebugOverlayModel } from '../../ulde/core/artifacts/ulde-artifacts';
+import { TocEntry, ArtifactsPanelModel, DebugOverlayModel, TocNode } from '../../ulde/core/artifacts/ulde-artifacts';
 
 import { ThemeService } from '../../core/services/theme.service';
 import { ThemeToggle } from './theme-toggle';
@@ -17,7 +17,7 @@ import { ThemeToggle } from './theme-toggle';
   selector: 'app-docs-viewer',
   standalone: true,
   imports: [
-    ThemeToggle, TocResizerDirective,
+    ThemeToggle, TocResizerDirective, NgTemplateOutlet
     // DebugOverlay,
     //  ArtifactsPanel
   ],
@@ -38,6 +38,17 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // ULDE outputs
   $toc = signal<TocEntry[]>([]);
+  readonly $tocTree = computed(() => this.buildTocTree(this.$toc()));
+  readonly $isParentActive = computed(() => {
+    const toc = this.$toc();
+    const active = this.$activeHeading();
+    return (item: TocEntry) => this.isParentOfActive(item, toc, active);
+  });
+
+  readonly isParentActive = (node: TocNode) =>
+    this.isAncestor(node, this.$activeHeading());
+
+
   // activeHeading = signal<string | null>(null);
   $debugOverlay = signal<DebugOverlayModel | null>(null);
   $artifactsPanel = signal<ArtifactsPanelModel | null>(null);
@@ -232,6 +243,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // ---------------------------------------------
 
     host.addEventListener('ulde:scrollspy', (e: any) => {
+      console.log(`Log: [DocsViewer] ulde:scrollspy event e=`, e.detail.id);
       this.$activeHeading.set(e.detail.id);
     });
 
@@ -253,8 +265,22 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   // Scroll to heading
   scrollTo(slug: string) {
     const el = document.getElementById(slug);
-    if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+    if (!el) return;
+
+    el.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+
+    // Optional: highlight the target
+    this.highlightElement(el);
   }
+
+  private highlightElement(el: HTMLElement) {
+    el.classList.add('inline-highlight');
+    setTimeout(() => el.classList.remove('inline-highlight'), 700);
+  }
+
 
   // Theme toggle
   async onToggleTheme() {
@@ -284,6 +310,62 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
     this.$showDebugMermaid.update(v => !v);
   }
+
+  private buildTocTree(entries: TocEntry[]): TocNode[] {
+    const root: TocNode[] = [];
+    const stack: TocNode[] = [];
+
+    for (const entry of entries) {
+      const node: TocNode = {
+        entry,
+        children: [],
+        collapsed: false
+      };
+
+      while (stack.length && stack[stack.length - 1].entry.level >= entry.level) {
+        stack.pop();
+      }
+
+      if (stack.length === 0) {
+        root.push(node);
+      } else {
+        stack[stack.length - 1].children.push(node);
+      }
+
+      stack.push(node);
+    }
+
+    console.log(`Log: buildTocTree() root=`, root);
+
+    return root;
+  }
+
+  isParentOfActive(item: TocEntry, toc: TocEntry[], activeSlug: string | null): boolean {
+    const activeIndex = toc.findIndex(t => t.slug === activeSlug);
+    if (activeIndex === -1) return false;
+
+    const active = toc[activeIndex];
+
+    // A parent has a lower level and appears before the active heading
+    return item.level < active.level &&
+      toc.indexOf(item) < activeIndex;
+  }
+
+  private isAncestor(node: TocNode, activeSlug: string | null): boolean {
+    // console.log(`Log: [DocsViewer] isAncestor() node`,node);
+    for (const child of node.children) {
+      if (child.entry.slug === activeSlug) {
+        // console.log(`Log: [DocsViewer] isAncestor() child.entry.slug === activeSlug=`, activeSlug);
+        return true;
+      }
+      if (this.isAncestor(child, activeSlug)) {
+        // console.log(`Log: [DocsViewer] this.isAncestor(child, activeSlug) `, child, activeSlug);
+        return true;
+      }
+    }
+    return false;
+  }
+
 
 }
 

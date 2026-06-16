@@ -44,7 +44,14 @@
       <div appTocResizerDirective [dvTocResizer]="$dvTocRef()?.nativeElement" class="dv-toc-resizer"></div>
       <h2>{{`${$currentDocId()}.md`}}</h2>
       <h3 [style.padding-left.px]="7"> Table of Contents</h3>
-      <ul>
+
+      <ul class="toc-root">
+        @for (node of $tocTree(); track node.entry.slug) {
+        <ng-container *ngTemplateOutlet="tocNode; context: { $implicit: node }"></ng-container>
+        }
+      </ul>
+
+      <!-- <ul>
         @for (item of $toc(); track item.slug) {
         <li class="toc-item" [style.padding-left.px]="(item.level - 1) * 16"
           [class.active]="$activeHeading() === item.slug">
@@ -53,11 +60,11 @@
           </a>
         </li>
         }
-      </ul>
+      </ul> -->
+
       <h2>{{`${previousDocId}.md`}}</h2>
     </aside>
     }
-
 
     <!-- Main Content -->
     <main class="dv-content">
@@ -81,3 +88,32 @@
   </header>
   <ol class="dv-mermaid-debug-panel-content"></ol>
 </div>
+
+
+<ng-template #tocNode let-node>
+  <li class="toc-item" [style.padding-left.px]="(node.entry.level - 1) * 16"
+    [class.active]="$activeHeading() === node.entry.slug" [class.parent-active]="isParentActive(node)">
+
+    <div class="toc-line">
+      @if (node.children.length > 0) {
+      <button class="toc-collapse-btn" (click)="node.collapsed = !node.collapsed">
+        {{ node.collapsed ? '▶' : '▼' }}
+      </button>
+      } @else {
+        &nbsp;&nbsp;&nbsp;
+      }
+
+      <a (click)="scrollTo(node.entry.slug)">
+        {{ node.entry.text }} - {{node.entry.slug}}
+      </a>
+    </div>
+
+    @if (!node.collapsed && node.children.length > 0) {
+    <ul class="toc-children">
+      @for (child of node.children; track child.entry.slug) {
+      <ng-container *ngTemplateOutlet="tocNode; context: { $implicit: child }"></ng-container>
+      }
+    </ul>
+    }
+  </li>
+</ng-template>
