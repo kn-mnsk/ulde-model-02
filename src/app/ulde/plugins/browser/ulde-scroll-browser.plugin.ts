@@ -20,6 +20,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
       container.querySelectorAll('h1, h2, h3, h4, h5, h6')
     );
 
+    console.log(`Log: [UldeScrollBrowserPlugin] headings=`, headings);
     if (headings.length > 0) {
 
       // IntersectionObserver to detect which heading is currently visible
@@ -34,9 +35,11 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
 
               // Mark the current heading as active
               entry.target.classList.add('active-heading');
-
+            }
               // Dispatch ScrollSpy event with the heading ID
               const id = (entry.target as HTMLElement).id;
+
+              console.log(`Log: [UldeScrollBrowserPlugin] entry=`, entry);
               if (id) {
                 container.dispatchEvent(
                   new CustomEvent('ulde:scrollspy', {
@@ -45,7 +48,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
                   })
                 );
               }
-            }
+            // }
           }
         },
         {
@@ -56,7 +59,11 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
       );
 
       // Observe each heading
-      headings.forEach(h => observer.observe(h));
+      headings.forEach(h => {
+        // console.log(`Log: [UldeScrollBrowserPlugin] observed heading=`, h);
+        observer.observe(h)
+      });
+
     }
 
     // ---------------------------------------------

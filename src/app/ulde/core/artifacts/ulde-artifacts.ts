@@ -10,6 +10,12 @@ export interface TocEntry {
   slug: string;
 }
 
+export interface TocNode {
+  entry: TocEntry;
+  children: TocNode[];
+  collapsed: boolean;
+}
+
 export interface LinkEntry {
   href: string;
   text: string;

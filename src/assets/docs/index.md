@@ -8,7 +8,7 @@ ___This project was generated using <a href="https://github.com/angular/angular-
 - [Angular Lifecycle - relation to Browser frame lifecyle](#docId:docs/supplements/doc-angular-0100 "docID: doc-angular-0100")
 
 
-## 3. Application(Documentation System) README
+## 1. Application(Documentation System) README
 ___This document is the master reference for the entire documentation rendering system. It explains how Markdown is parsed, enhanced, rendered to html, and synchronized with user navigation. ...___
 
 - [details](#docId:docs/application-readme "Internal Documents")
@@ -22,12 +22,12 @@ ___This document is the master reference for the entire documentation rendering 
 >4. [Scroll Restoration & Timing Diagram](#docId:docs/supplements/doc10-app-0151 "docID: doc10-app-0151")
 
 
-## 4. GitHub
+## 2. GitHub
 - [README](#docId:docs/github-readme "Internal Documents")
 - [Troubleshooting Guide](#docId:docs/supplements/doc-github-0100 "Internal Documents")
 - <a href="https://github.com/mdn/dom-examples/tree/main" target="_blank" title="External Site">Dom Examples on Github</a> 
 
-## 5. Markdown Documents
+## 3. Markdown Documents
 - <a href="https://daringfireball.net/projects/markdown/" target="_blank" title="External Site">DARING FIREBALL Markdown</a> 
 - <a href="https://www.markdownlang.com/" target="_blank" title="External Site">Markdown Lang Home</a> 
 - <a href="https://marked.js.org/" target="_blank" title="External Site">Marked Documentation</a> 
@@ -35,14 +35,14 @@ ___This document is the master reference for the entire documentation rendering 
 - [Lexer and Parser](#docId:docs/supplements/doc-marked-0200 "Internal Documents")
 - <a href="https://markdown-it.github.io/markdown-it/" target="_blank" title="External Site">Markdown-it Documentation</a> 
 
-## 6. Mermaid Document
+## 4. Mermaid Document
 - <a href="https://www.mostlylucid.net/blog/switchingthemesformermaid" target="_blank" title="External Site">Switching Themes for Mermaid</a> 
 
-## 7. Web APIS, etc.
+## 5. Web APIS, etc.
 - [requestAnimationFrame vs queueMicrotask](#docId:docs/supplements/doc-webapi-0100 "docId: doc-webapi-0100")
 - [queueMicrotask vs signal](#docId:docs/supplements/doc-webapi-0120 "docId: doc-webapi-0120")
 
-## 8. Plugins
+## 6. Plugins
 - [ULDE Integratiom](#docId:docs/supplements/doc-ulde-0100 "docId: doc-ulde-0100")
 - [Unified Documentation + ULDE Lifecycle](#docId:doc-ulde-0110 "docId: doc-ulde-0110")
 - [Plugin API Design](#docId:docs/supplements/doc-ulde-0120 "docId: doc-ulde-0120")
@@ -54,7 +54,7 @@ ___This document is the master reference for the entire documentation rendering 
 - [Add a Mermaid Rendering Plugin](#docId:docs/supplements/doc-ulde-0180 "docId: doc-ulde-0180")
 
 
-## 9. Plugins Vesrion 2
+## 7. Plugins Vesrion 2
 - [ULDE v2 Project](#docId:docs/supplements/doc-ulde2-0200 "docId: doc-ulde2-0200")
 - [Implement plugin-registry.ts](#docId:docs/supplements/doc-ulde2-0210 "docId: doc-ulde2-0210")
 - [Implement content-engine.ts](#docId:docs/supplements/doc-ulde2-0220 "docId: doc-ulde2-0220")
