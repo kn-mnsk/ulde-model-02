@@ -88,7 +88,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       const id = this.$docId();
       if (id) {
         // this.$previousDocId.set(this.$currentDocId());
+        this.previousDocId = id;
         this.$currentDocId.set(id);
+
+
         // this.$currentReload.set(true);
       }
     });
@@ -102,10 +105,11 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
     // React to internal docId changes
     effect(() => {
+
       const id = this.$currentDocId();
       // this.previousDocId = id;
       if (id && this.$isBrowser()) {
-
+        // this.previousDocId = id;
         // Load saved scroll position
         const key = `ulde:scrollpos:${id}`;
         const saved = Number(localStorage.getItem(key) ?? 0);
@@ -234,6 +238,13 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     this.$currentReload.set(true);
   }
 
+  backToPrevDoc() {
+
+    const currentDocId = this.$currentDocId();
+    this.$currentDocId.set(this.previousDocId);
+    this.previousDocId = currentDocId;
+  }
+
   attachScrollEvents() {
     const host = this.hostRef?.nativeElement;
     if (!host) return;
@@ -261,19 +272,65 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   }
 
+  private activateClickedTocItem(nodes: TocNode[], clickedSlug: string) {
+    if (nodes.length === 0) return;
+
+    for (const node of nodes) {
+      if (node.entry.slug === clickedSlug) {
+        const clickedItem = document.getElementById(clickedSlug);
+        clickedItem?.classList.add('active-heading');
+        this.$activeHeading.set(clickedSlug);
+      }
+
+      this.activateClickedTocItem(node.children, clickedSlug);
+
+    }
+  }
 
   // Scroll to heading
   scrollTo(slug: string) {
     const el = document.getElementById(slug);
     if (!el) return;
 
-    el.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
+    requestAnimationFrame(() => {
 
-    // Optional: highlight the target
-    this.highlightElement(el);
+      el.scrollIntoView({
+        behavior: 'auto',//'smooth',
+        block: 'start'
+      });
+
+      // Optional: highlight the target
+      this.highlightElement(el);
+
+      setTimeout(() => {
+        // remove active-heading class from all toc items
+        const activeHeadings = document.querySelectorAll('.active-heading');
+        activeHeadings.forEach(el => el.classList.remove('active-heading'));
+      }, 300);
+
+      requestAnimationFrame(() => {
+        // setTimeout(() => {
+        // queueMicrotask(() => {
+        // remove active-heading class from all toc items
+        // const activeHeadings = document.querySelectorAll('.active-heading');
+        // activeHeadings.forEach(el => el.classList.remove('active-heading'));
+        // setTimeout(() => {
+        this.activateClickedTocItem(this.$tocTree(), slug);
+
+        // }, 300);
+      });
+    });
+    // make clicked toc-line active
+    // setTimeout(() => {
+    //   // queueMicrotask(() => {
+    //   // remove active-heading class from all toc items
+    //   const activeHeadings = document.querySelectorAll('.active-heading');
+    //   activeHeadings.forEach(el => el.classList.remove('active-heading'));
+
+    //   this.activateClickedTocItem(this.$tocTree(), slug);
+
+    // }, 300);
+
   }
 
   private highlightElement(el: HTMLElement) {
