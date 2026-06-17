@@ -13,7 +13,7 @@
         <app-theme-toggle (toggleTheme)="onToggleTheme()">
         </app-theme-toggle>
         <div class="dv-button">
-          <button (click)="backToIndex()">Back</button>
+          <button (click)="backToIndex()">Index</button>
           <button (click)="reloadDoc()">Reload</button>
           <button (click)="toggleShowToc()">{{ $showToc() ? 'Hide TOC' : 'Show TOC' }}</button>
           <button (click)="toggleArtifacts()">Artifacts</button>
@@ -61,8 +61,8 @@
         </li>
         }
       </ul> -->
-
-      <h2>{{`${previousDocId}.md`}}</h2>
+      <hr>
+      <button (click) = "backToPrevDoc()">To Previous Doc - {{this.previousDocId}}</button>
     </aside>
     }
 
@@ -104,7 +104,7 @@
       }
 
       <a (click)="scrollTo(node.entry.slug)">
-        {{ node.entry.text }} - {{node.entry.slug}}
+        {{ node.entry.text }}
       </a>
     </div>
 
