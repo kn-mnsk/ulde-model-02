@@ -14,7 +14,7 @@ import { UldeArtifactsPanelBrowserPlugin } from '../../plugins/browser/ulde-arti
 
 @Injectable({ providedIn: 'root' })
 export class UldeDocsViewerBridge {
-   host = new UldeBrowserHost();
+  host = new UldeBrowserHost();
   // private host = new UldeBrowserHost();
 
   constructor() {
@@ -32,7 +32,7 @@ export class UldeDocsViewerBridge {
    * @param options
    * @returns
    */
-  run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string; onScrollSpy?: (id: string) => void ; onScrollPos?: (pos: number) => void ; onNavigate?: (docId: string) => void }) {
+  run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string; onScrollSpy?: (id: string) => void; onScrollPos?: (e: any) => void; onNavigate?: (docId: string) => void }) {
 
     const { host, html, reload, onScrollSpy, onScrollPos, onNavigate } = options;
 
@@ -51,15 +51,17 @@ export class UldeDocsViewerBridge {
 
     // listen for ULDE scrollpos events
     if (onScrollPos) {
+
+
       host.addEventListener('ulde:scrollpos', (e: any) => {
-        onScrollPos(e.detail.scrollTop);
+        onScrollPos(e);
       });
     }
 
     // Listen for ULDE navigation events
     if (onNavigate) {
       host.addEventListener('ulde:navigate', (e: any) => {
-        onNavigate(e.detail.docId);
+        onNavigate(e);
       });
     }
 

@@ -11,7 +11,8 @@ import { TocEntry, ArtifactsPanelModel, DebugOverlayModel, TocNode } from '../..
 
 import { ThemeService } from '../../core/services/theme.service';
 import { ThemeToggle } from './theme-toggle';
-
+import { ScrollService } from '../../core/services/scroll.service';
+import { writeSessionState } from '../../core/services/session-state.manage';
 
 @Component({
   selector: 'app-docs-viewer',
@@ -60,22 +61,28 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   $showArtifacts = signal(false);
   $showDebugMermaid = signal(false);
   $isMermaidPanelFilled = signal<boolean>(true);
-  $showToc = signal(false);
+  // $showToc = signal(false);
   $dvTocRef = signal<ElementRef<HTMLElement> | undefined>(undefined);
   $savedScrollTop = signal(0);
 
   private cleanupFn: (() => void) | null = null;
   private scrollSpyHandler?: (e: any) => void;
+  private scrollPosHandler?: (e: any) => void;
   private finalHtml: string | null = null;
 
+
+  private rafPending = false;
+
   @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLElement>;
+  @ViewChild('hostOverlay', { static: true }) hostOverlayRef!: ElementRef<HTMLElement>;
   @ViewChild('dvToc', { static: false }) dvTocRef!: ElementRef<HTMLElement>;
-  @ViewChild('overlay', { static: true }) hostOverlayRef!: ElementRef<HTMLElement>;
+  // @ViewChild('tocRootOverlay', { static: true }) tocRootOverlayRef!: ElementRef<HTMLElement>;
 
   constructor(
     private bridge: UldeDocsViewerBridge,
     private ulde: UldeAngularService,
     private theme: ThemeService,
+    public scrollService: ScrollService,
     @Inject(PLATFORM_ID) private platformId: Object,
   ) {
 
@@ -83,6 +90,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     this.$isBrowser.set(isPlatformBrowser(this.platformId));
     if (!this.$isBrowser()) return;
 
+    this.scrollPosHandler?.bind(this.onScrollPos);
     // Sync external docId → internal writable docId
     effect(() => {
       const id = this.$docId();
@@ -141,14 +149,21 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       }
 
       this.hostOverlayRef.nativeElement.classList.remove('hidden');
+      // this.tocRootOverlayRef.nativeElement.classList.remove('hidden');
 
       this.cleanupFn = this.bridge.run({
         host: this.hostRef.nativeElement,
         docId: this.$currentDocId(),
         reload: this.$currentReload(),
         html: result.finalHtml,
-        onScrollSpy: id => this.$activeHeading.set(id),
-        onScrollPos: pos => this.$savedScrollTop.set(pos),
+        onScrollSpy: id => {
+          console.log(`Log: [DocsViewer] ulde:scrollspy id=`, id);
+          this.$activeHeading.set(id)
+        },
+        // onScrollPos: (e: any) => {
+        //   this.$savedScrollTop.set(e.detail.sctollTop)
+        // },
+        onScrollPos: e => {this.onScrollPos(e)},
         onNavigate: newDocId => {
           this.$currentDocId.set(newDocId);
           // this.$currentReload.set(true);
@@ -172,6 +187,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
             // Fade out overlay
             this.hostOverlayRef.nativeElement.classList.add('hidden');
+            // this.tocRootOverlayRef.nativeElement.classList.add('hidden');
           });
         });
       });
@@ -197,6 +213,14 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
         this.scrollSpyHandler
       );
     }
+
+    if (this.scrollPosHandler) {
+      this.hostRef.nativeElement.removeEventListener(
+        'ulde:scrollpos',
+        this.scrollPosHandler
+      );
+    }
+
   }
 
   // Load markdown and run ULDE
@@ -218,9 +242,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
       const markdown = await response.text();
       await this.ulde.renderMarkdown(markdown);
-
-      // this.checkMermaidPanelContent()
-
 
     } catch (err) {
       console.error('[DocsViewer] loadAndRender error:', err);
@@ -253,24 +274,75 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // 1. Heading activation
     // ---------------------------------------------
 
-    host.addEventListener('ulde:scrollspy', (e: any) => {
-      console.log(`Log: [DocsViewer] ulde:scrollspy event e=`, e.detail.id);
-      this.$activeHeading.set(e.detail.id);
-    });
+    // host.addEventListener('ulde:scrollspy', (e: any) => {
+    //   console.log(`Log: [DocsViewer] ulde:scrollspy event e=`, e.detail.id);
+    //   this.$activeHeading.set(e.detail.id);
+    // });
 
     // ---------------------------------------------
     // 2. Scroll position
     // ---------------------------------------------
-    host.addEventListener('ulde:scrollpos', (e: any) => {
-      const pos = e.detail.scrollTop;
-      this.$savedScrollTop.set(pos);
-      // Persist per-doc scroll position
-      const key = `ulde:scrollpos:${this.$currentDocId()}`;
-      localStorage.setItem(key, String(pos));
-    });
+    // host.addEventListener('ulde:scrollpos', (e: any) => {
+    //   const pos = e.detail.scrollTop;
+    //   const height = e.detail.scrollHeight;
+
+    //   console.log(`Log: [DocsViewer] ulde:scrollpos \npos=`, pos, `\nheight=`, height);
+
+    //   // current: scroll position spy
+    //   this.$savedScrollTop.set(pos);
+    //   // Persist per-doc scroll position
+    //   const key = `ulde:scrollpos:${this.$currentDocId()}`;
+    //   localStorage.setItem(key, String(pos));
+
+    //   //new: scroll position spy
+
+    //   if (!this.rafPending) {
+    //     this.rafPending = true;
+    //     // this.handleInternalNavigation(linkId, destId);
+    //   }
+
+    //   requestAnimationFrame(() => {
+    //     this.scrollService.setPosition(this.$currentDocId(), pos, height);
+    //     writeSessionState({ scrollPos: pos }, this.$isBrowser());
+
+    //     this.rafPending = false;
+    //   });
+
+
+    // });
 
 
   }
+
+  private onScrollPos(e: any) {
+    const pos = e.detail.scrollTop;
+    const height = e.detail.scrollHeight;
+
+    console.log(`Log: [DocsViewer] ulde:scrollpos \npos=`, pos, `\nheight=`, height);
+
+    // current: scroll position spy
+    this.$savedScrollTop.set(pos);
+    // Persist per-doc scroll position
+    const key = `ulde:scrollpos:${this.$currentDocId()}`;
+    localStorage.setItem(key, String(pos));
+
+    //new: scroll position spy
+
+    if (!this.rafPending) {
+      this.rafPending = true;
+      // this.handleInternalNavigation(linkId, destId);
+    }
+
+    requestAnimationFrame(() => {
+      this.scrollService.setPosition(this.$currentDocId(), pos, height);
+      writeSessionState({ scrollPos: pos }, this.$isBrowser());
+
+      this.rafPending = false;
+    });
+
+
+  };
+
 
   private activateClickedTocItem(nodes: TocNode[], clickedSlug: string) {
     if (nodes.length === 0) return;
@@ -290,46 +362,22 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   // Scroll to heading
   scrollTo(slug: string) {
     const el = document.getElementById(slug);
+    // console.log(`Log: [DocsViewer] scrollTo element`, el);
     if (!el) return;
 
-    requestAnimationFrame(() => {
-
-      el.scrollIntoView({
-        behavior: 'auto',//'smooth',
-        block: 'start'
-      });
-
-      // Optional: highlight the target
-      this.highlightElement(el);
-
-      setTimeout(() => {
-        // remove active-heading class from all toc items
-        const activeHeadings = document.querySelectorAll('.active-heading');
-        activeHeadings.forEach(el => el.classList.remove('active-heading'));
-      }, 300);
-
-      requestAnimationFrame(() => {
-        // setTimeout(() => {
-        // queueMicrotask(() => {
-        // remove active-heading class from all toc items
-        // const activeHeadings = document.querySelectorAll('.active-heading');
-        // activeHeadings.forEach(el => el.classList.remove('active-heading'));
-        // setTimeout(() => {
-        this.activateClickedTocItem(this.$tocTree(), slug);
-
-        // }, 300);
-      });
+    el.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
     });
-    // make clicked toc-line active
-    // setTimeout(() => {
-    //   // queueMicrotask(() => {
-    //   // remove active-heading class from all toc items
-    //   const activeHeadings = document.querySelectorAll('.active-heading');
-    //   activeHeadings.forEach(el => el.classList.remove('active-heading'));
+    this.highlightElement(el);
 
-    //   this.activateClickedTocItem(this.$tocTree(), slug);
+    document.querySelectorAll('.active-heading').forEach(el => el.classList.remove('active-heading'));
 
-    // }, 300);
+    // // instead, add 'active-heading' calss to the clicked toc-item
+    setTimeout(() => {
+      this.activateClickedTocItem(this.$tocTree(), slug);
+    }, 400);
+
 
   }
 
@@ -350,10 +398,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   // UI toggles
-  toggleShowToc() {
-    // this.$dvTocRef.set(this.dvTocRef);
-    this.$showToc.update(v => !v);
-  }
+  // toggleShowToc() {
+  //   // this.$dvTocRef.set(this.dvTocRef);
+  //   this.$showToc.update(v => !v);
+  // }
 
   toggleArtifacts() {
     this.$showArtifacts.update(v => !v);
@@ -392,7 +440,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       stack.push(node);
     }
 
-    console.log(`Log: buildTocTree() root=`, root);
+    // console.log(`Log: buildTocTree() root=`, root);
 
     return root;
   }
