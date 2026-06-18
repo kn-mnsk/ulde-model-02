@@ -15,7 +15,6 @@
         <div class="dv-button">
           <button (click)="backToIndex()">Index</button>
           <button (click)="reloadDoc()">Reload</button>
-          <button (click)="toggleShowToc()">{{ $showToc() ? 'Hide TOC' : 'Show TOC' }}</button>
           <button (click)="toggleArtifacts()">Artifacts</button>
           <button (click)="toggleDebugOverlay()">Debug Overlay</button>
 
@@ -28,18 +27,14 @@
 
   <!-- Optional progress bar -->
   <div class="progress-bar">
-    <div class="progress-bar_fill" [style.width.%]="100">
-      <!-- </div><div class="progress-bar_fill" [style.width.%]="scrollService.scrollPercent()">
-    </div> -->
-    </div>
+    <!-- <div class="progress-bar_fill" [style.width.%]="100"> </div> -->
+    <div class="progress-bar_fill" [style.width.%]="scrollService.scrollPercent()"></div>
+
   </div>
 
   <!-- Body -->
   <div class="dv-body">
 
-    <!-- TOC Sidebar -->
-    @if (true) {
-    <!-- @if ($showToc()) { -->
     <aside class="dv-toc" #dvToc>
       <div appTocResizerDirective [dvTocResizer]="$dvTocRef()?.nativeElement" class="dv-toc-resizer"></div>
       <h2>{{`${$currentDocId()}.md`}}</h2>
@@ -51,44 +46,33 @@
         }
       </ul>
 
-      <!-- <ul>
-        @for (item of $toc(); track item.slug) {
-        <li class="toc-item" [style.padding-left.px]="(item.level - 1) * 16"
-          [class.active]="$activeHeading() === item.slug">
-          <a (click)="scrollTo(item.slug)">
-            {{ item.text }}
-          </a>
-        </li>
-        }
-      </ul> -->
       <hr>
-      <button (click) = "backToPrevDoc()">To Previous Doc - {{this.previousDocId}}</button>
+      <button (click)="backToPrevDoc()">To Previous Doc - {{this.previousDocId}}</button>
     </aside>
-    }
 
     <!-- Main Content -->
     <main class="dv-content">
       <div class="host-wrapper">
-        <div #overlay class="host-overlay hidden"></div>
+        <div #hostOverlay class="host-overlay hidden"></div>
         <div #host class="dv-host"></div>
       </div>
     </main>
 
   </div>
 
+  <!-- </div> -->
+
+  <div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()"></div>
+
+  <div class="dv-artifacts-panel" [class.visible]="$showArtifacts()"></div>
+
+  <div class="dv-mermaid-debug-panel" [class.visible]="$showDebugMermaid()? true: false">
+    <header>
+      {{"Debug Mermaid Panel"}}
+    </header>
+    <ol class="dv-mermaid-debug-panel-content"></ol>
+  </div>
 </div>
-
-<div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()"></div>
-
-<div class="dv-artifacts-panel" [class.visible]="$showArtifacts()"></div>
-
-<div class="dv-mermaid-debug-panel" [class.visible]="$showDebugMermaid()? true: false">
-  <header>
-    {{"Debug Mermaid Panel"}}
-  </header>
-  <ol class="dv-mermaid-debug-panel-content"></ol>
-</div>
-
 
 <ng-template #tocNode let-node>
   <li class="toc-item" [style.padding-left.px]="(node.entry.level - 1) * 16"
@@ -100,7 +84,7 @@
         {{ node.collapsed ? '▶' : '▼' }}
       </button>
       } @else {
-        &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;
       }
 
       <a (click)="scrollTo(node.entry.slug)">

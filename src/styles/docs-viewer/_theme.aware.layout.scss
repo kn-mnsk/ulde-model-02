@@ -5,7 +5,7 @@
 --------------------------------------------------------- */
 app-docs-viewer {
   position: fixed;
-  overflow: hidden;
+  // overflow: hidden;
   height: 100vh;
 }
 
@@ -101,7 +101,7 @@ app-theme-toggle {
   display: flex;
   // flex: 1;
   height: 85vh; //calc(100vh - 120px);
-  // overflow: hidden;
+  overflow: hidden;
   background: var(--bg-color);
   transition: background-color 0.4s ease;
 }
@@ -146,6 +146,8 @@ app-theme-toggle {
     }
   }
 
+
+
   // &.hidden {
   //   display: none;
   // }
@@ -186,8 +188,33 @@ app-theme-toggle {
   list-style: none;
   padding-left: 0;
   margin: 0;
+  opacity: 1;
+
+  &.hidden {
+    opacity: 0;
+  }
+
 }
 
+// .toc-root .toc-root-wrapper {
+//   overflow-y: auto;
+// }
+
+// .toc-root-overlay {
+//   position: absolute;
+//   height: 0;
+//   // overflow: hidden;
+//   inset: 0;
+//   background: var(--dv-background, #fff);
+//   z-index: 100;
+//   opacity: 1;
+//   transition: opacity 180ms ease-out;
+//   pointer-events: none;
+
+//   &.hidden {
+//     opacity: 0;
+//   }
+// }
 
 /* Draggable TOC Resizer */
 .dv-toc-resizer {
@@ -282,8 +309,8 @@ app-theme-toggle {
   position: relative; // new
   display: flex;
   flex: 1;
-  overflow: visible;
-  // overflow: hidden;
+  // overflow: visible;
+  overflow: hidden;
   // overflow-y: auto;
   // padding: 2rem;
   background: var(--bg-color);
@@ -322,7 +349,8 @@ app-theme-toggle {
 .dv-host {
   position: relative;
   flex: 1;
-  overflow-y: auto;
+  // overflow: hidden;
+  // overflow-y: auto;
   padding: 10px 10px;
   width: 100%;
   // width: fit-content;
