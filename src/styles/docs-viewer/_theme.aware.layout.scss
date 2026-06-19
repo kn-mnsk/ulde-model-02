@@ -111,15 +111,13 @@ app-theme-toggle {
 --------------------------------------------------------- */
 
 .dv-toc {
-  z-index: 20; // new
-  position: relative;
+  position: relative;              /* anchor for resizer + overlay */
   width: 250px;
   min-width: 200px;
   max-width: 350px;
   height: 85vh;
   padding-left: 0.5rem;
-  // padding: 0.25rem;
-  overflow-y: auto;
+  overflow: hidden;                /* wrapper scrolls now */
   font-size: 13px;
   border-right: 3px solid var(--ap-border);
   background: var(--bg-color);
@@ -132,11 +130,8 @@ app-theme-toggle {
     color 0.4s ease,
     border-color 0.4s ease;
 
-  & a {
+  a {
     display: inline-table;
-    // padding-bottom: 0.3rem;
-    // padding-left: 0.05rem;
-    // padding-right: 0.2rem;
     color: var(--link-color);
     transition: color 0.25s ease;
 
@@ -145,16 +140,73 @@ app-theme-toggle {
       text-decoration: underline;
     }
   }
-
-
-
-  // &.hidden {
-  //   display: none;
-  // }
 }
 
+/* ---------------------------------------------------------
+   Scroll Container
+--------------------------------------------------------- */
 
-/* Collapsible TOC */
+.toc-wrapper {
+  position: relative;              /* anchor for overlay */
+  overflow-y: auto;
+  height: calc(85vh - 160px);      /* adjust for header + buttons */
+  // height: calc(85vh - 120px);      /* adjust for header + buttons */
+  padding-right: 6px;
+  z-index: 1;                      /* BELOW resizer */
+}
+
+/* ---------------------------------------------------------
+   Overlay (above scroll container, below resizer)
+--------------------------------------------------------- */
+
+.toc-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-color);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease-out;
+  z-index: 10;                     /* ABOVE wrapper */
+
+  &.visible {
+    opacity: 1;
+  }
+
+  &.hidden {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------
+   Resizer (must stay above everything)
+--------------------------------------------------------- */
+
+.dv-toc-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: ew-resize;
+  background: transparent;
+  transition: background-color 0.2s ease;
+  z-index: 20;                     /* ABOVE overlay + wrapper */
+
+  &:hover {
+    background: #0078d4;
+  }
+}
+
+/* ---------------------------------------------------------
+   TOC Items
+--------------------------------------------------------- */
+
+.toc-root {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
 .toc-line {
   display: flex;
   align-items: center;
@@ -184,64 +236,14 @@ app-theme-toggle {
   transition: all 0.25s ease;
 }
 
-.toc-root {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-  opacity: 1;
-
-  &.hidden {
-    opacity: 0;
-  }
-
-}
-
-// .toc-root .toc-root-wrapper {
-//   overflow-y: auto;
-// }
-
-// .toc-root-overlay {
-//   position: absolute;
-//   height: 0;
-//   // overflow: hidden;
-//   inset: 0;
-//   background: var(--dv-background, #fff);
-//   z-index: 100;
-//   opacity: 1;
-//   transition: opacity 180ms ease-out;
-//   pointer-events: none;
-
-//   &.hidden {
-//     opacity: 0;
-//   }
-// }
-
-/* Draggable TOC Resizer */
-.dv-toc-resizer {
-  // position: absolute;
-  width: 6px;
-  cursor: ew-resize;
-  background: transparent;
-  transition: background-color 0.2s ease;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-
-  &:hover {
-    // width: 8px;
-    background: #0078d4; //var(--ap-color);
-  }
-}
-
 .toc-item {
   list-style: none;
   margin: 3px 0px;
-}
 
-.toc-item a {
-  text-decoration: none;
-  color: var(--text-color);
+  a {
+    text-decoration: none;
+    color: var(--text-color);
+  }
 }
 
 /* Active heading */
@@ -249,15 +251,12 @@ app-theme-toggle {
   position: relative;
   font-weight: bold;
   color: #0078d4;
-
   animation: tocActiveFade 0.25s ease-out;
 
   a {
     color: #0078d4;
   }
 
-  /* Left accent bar */
-  // &::marker {
   &::before {
     content: "";
     position: absolute;
@@ -268,18 +267,11 @@ app-theme-toggle {
     background: #0078d4;
     border-radius: 2px;
   }
-
-
 }
 
 @keyframes tocActiveFade {
-  from {
-    background: rgba(0, 120, 212, 0.15);
-  }
-
-  to {
-    background: transparent;
-  }
+  from { background: rgba(0, 120, 212, 0.15); }
+  to   { background: transparent; }
 }
 
 /* Parent of active heading */
@@ -289,13 +281,175 @@ app-theme-toggle {
   transition: background 0.25s ease;
 }
 
+/// OLD VERSION
+// .dv-toc {
+//   position: relative;
+//   width: 250px;
+//   min-width: 200px;
+//   max-width: 350px;
+//   height: 85vh;
+//   padding-left: 0.5rem;
+//   // padding: 0.25rem;
+//   overflow: hidden;
+//   font-size: 13px;
+//   border-right: 3px solid var(--ap-border);
+//   background: var(--bg-color);
+//   color: var(--text-color);
+//   cursor: default;
+//   margin: 0px 5px;
 
-// .toc-item.active a {
-//   scale: 1.1;
-//   font-weight: bold;
-//   color: #0078d4;
+//   transition:
+//     background-color 0.4s ease,
+//     color 0.4s ease,
+//     border-color 0.4s ease;
+
+//   & a {
+//     display: inline-table;
+//     // padding-bottom: 0.3rem;
+//     // padding-left: 0.05rem;
+//     // padding-right: 0.2rem;
+//     color: var(--link-color);
+//     transition: color 0.25s ease;
+
+//     &:hover {
+//       color: var(--link-hover-color);
+//       text-decoration: underline;
+//     }
+//   }
+
 // }
 
+// .toc-wrapper {
+//   // position: relative;
+//   overflow-y: auto;
+//   height: calc(85vh - 200px);   // adjust for header + buttons
+//   // height: calc(85vh - 120px);   // adjust for header + buttons
+//   padding-right: 10px;           // avoid scrollbar overlap
+//   // padding-right: 6px;           // avoid scrollbar overlap
+// }
+
+// .toc-overlay {
+//   position: absolute;
+//   inset: 0;
+//   background: var(--bg-color);
+//   opacity: 0;
+//   pointer-events: none;
+//   transition: opacity 180ms ease-out;
+
+//   &.visible {
+//     opacity: 1;
+//   }
+// }
+
+
+// /* Collapsible TOC */
+// .toc-line {
+//   display: flex;
+//   align-items: center;
+//   gap: 4px;
+// }
+
+// .toc-collapse-btn {
+//   background: transparent;
+//   border: none;
+//   color: var(--text-color);
+//   cursor: pointer;
+//   font-size: 10px;
+//   padding: 0;
+//   margin: 0;
+//   opacity: 0.7;
+//   transition: opacity 0.2s ease;
+
+//   &:hover {
+//     opacity: 1;
+//   }
+// }
+
+// .toc-children {
+//   margin: 0;
+//   padding-left: 0;
+//   list-style: none;
+//   transition: all 0.25s ease;
+// }
+
+// .toc-root {
+//   list-style: none;
+//   padding-left: 0;
+//   margin: 0;
+// }
+
+
+// /* Draggable TOC Resizer */
+// .dv-toc-resizer {
+//   position: absolute;
+//   width: 6px;
+//   cursor: ew-resize;
+//   background: transparent;
+//   transition: background-color 0.2s ease;
+//   top: 0;
+//   right: 0;
+//   bottom: 0;
+
+//   &:hover {
+//     // width: 8px;
+//     background: #0078d4; //var(--ap-color);
+//   }
+// }
+
+// .toc-item {
+//   list-style: none;
+//   margin: 3px 0px;
+// }
+
+// .toc-item a {
+//   text-decoration: none;
+//   color: var(--text-color);
+// }
+
+// /* Active heading */
+// .toc-item.active {
+//   position: relative;
+//   font-weight: bold;
+//   color: #0078d4;
+
+//   animation: tocActiveFade 0.25s ease-out;
+
+//   a {
+//     color: #0078d4;
+//   }
+
+//   /* Left accent bar */
+//   // &::marker {
+//   &::before {
+//     content: "";
+//     position: absolute;
+//     left: -6px;
+//     top: 0;
+//     bottom: 0;
+//     width: 3px;
+//     background: #0078d4;
+//     border-radius: 2px;
+//   }
+
+
+// }
+
+// @keyframes tocActiveFade {
+//   from {
+//     background: rgba(0, 120, 212, 0.15);
+//   }
+
+//   to {
+//     background: transparent;
+//   }
+// }
+
+// /* Parent of active heading */
+// .toc-item.parent-active {
+//   background: rgba(0, 120, 212, 0.08);
+//   border-radius: 4px;
+//   transition: background 0.25s ease;
+// }
 
 
 
@@ -323,28 +477,46 @@ app-theme-toggle {
 }
 
 .dv-content .host-wrapper {
-  overflow-y: auto;
+    position: relative; // ensure overlay absolute works
+    overflow-y: auto;   // scroll container
 }
 
 .host-overlay {
   position: absolute;
-  height: 0;
-  // overflow: hidden;
   inset: 0;
-  background: var(--dv-background, #fff);
-  z-index: 10;
-  opacity: 1;
-  transition: opacity 180ms ease-out;
+  background: var(--bg-color);
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 180ms ease-out;
+  z-index: 10;
+
+  &.visible {
+    opacity: 1;
+  }
 
   &.hidden {
     opacity: 0;
   }
 }
 
-// .host-overlay.hidden {
-//   opacity: 0;
+
+/// OLD VERSION
+// .host-overlay {
+//   position: absolute;
+//   height: 0;
+//   // overflow: hidden;
+//   inset: 0;
+//   background: var(--dv-background, #fff);
+//   z-index: 10;
+//   opacity: 1;
+//   transition: opacity 180ms ease-out;
+//   pointer-events: none;
+
+//   &.hidden {
+//     opacity: 0;
+//   }
 // }
+
 
 .dv-host {
   position: relative;

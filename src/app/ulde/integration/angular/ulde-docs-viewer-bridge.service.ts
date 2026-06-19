@@ -14,8 +14,8 @@ import { UldeArtifactsPanelBrowserPlugin } from '../../plugins/browser/ulde-arti
 
 @Injectable({ providedIn: 'root' })
 export class UldeDocsViewerBridge {
+
   host = new UldeBrowserHost();
-  // private host = new UldeBrowserHost();
 
   constructor() {
     // Register browser DOM plugins
@@ -27,58 +27,140 @@ export class UldeDocsViewerBridge {
     this.host.registerBrowserDomPlugin(UldeArtifactsPanelBrowserPlugin);
   }
 
+  // new version
   /**
-   *
-   * @param options
-   * @returns
-   */
-  run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string; onScrollSpy?: (id: string) => void; onScrollPos?: (e: any) => void; onNavigate?: (docId: string) => void }) {
+     * Runs ULDE on the given host-wrapper element.
+     * Wires scrollspy, scrollpos, and navigation events.
+     */
+  run(options: {
+    host: HTMLElement;                     // host-wrapper (scroll container)
+    docId: string;
+    reload?: boolean;
+    html: string;
+    onScrollSpy?: (id: string) => void;
+    onScrollPos?: (e: any) => void;
+    onNavigate?: (docId: string) => void;
+  }) {
 
-    const { host, html, reload, onScrollSpy, onScrollPos, onNavigate } = options;
+    const {
+      host,
+      html,
+      reload,
+      onScrollSpy,
+      onScrollPos,
+      onNavigate
+    } = options;
 
-    // // TODO: resolve docId → HTML
-    // const html = this.resolveHtml(docId);
+    // Clear host-wrapper if reload requested
     if (reload) {
       host.innerHTML = '';
     }
 
-    // listen for ULDE scrollspy events
-    if (onScrollSpy) {
-      host.addEventListener('ulde:scrollspy', (e: any) => {
+    // -------------------------------
+    // Event wiring
+    // -------------------------------
+
+    const scrollSpyHandler = (e: any) => {
+      if (onScrollSpy) {
         onScrollSpy(e.detail.id);
-      });
-    }
+      }
+    };
 
-    // listen for ULDE scrollpos events
-    if (onScrollPos) {
-
-
-      host.addEventListener('ulde:scrollpos', (e: any) => {
+    const scrollPosHandler = (e: any) => {
+      if (onScrollPos) {
         onScrollPos(e);
-      });
-    }
+      }
+    };
 
-    // Listen for ULDE navigation events
-    if (onNavigate) {
-      host.addEventListener('ulde:navigate', (e: any) => {
-        onNavigate(e);
-      });
-    }
+    const navigateHandler = (e: any) => {
+      if (onNavigate) {
+        onNavigate(e.detail?.docId);
+      }
+    };
 
-    // This returns a Promise<void>
+    host.addEventListener('ulde:scrollspy', scrollSpyHandler);
+    host.addEventListener('ulde:scrollpos', scrollPosHandler);
+    host.addEventListener('ulde:navigate', navigateHandler);
+
+    // -------------------------------
+    // Run ULDE pipeline
+    // -------------------------------
     this.host.run(host, html);
 
-    // Return a no-op cleanup function
-    return () => { };
+    // -------------------------------
+    // Cleanup function
+    // -------------------------------
+    return () => {
+      host.removeEventListener('ulde:scrollspy', scrollSpyHandler);
+      host.removeEventListener('ulde:scrollpos', scrollPosHandler);
+      host.removeEventListener('ulde:navigate', navigateHandler);
+    };
   }
 
+  /**
+   * Optional helper for theme re-run:
+   * DocsViewer calls: bridge.host.run(hostWrapper, html)
+   */
   private resolveHtml(docId: string): string {
-    // Temporary: replace with real lookup
     return `<h1>${docId}</h1>`;
   }
-
-  // run(container: HTMLElement, html: string) {
-  //   return this.host.run(container, html);
-  // }
-
 }
+
+
+
+
+//   /**
+//    *
+//    * @param options
+//    * @returns
+//    */
+//   run(options: { host: HTMLElement; docId: string; reload?: boolean; html: string; onScrollSpy?: (id: string) => void; onScrollPos?: (e: any) => void; onNavigate?: (docId: string) => void }) {
+
+//     const { host, html, reload, onScrollSpy, onScrollPos, onNavigate } = options;
+
+//     // // TODO: resolve docId → HTML
+//     // const html = this.resolveHtml(docId);
+//     if (reload) {
+//       host.innerHTML = '';
+//     }
+
+//     // listen for ULDE scrollspy events
+//     if (onScrollSpy) {
+//       host.addEventListener('ulde:scrollspy', (e: any) => {
+//         onScrollSpy(e.detail.id);
+//       });
+//     }
+
+//     // listen for ULDE scrollpos events
+//     if (onScrollPos) {
+
+
+//       host.addEventListener('ulde:scrollpos', (e: any) => {
+//         onScrollPos(e);
+//       });
+//     }
+
+//     // Listen for ULDE navigation events
+//     if (onNavigate) {
+//       host.addEventListener('ulde:navigate', (e: any) => {
+//         onNavigate(e);
+//       });
+//     }
+
+//     // This returns a Promise<void>
+//     this.host.run(host, html);
+
+//     // Return a no-op cleanup function
+//     return () => { };
+//   }
+
+//   private resolveHtml(docId: string): string {
+//     // Temporary: replace with real lookup
+//     return `<h1>${docId}</h1>`;
+//   }
+
+//   // run(container: HTMLElement, html: string) {
+//   //   return this.host.run(container, html);
+//   // }
+
+// }

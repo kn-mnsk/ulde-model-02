@@ -36,27 +36,43 @@
   <div class="dv-body">
 
     <aside class="dv-toc" #dvToc>
-      <div appTocResizerDirective [dvTocResizer]="$dvTocRef()?.nativeElement" class="dv-toc-resizer"></div>
-      <h2>{{`${$currentDocId()}.md`}}</h2>
-      <h3 [style.padding-left.px]="7"> Table of Contents</h3>
 
-      <ul class="toc-root">
-        @for (node of $tocTree(); track node.entry.slug) {
-        <ng-container *ngTemplateOutlet="tocNode; context: { $implicit: node }"></ng-container>
-        }
-      </ul>
+      <!-- Resizer (layout-level, not inside scroll container) -->
+      <div appTocResizerDirective [dvTocResizer]="$dvTocRef()?.nativeElement" class="dv-toc-resizer"></div>
+
+      <!-- Title -->
+      <h2>{{ `${$currentDocId()}.md` }}</h2>
+      <h3 [style.padding-left.px]="7">Table of Contents</h3>
+
+      <!-- OVERLAY (layout-level, above scroll container) -->
+      <div #tocOverlay class="toc-overlay hidden"></div>
+
+      <!-- SCROLL CONTAINER -->
+      <div class="toc-wrapper">
+        <!-- RENDER CONTAINER -->
+        <ul class="toc-root">
+          @for (node of $tocTree(); track node.entry.slug) {
+          <ng-container *ngTemplateOutlet="tocNode; context: { $implicit: node }">
+          </ng-container>
+          }
+        </ul>
+      </div>
 
       <hr>
-      <button (click)="backToPrevDoc()">To Previous Doc - {{this.previousDocId}}</button>
+      <button (click)="backToPrevDoc()">
+        To Previous Doc – {{ this.previousDocId }}
+      </button>
+
     </aside>
 
     <!-- Main Content -->
     <main class="dv-content">
-      <div class="host-wrapper">
+      <div #hostWrapper class="host-wrapper"> <!-- ULDE host container -->
         <div #hostOverlay class="host-overlay hidden"></div>
-        <div #host class="dv-host"></div>
+        <div class="dv-host"></div> <!-- pure render target / styling -->
       </div>
     </main>
+
 
   </div>
 
