@@ -66,17 +66,20 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   $savedScrollTop = signal(0);
 
   private cleanupFn: (() => void) | null = null;
-  private scrollSpyHandler?: (e: any) => void;
-  private scrollPosHandler?: (e: any) => void;
+  // private scrollSpyHandler?: (e: any) => void;
+  // private scrollPosHandler?: (e: any) => void;
   private finalHtml: string | null = null;
-
-
   private rafPending = false;
 
-  @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLElement>;
+  // Suppress ScrollSpy while TOC click scroll is in progress
+  private suppressScrollSpy = false;
+
+  @ViewChild('hostWrapper', { static: true }) hostWrapperRef!: ElementRef<HTMLElement>;
   @ViewChild('hostOverlay', { static: true }) hostOverlayRef!: ElementRef<HTMLElement>;
+
   @ViewChild('dvToc', { static: false }) dvTocRef!: ElementRef<HTMLElement>;
-  // @ViewChild('tocRootOverlay', { static: true }) tocRootOverlayRef!: ElementRef<HTMLElement>;
+  @ViewChild('tocOverlay', { static: false })
+  tocOverlayRef?: ElementRef<HTMLElement>;
 
   constructor(
     private bridge: UldeDocsViewerBridge,
@@ -90,7 +93,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     this.$isBrowser.set(isPlatformBrowser(this.platformId));
     if (!this.$isBrowser()) return;
 
-    this.scrollPosHandler?.bind(this.onScrollPos);
+    // this.scrollPosHandler?.bind(this.onScrollPos);
     // Sync external docId → internal writable docId
     effect(() => {
       const id = this.$docId();
@@ -139,7 +142,12 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       if (!result) return;
 
       this.finalHtml = result.finalHtml;
+
+      // 1. Show overlay immediately
+      this.showTocOverlay();
+      // 2. Update TOC
       this.$toc.set(result.toc ?? []);
+
       this.$debugOverlay.set(result.debugOverlay);
       this.$artifactsPanel.set(result.artifactsPanel);
 
@@ -148,22 +156,25 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
         this.cleanupFn = null;
       }
 
-      this.hostOverlayRef.nativeElement.classList.remove('hidden');
-      // this.tocRootOverlayRef.nativeElement.classList.remove('hidden');
+      this.showHostOverlay();
+
+      // this.hostOverlayRef.nativeElement.classList.remove('hidden');
+      // this.tocOverlayRef?.nativeElement.classList?.remove('hidden');
 
       this.cleanupFn = this.bridge.run({
-        host: this.hostRef.nativeElement,
+        host: this.hostWrapperRef.nativeElement,
         docId: this.$currentDocId(),
         reload: this.$currentReload(),
         html: result.finalHtml,
         onScrollSpy: id => {
-          console.log(`Log: [DocsViewer] ulde:scrollspy id=`, id);
-          this.$activeHeading.set(id)
+          if (this.suppressScrollSpy) return;
+          // console.log(`Log: [DocsViewer] ulde:scrollspy id=`, id);
+          this.$activeHeading.set(id);
         },
         // onScrollPos: (e: any) => {
         //   this.$savedScrollTop.set(e.detail.sctollTop)
         // },
-        onScrollPos: e => {this.onScrollPos(e)},
+        onScrollPos: e => { this.onScrollPos(e); },
         onNavigate: newDocId => {
           this.$currentDocId.set(newDocId);
           // this.$currentReload.set(true);
@@ -171,7 +182,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       });
 
       // 2. Attach ScrollSpy event listener
-      this.attachScrollEvents();
+      // this.attachScrollEvents();
       // Listen for scrollpos events
 
       // After rendering
@@ -181,13 +192,14 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
           // layout + paint complete
           queueMicrotask(() => {
             // scrollTop applied after paint
-
             const pos = this.$savedScrollTop();
-            this.hostRef.nativeElement.scrollTop = pos;
+            this.hostWrapperRef.nativeElement.scrollTop = pos;
 
             // Fade out overlay
-            this.hostOverlayRef.nativeElement.classList.add('hidden');
-            // this.tocRootOverlayRef.nativeElement.classList.add('hidden');
+            // this.hostOverlayRef.nativeElement.classList.add('hidden');
+            this.hideHostOverlay();
+            // this.tocOverlayRef?.nativeElement.classList?.add('hidden');
+            this.hideTocOverlay();
           });
         });
       });
@@ -207,20 +219,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       this.cleanupFn = null;
     }
 
-    if (this.scrollSpyHandler) {
-      this.hostRef.nativeElement.removeEventListener(
-        'ulde:scrollspy',
-        this.scrollSpyHandler
-      );
-    }
-
-    if (this.scrollPosHandler) {
-      this.hostRef.nativeElement.removeEventListener(
-        'ulde:scrollpos',
-        this.scrollPosHandler
-      );
-    }
-
   }
 
   // Load markdown and run ULDE
@@ -231,7 +229,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       const response = await fetch(url);
 
       if (response.redirected) {
-        this.hostRef.nativeElement.innerHTML = `
+        this.hostWrapperRef.nativeElement.innerHTML = `
           <div class="page-not-found">
             <h1>Page not found</h1>
             <p><strong>Invalid URL: ${url}</strong></p>
@@ -260,65 +258,46 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   backToPrevDoc() {
-
     const currentDocId = this.$currentDocId();
     this.$currentDocId.set(this.previousDocId);
     this.previousDocId = currentDocId;
   }
 
-  attachScrollEvents() {
-    const host = this.hostRef?.nativeElement;
-    if (!host) return;
-
-    // ---------------------------------------------
-    // 1. Heading activation
-    // ---------------------------------------------
-
-    // host.addEventListener('ulde:scrollspy', (e: any) => {
-    //   console.log(`Log: [DocsViewer] ulde:scrollspy event e=`, e.detail.id);
-    //   this.$activeHeading.set(e.detail.id);
-    // });
-
-    // ---------------------------------------------
-    // 2. Scroll position
-    // ---------------------------------------------
-    // host.addEventListener('ulde:scrollpos', (e: any) => {
-    //   const pos = e.detail.scrollTop;
-    //   const height = e.detail.scrollHeight;
-
-    //   console.log(`Log: [DocsViewer] ulde:scrollpos \npos=`, pos, `\nheight=`, height);
-
-    //   // current: scroll position spy
-    //   this.$savedScrollTop.set(pos);
-    //   // Persist per-doc scroll position
-    //   const key = `ulde:scrollpos:${this.$currentDocId()}`;
-    //   localStorage.setItem(key, String(pos));
-
-    //   //new: scroll position spy
-
-    //   if (!this.rafPending) {
-    //     this.rafPending = true;
-    //     // this.handleInternalNavigation(linkId, destId);
-    //   }
-
-    //   requestAnimationFrame(() => {
-    //     this.scrollService.setPosition(this.$currentDocId(), pos, height);
-    //     writeSessionState({ scrollPos: pos }, this.$isBrowser());
-
-    //     this.rafPending = false;
-    //   });
-
-
-    // });
-
-
+  private showHostOverlay() {
+    const el = this.hostOverlayRef?.nativeElement;
+    if (!el) return;
+    el.classList.remove('hidden');
+    el.classList.add('visible');
   }
+
+  private hideHostOverlay() {
+    const el = this.hostOverlayRef?.nativeElement;
+    if (!el) return;
+    el.classList.remove('visible');
+    el.classList.add('hidden');
+  }
+
+
+  private showTocOverlay() {
+    const el = this.tocOverlayRef?.nativeElement;
+    if (!el) return;
+    el.classList.remove('hidden');
+    el.classList.add('visible');
+  }
+
+  private hideTocOverlay() {
+    const el = this.tocOverlayRef?.nativeElement;
+    if (!el) return;
+    el.classList.remove('visible');
+    el.classList.add('hidden');
+  }
+
 
   private onScrollPos(e: any) {
     const pos = e.detail.scrollTop;
     const height = e.detail.scrollHeight;
 
-    console.log(`Log: [DocsViewer] ulde:scrollpos \npos=`, pos, `\nheight=`, height);
+    // console.log(`Log: [DocsViewer] ulde:scrollpos \npos=`, pos, `\nheight=`, height);
 
     // current: scroll position spy
     this.$savedScrollTop.set(pos);
@@ -365,9 +344,11 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // console.log(`Log: [DocsViewer] scrollTo element`, el);
     if (!el) return;
 
+    this.suppressScrollSpy = true;
+
     el.scrollIntoView({
       behavior: 'smooth',
-      block: 'start'
+      block: 'center'
     });
     this.highlightElement(el);
 
@@ -376,9 +357,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // // instead, add 'active-heading' calss to the clicked toc-item
     setTimeout(() => {
       this.activateClickedTocItem(this.$tocTree(), slug);
+      this.suppressScrollSpy = false;
     }, 400);
-
-
   }
 
   private highlightElement(el: HTMLElement) {
@@ -392,7 +372,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // console.log(`Log: [DocsViewer] theme isDark=`, isDark);
     this.theme.toggleTheme();
     if (this.finalHtml) {
-      await this.bridge.host.run(this.hostRef.nativeElement, this.finalHtml);
+      await this.bridge.host.run(this.hostWrapperRef.nativeElement, this.finalHtml);
       // await this.checkMermaidPanelContent()
     }
   }

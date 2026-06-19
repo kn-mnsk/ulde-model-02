@@ -6,7 +6,7 @@ import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
 export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
   id: 'browser.scrollspy',
 
-  init(container: HTMLElement) {
+  init(container: HTMLElement) { // container is now 'host-wrapper'
     const isBrowser =
       typeof window !== 'undefined' &&
       typeof document !== 'undefined';
@@ -23,12 +23,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
 
     // console.log(`Log: [UldeScrollBrowserPlugin] headings=`, headings);
 
-    // my way
-
-
-
-
-    // MDN sample
+    // Based on MDN sample
     // https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/observe
 
     // Register IntersectionObserver
@@ -45,13 +40,15 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
             // Add 'active' class if observation target is inside viewport
             entry.target.classList.add("active-heading");
 
-            const id = entry.target.id;
-            container.dispatchEvent(
-              new CustomEvent('ulde:scrollspy', {
-                detail: { id },
-                bubbles: true
-              })
-            );
+            const id = (entry.target as HTMLElement).id;
+            if (id) {
+              container.dispatchEvent(
+                new CustomEvent('ulde:scrollspy', {
+                  detail: { id },
+                  bubbles: true
+                })
+              );
+            }
           }
         });
       },
@@ -71,10 +68,10 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
     // 2. Scroll Position Spy (NEW) - scroll position tracking
     // ---------------------------------------------
     let lastSent = 0;
-    console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos `, container);
+    // console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos `, container);
     const onScroll = (e: any) => {
       const now = performance.now();
-      console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos `);
+      // console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos `);
       // throttle to ~30fps
       if (now - lastSent < 33) return;
       lastSent = now;
@@ -82,7 +79,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
       const pos = container.scrollTop;
       const height = container.scrollHeight - container.clientHeight;
 
-      console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos \npos=`, pos, `\nheight=`, height);
+      // console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos \npos=`, pos, `\nheight=`, height);
 
       container.dispatchEvent(
         new CustomEvent('ulde:scrollpos', {
@@ -96,7 +93,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
       );
     };
 
-  console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos `, document);
+    // console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos `, document);
     container.addEventListener('scroll', onScroll);
     // container.onclick = onScroll;
 
