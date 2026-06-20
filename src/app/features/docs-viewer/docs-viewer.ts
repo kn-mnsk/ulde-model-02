@@ -289,7 +289,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   }
 
-
   private handleScrollPos(e: any) {
     const pos = e.detail.scrollTop;
     this.scrollDirection = pos > this.lastScrollTop ? 'down' : 'up';
