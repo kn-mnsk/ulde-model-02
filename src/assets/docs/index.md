@@ -1,5 +1,7 @@
-# 1. KATEX TEST
+# 1. TEST file
 - [Katex test file](#docId:docs/test/test.katex)
+- [Stacking Order](#docId:docs/supplements/doc-stackingorder-0100)
+
 
 # 2. Angular README
 ___This project was generated using <a href="https://github.com/angular/angular-cli" target="_blank">[Angular CLI]</a>version 21.0.0. ...___

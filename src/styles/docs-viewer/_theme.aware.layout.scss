@@ -111,13 +111,16 @@ app-theme-toggle {
 --------------------------------------------------------- */
 
 .dv-toc {
-  position: relative;              /* anchor for resizer + overlay */
+  position: relative;
+  /* anchor for resizer + overlay */
+  z-index: var(--z-base);
   width: 250px;
   min-width: 200px;
   max-width: 350px;
   height: 85vh;
   padding-left: 0.5rem;
-  overflow: hidden;                /* wrapper scrolls now */
+  overflow: hidden;
+  /* wrapper scrolls now */
   font-size: 13px;
   border-right: 3px solid var(--ap-border);
   background: var(--bg-color);
@@ -147,12 +150,16 @@ app-theme-toggle {
 --------------------------------------------------------- */
 
 .toc-wrapper {
-  position: relative;              /* anchor for overlay */
+  position: relative;
+  z-index: var(--z-scroll-content);
+  /* anchor for overlay */
   overflow-y: auto;
-  height: calc(85vh - 160px);      /* adjust for header + buttons */
+  height: calc(85vh - 160px);
+  /* adjust for header + buttons */
   // height: calc(85vh - 120px);      /* adjust for header + buttons */
   padding-right: 6px;
-  z-index: 1;                      /* BELOW resizer */
+  z-index: 1;
+  /* BELOW resizer */
 }
 
 /* ---------------------------------------------------------
@@ -166,7 +173,8 @@ app-theme-toggle {
   opacity: 0;
   pointer-events: none;
   transition: opacity 180ms ease-out;
-  z-index: 10;                     /* ABOVE wrapper */
+  z-index: var(--z-overlay);
+  /* ABOVE wrapper */
 
   &.visible {
     opacity: 1;
@@ -183,6 +191,7 @@ app-theme-toggle {
 
 .dv-toc-resizer {
   position: absolute;
+  z-index: var(--z-control);
   top: 0;
   right: 0;
   bottom: 0;
@@ -190,7 +199,7 @@ app-theme-toggle {
   cursor: ew-resize;
   background: transparent;
   transition: background-color 0.2s ease;
-  z-index: 20;                     /* ABOVE overlay + wrapper */
+  /* ABOVE overlay + wrapper */
 
   &:hover {
     background: #0078d4;
@@ -270,8 +279,13 @@ app-theme-toggle {
 }
 
 @keyframes tocActiveFade {
-  from { background: rgba(0, 120, 212, 0.15); }
-  to   { background: transparent; }
+  from {
+    background: rgba(0, 120, 212, 0.15);
+  }
+
+  to {
+    background: transparent;
+  }
 }
 
 /* Parent of active heading */
@@ -459,13 +473,11 @@ app-theme-toggle {
 --------------------------------------------------------- */
 
 .dv-content {
-  z-index: 10; // new
-  position: relative; // new
+  position: relative;
+  z-index: var(--z-base);
   display: flex;
   flex: 1;
-  // overflow: visible;
   overflow: hidden;
-  // overflow-y: auto;
   // padding: 2rem;
   background: var(--bg-color);
   color: var(--text-color);
@@ -476,9 +488,10 @@ app-theme-toggle {
     color 0.4s ease;
 }
 
-.dv-content .host-wrapper {
-    position: relative; // ensure overlay absolute works
-    overflow-y: auto;   // scroll container
+.host-wrapper {
+  position: relative; // ensure overlay absolute works
+  z-index: var(--z-scroll-content);
+  overflow-y: auto; // scroll container
 }
 
 .host-overlay {
@@ -488,7 +501,7 @@ app-theme-toggle {
   opacity: 0;
   pointer-events: none;
   transition: opacity 180ms ease-out;
-  z-index: 10;
+  z-index: var(--z-overlay);
 
   &.visible {
     opacity: 1;
@@ -520,13 +533,10 @@ app-theme-toggle {
 
 .dv-host {
   position: relative;
+  z-index: var(--z-scroll-content);
   flex: 1;
-  // overflow: hidden;
-  // overflow-y: auto;
   padding: 10px 10px;
   width: 100%;
-  // width: fit-content;
-  // height: 85vh;
 }
 
 /* Ensure headings don't hide under the fixed header */
