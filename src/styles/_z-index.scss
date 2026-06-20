@@ -1,0 +1,44 @@
+/* styles/_z-index.scss */
+
+/* ---------------------------------------------------------
+   global z-index layers
+--------------------------------------------------------- */
+
+/*
+Usage rule of thumb:
+
+Content: --z-scroll-content
+
+Pane overlays (host/TOC): --z-overlay
+
+Pane controls (resizers, floating buttons): --z-control
+
+Global helpers (tooltips/popovers): --z-tooltip / --z-popover
+
+Blocking UI (modals): --z-modal-backdrop / --z-modal
+*/
+
+
+:root {
+  /* Base content */
+  --z-base: 0;
+
+  /* Scrollable content inside panes */
+  --z-scroll-content: 1;
+
+  /* Local overlays (host, TOC) */
+  --z-overlay: 10;
+
+  /* Local controls (resizers, buttons on top of panes) */
+  --z-control: 20;
+
+  /* Global tooltips */
+  --z-tooltip: 40;
+
+  /* Global dropdowns / popovers */
+  --z-popover: 50;
+
+  /* Global modals */
+  --z-modal-backdrop: 90;
+  --z-modal: 100;
+}
