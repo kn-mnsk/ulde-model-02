@@ -72,8 +72,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   private lastSpyId: string | null = null;
   private lastScrollTop = 0;
   private scrollDirection: 'up' | 'down' = 'down';
-  // Suppress ScrollSpy while TOC click scroll is in progress
-  // private suppressScrollSpy = false;
 
   @ViewChild('hostWrapper', { static: true })
   hostWrapperRef!: ElementRef<HTMLElement>;
