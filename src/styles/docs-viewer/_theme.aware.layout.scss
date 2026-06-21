@@ -100,7 +100,7 @@ app-theme-toggle {
   position: relative;
   display: flex;
   // flex: 1;
-  height: 85vh; //calc(100vh - 120px);
+  height: 90vh;//calc(100vh - 120px);
   overflow: hidden;
   background: var(--bg-color);
   transition: background-color 0.4s ease;
@@ -154,7 +154,7 @@ app-theme-toggle {
   z-index: var(--z-scroll-content);
   /* anchor for overlay */
   overflow-y: auto;
-  height: calc(85vh - 160px);
+  height: calc(90vh - 200px);//calc(85vh - 160px);
   /* adjust for header + buttons */
   // height: calc(85vh - 120px);      /* adjust for header + buttons */
   padding-right: 6px;
@@ -481,7 +481,8 @@ app-theme-toggle {
   // padding: 2rem;
   background: var(--bg-color);
   color: var(--text-color);
-  height: 85vh;
+
+  // height: 85vh;
   min-width: 0; // new
   transition:
     background-color 0.4s ease,
@@ -492,6 +493,7 @@ app-theme-toggle {
   position: relative; // ensure overlay absolute works
   z-index: var(--z-scroll-content);
   overflow-y: auto; // scroll container
+  height: 85vh;//85vh;
 }
 
 .host-overlay {
@@ -502,6 +504,8 @@ app-theme-toggle {
   pointer-events: none;
   transition: opacity 180ms ease-out;
   z-index: var(--z-overlay);
+
+  // height: 100%;
 
   &.visible {
     opacity: 1;
@@ -537,6 +541,8 @@ app-theme-toggle {
   flex: 1;
   padding: 10px 10px;
   width: 100%;
+
+  // height: 100%;
 }
 
 /* Ensure headings don't hide under the fixed header */
@@ -546,7 +552,7 @@ app-theme-toggle {
 .dv-host h4,
 .dv-host h5,
 .dv-host h6 {
-  scroll-margin-top: 80px; // adjust if needed
+  scroll-margin-top: 50px; // 80 original adjust if needed
 }
 
 
