@@ -60,27 +60,30 @@ export class UldeDocsViewerBridge {
     // Event wiring
     // -------------------------------
 
-    const scrollSpyHandler = (e: any) => {
+    const handleScrollSpy = (e: any) => {
       if (onScrollSpy) {
+        // console.log(`Log: [UldeDocsViewerBridge] handleScrollSpy header id=`, e.detail.id);
         onScrollSpy(e.detail.id);
       }
     };
 
-    const scrollPosHandler = (e: any) => {
+    const handleScrollPos = (e: any) => {
       if (onScrollPos) {
+        // console.log(`Log: [UldeDocsViewerBridge] handleScrollPos scrollTop=`, e.detail.scrollTop);
+
         onScrollPos(e);
       }
     };
 
-    const navigateHandler = (e: any) => {
+    const handleNavigate = (e: any) => {
       if (onNavigate) {
         onNavigate(e.detail?.docId);
       }
     };
 
-    host.addEventListener('ulde:scrollspy', scrollSpyHandler);
-    host.addEventListener('ulde:scrollpos', scrollPosHandler);
-    host.addEventListener('ulde:navigate', navigateHandler);
+    host.addEventListener('ulde:scrollspy', handleScrollSpy);
+    host.addEventListener('ulde:scrollpos', handleScrollPos);
+    host.addEventListener('ulde:navigate', handleNavigate);
 
     // -------------------------------
     // Run ULDE pipeline
@@ -91,9 +94,9 @@ export class UldeDocsViewerBridge {
     // Cleanup function
     // -------------------------------
     return () => {
-      host.removeEventListener('ulde:scrollspy', scrollSpyHandler);
-      host.removeEventListener('ulde:scrollpos', scrollPosHandler);
-      host.removeEventListener('ulde:navigate', navigateHandler);
+      host.removeEventListener('ulde:scrollspy', handleScrollSpy);
+      host.removeEventListener('ulde:scrollpos', handleScrollPos);
+      host.removeEventListener('ulde:navigate', handleNavigate);
     };
   }
 

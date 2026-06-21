@@ -16,30 +16,30 @@ import { writeSessionState } from '../../core/services/session-state.manage';
 import { OverlayManager } from '../../core/services/overlay-manager.service';
 import { ScrollSpyController } from '../../core/services/scrollspy-controller';
 
+
 @Component({
   selector: 'app-docs-viewer',
   standalone: true,
-  imports: [
-    ThemeToggle, TocResizerDirective, NgTemplateOutlet
-  ],
+  imports: [ThemeToggle, TocResizerDirective, NgTemplateOutlet],
   templateUrl: './docs-viewer.html'
 })
 export class DocsViewer implements AfterViewInit, OnDestroy {
-  // External readonly inputs
+
+  // External inputs
   $docId = input<string>('');
   $reload = input<boolean>(false);
 
-  // Internal writable signals
+  // Internal state
   $currentDocId = signal('');
-  previousDocId: string = '';
+  previousDocId = '';
   private $currentReload = signal(false);
 
-  // Environment
   $isBrowser = signal(false);
 
   // ULDE outputs
   $toc = signal<TocEntry[]>([]);
   readonly $tocTree = computed(() => this.buildTocTree(this.$toc()));
+
   readonly $isParentActive = computed(() => {
     const toc = this.$toc();
     const active = this.$activeHeading();
@@ -57,7 +57,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   $showDebugOverlay = signal(false);
   $showArtifacts = signal(false);
   $showDebugMermaid = signal(false);
-  $isMermaidPanelFilled = signal<boolean>(true);
+  $isMermaidPanelFilled = signal(true);
   $dvTocRef = signal<ElementRef<HTMLElement> | undefined>(undefined);
   $savedScrollTop = signal(0);
 
@@ -65,13 +65,12 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   private finalHtml: string | null = null;
   private rafPending = false;
 
-  // scrollspy controller
+  // ScrollSpy
   private scrollSpy = new ScrollSpyController();
-
   private scrollSpyDebounce: any = null;
   private lastSpyId: string | null = null;
   private lastScrollTop = 0;
-  private scrollDirection: 'up' | 'down' = 'down';
+  private scrollDirection: 'up' | 'down' | null = null;
 
   @ViewChild('hostWrapper', { static: true })
   hostWrapperRef!: ElementRef<HTMLElement>;
@@ -93,11 +92,12 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     private overlay: OverlayManager,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // Detect browser environment
+
+    // Detect browser
     this.$isBrowser.set(isPlatformBrowser(this.platformId));
     if (!this.$isBrowser()) return;
 
-    // Sync external docId → internal writable docId
+    // Sync external docId → internal
     effect(() => {
       const id = this.$docId();
       if (id) {
@@ -106,30 +106,45 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       }
     });
 
-    // Sync external reload → internal reload
+    // Sync reload flag
     effect(() => {
       if (this.$reload()) {
         this.$currentReload.set(true);
       }
     });
 
-    // React to internal docId changes
+    // React to docId changes
     effect(() => {
       const id = this.$currentDocId();
       if (id && this.$isBrowser()) {
         const key = `ulde:scrollpos:${id}`;
         const saved = Number(localStorage.getItem(key) ?? 0);
         this.$savedScrollTop.set(saved);
-
         this.loadAndRender(id);
       }
     });
 
-    // React to internal reload flag
+    // React to reload
     effect(() => {
       if (this.$currentReload() && this.$isBrowser()) {
         this.loadAndRender(this.$currentDocId());
       }
+    });
+
+    // VS Code auto-expand behavior
+    effect(() => {
+      const active = this.$activeHeading();
+      const tree = this.$tocTree();
+
+      if (!tree.length) return;
+
+      if (!active) {
+        // First load → expand everything
+        tree.forEach(n => n.collapsed = false);
+        return;
+      }
+
+      this.updateTocCollapseState(tree, active);
     });
 
     // ULDE pipeline subscription
@@ -138,22 +153,22 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
       this.finalHtml = result.finalHtml;
 
-      // 1. Show overlays immediately
+      // Show overlays
       this.overlay.show(this.tocOverlayRef);
       this.overlay.show(this.hostOverlayRef);
 
-      // 2. Update TOC and debug artifacts
+      // Update TOC + debug
       this.$toc.set(result.toc ?? []);
       this.$debugOverlay.set(result.debugOverlay);
       this.$artifactsPanel.set(result.artifactsPanel);
 
-      // 3. Cleanup previous ULDE host
+      // Cleanup previous host
       if (this.cleanupFn) {
         this.cleanupFn();
         this.cleanupFn = null;
       }
 
-      // 4. Run ULDE host
+      // Run ULDE host
       this.cleanupFn = this.bridge.run({
         host: this.hostWrapperRef.nativeElement,
         docId: this.$currentDocId(),
@@ -164,11 +179,12 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
         onNavigate: newDocId => this.handleNavigate(newDocId)
       });
 
-      // 5. After rendering: restore scroll + fade out overlays
+      // Ensure ScrollSpy is active
+      this.scrollSpy.allow();
+
+      // Restore scroll + hide overlays
       requestAnimationFrame(() => {
-        // DOM mounted
         requestAnimationFrame(() => {
-          // layout + paint complete
           queueMicrotask(() => {
             const pos = this.$savedScrollTop();
             this.hostWrapperRef.nativeElement.scrollTop = pos;
@@ -183,10 +199,20 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     });
   }
 
-  ngAfterViewInit() {
-    if (!this.$isBrowser()) return;
+  // VS Code auto-expand logic
+  private updateTocCollapseState(tree: TocNode[], activeSlug: string | null) {
+    const visit = (node: TocNode): boolean => {
+      const isSelfActive = node.entry.slug === activeSlug;
+      const hasActiveDesc = node.children.some(child => visit(child));
+
+      node.collapsed = !(isSelfActive || hasActiveDesc);
+      return isSelfActive || hasActiveDesc;
+    };
+
+    tree.forEach(root => visit(root));
   }
 
+  ngAfterViewInit() { }
   ngOnDestroy() {
     if (this.cleanupFn) {
       this.cleanupFn();
@@ -194,7 +220,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     }
   }
 
-  // Load markdown and run ULDE
+  // Load markdown
   private async loadAndRender(docId: string) {
     const url = `assets/${docId}.md`;
 
@@ -229,77 +255,84 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   backToPrevDoc() {
-    const currentDocId = this.$currentDocId();
+    const current = this.$currentDocId();
     this.$currentDocId.set(this.previousDocId);
-    this.previousDocId = currentDocId;
+    this.previousDocId = current;
   }
 
-  private activateClickedTocItem(nodes: TocNode[], clickedSlug: string) {
-    if (nodes.length === 0) return;
-
-    for (const node of nodes) {
-      if (node.entry.slug === clickedSlug) {
-        const clickedItem = document.getElementById(clickedSlug);
-        clickedItem?.classList.add('active-heading');
-        this.$activeHeading.set(clickedSlug);
-      }
-
-      this.activateClickedTocItem(node.children, clickedSlug);
-    }
-  }
-
-  // ScrollSpy handler from ULDE
+  // ScrollSpy handler
   private handleScrollSpy(id: string) {
+    // console.log(`Log: [DocsViewer] handleScrollSpy \nheader id=`, id, `scrollSpy.isSuppressed()=`, this.scrollSpy.isSuppressed());
+
     if (this.scrollSpy.isSuppressed()) return;
 
-    clearTimeout(this.scrollSpyDebounce);
 
-    this.scrollSpyDebounce = setTimeout(() => {
-      // Stabilization: require same ID twice
-      if (this.lastSpyId !== id) {
-        this.lastSpyId = id;
-        return;
-      }
-
-      // Direction-aware activation
       const toc = this.$toc();
-      const index = toc.findIndex(t => t.slug === id);
+      const currentId = id;
+      const currentIndex = toc.findIndex(t => t.slug === id);
+      const lastActivatedId = this.$activeHeading();
+      const lastActivatedIndex = toc.findIndex(t => t.slug === lastActivatedId);
 
-      if (index === -1) return;
+      this.$activeHeading.set(currentId);
 
-      let finalId = id;
+      console.log(`Log: [DocsViewer] handleScrollSpy this.scrollSpyDebounce \ncurrent Index=`, currentIndex, currentId, `\nlast index=`, lastActivatedIndex, lastActivatedId);
 
-      if (this.scrollDirection === 'down') {
-        // Prefer next heading if available
-        const next = toc[index + 1];
-        if (next) finalId = next.slug;
-      } else {
-        // Prefer previous heading if available
-        const prev = toc[index - 1];
-        if (prev) finalId = prev.slug;
-      }
+    // clearTimeout(this.scrollSpyDebounce);
 
-      this.$activeHeading.set(finalId);
+    // this.scrollSpyDebounce = setTimeout(() => {
+    //   // console.log(`Log: [DocsViewer] handleScrollSpy this.scrollSpyDebounce \nlastSpyId=`, this.lastSpyId);
 
-      // Reset stabilization
-      this.lastSpyId = null;
-    }, 50);
+
+    //   if (this.lastSpyId !== id) {
+    //     this.lastSpyId = id;
+    //     return;
+    //   }
+    //   // console.log(`Log: [DocsViewer] handleScrollSpy this.scrollSpyDebounce \nlastSpyId=`, this.lastSpyId);
+
+    //   const toc = this.$toc();
+    //   let index = toc.findIndex(t => t.slug === id);
+    //   if (index === -1) return;
+
+    //   // // console.log(`Log: [DocsViewer] handleScrollSpy this.scrollSpyDebounce \ncurrent Index=`, index, id, `\nlast index=`, lastIndex, this.lastSpyId, `\nscrollDirection=`, this.scrollDirection);
+
+
+    //   let finalId = id;
+
+    //   if (this.scrollDirection === 'down') {
+    //     const next = toc[index + 1];
+    //     if (next) finalId = next.slug;
+    //   } else if (this.scrollDirection === 'up') {
+    //     const prev = toc[index - 1]; // original
+    //     if (prev) finalId = prev.slug;
+    //   }
+
+    //   // console.log(`Log: [DocsViewer] handleScrollSpy this.scrollSpyDebounce \nlscrollDirection=`, this.scrollDirection, `\ncurrentIndex`, index, id, `\nlastIndex`, lastIndex, this.lastSpyId, `\nfinalId`, finalId,);
+
+
+    //   this.$activeHeading.set(finalId);
+
+    //   this.lastSpyId = null;
+
+    // }, 50);
 
   }
 
   private handleScrollPos(e: any) {
     const pos = e.detail.scrollTop;
-    this.scrollDirection = pos > this.lastScrollTop ? 'down' : 'up';
+
+    const lastScrollTop = this.$savedScrollTop();
+    this.scrollDirection = pos > lastScrollTop ? 'down' : pos < lastScrollTop ? 'up' : null;
+
+    // this.scrollDirection = pos > this.lastScrollTop ? 'down' : pos < this.lastScrollTop ? 'up' : null;
+    // this.lastScrollTop = pos;
+
     const height = e.detail.scrollHeight;
 
     this.$savedScrollTop.set(pos);
-
     const key = `ulde:scrollpos:${this.$currentDocId()}`;
     localStorage.setItem(key, String(pos));
 
-    if (!this.rafPending) {
-      this.rafPending = true;
-    }
+    if (!this.rafPending) this.rafPending = true;
 
     requestAnimationFrame(() => {
       this.scrollService.setPosition(this.$currentDocId(), pos, height);
@@ -310,38 +343,85 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   private handleNavigate(id: string) {
     this.$currentDocId.set(id);
-  };
+  }
 
-  // Scroll to heading with deterministic scroll completion
+  // Scroll to heading
   scrollTo(slug: string) {
     const el = document.getElementById(slug);
     if (!el) return;
 
     this.scrollSpy.suppress();
 
-    // Start smooth scroll
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    // Highlight animation
     this.highlightElement(el);
 
-    // Remove previous active-heading classes
-    document
-      .querySelectorAll('.active-heading')
+    document.querySelectorAll('.active-heading')
       .forEach(el => el.classList.remove('active-heading'));
 
-    // rAF-based scroll completion detection
     const wrapper = this.hostWrapperRef.nativeElement;
     this.scrollSpy.detectScrollEnd(wrapper, () => {
       this.activateClickedTocItem(this.$tocTree(), slug);
+      this.scrollSpy.allow();
     });
-
   }
 
   private highlightElement(el: HTMLElement) {
     el.classList.add('inline-highlight');
     setTimeout(() => el.classList.remove('inline-highlight'), 700);
   }
+
+  private activateClickedTocItem(nodes: TocNode[], slug: string) {
+    for (const node of nodes) {
+      if (node.entry.slug === slug) {
+        const el = document.getElementById(slug);
+        el?.classList.add('active-heading');
+        this.$activeHeading.set(slug);
+      }
+      this.activateClickedTocItem(node.children, slug);
+    }
+  }
+
+  // Build TOC tree
+  private buildTocTree(entries: TocEntry[]): TocNode[] {
+    const root: TocNode[] = [];
+    const stack: TocNode[] = [];
+
+    for (const entry of entries) {
+      const node: TocNode = {
+        entry,
+        children: [],
+        collapsed: false
+      };
+
+      while (stack.length && stack[stack.length - 1].entry.level >= entry.level) {
+        stack.pop();
+      }
+
+      if (!stack.length) root.push(node);
+      else stack[stack.length - 1].children.push(node);
+
+      stack.push(node);
+    }
+
+    return root;
+  }
+
+  isParentOfActive(item: TocEntry, toc: TocEntry[], activeSlug: string | null): boolean {
+    const activeIndex = toc.findIndex(t => t.slug === activeSlug);
+    if (activeIndex === -1) return false;
+
+    const active = toc[activeIndex];
+    return item.level < active.level && toc.indexOf(item) < activeIndex;
+  }
+
+  private isAncestor(node: TocNode, activeSlug: string | null): boolean {
+    for (const child of node.children) {
+      if (child.entry.slug === activeSlug) return true;
+      if (this.isAncestor(child, activeSlug)) return true;
+    }
+    return false;
+  }
+
 
   // Theme toggle
   async onToggleTheme() {
@@ -367,73 +447,25 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     this.$showDebugMermaid.update(v => !v);
   }
 
-  private buildTocTree(entries: TocEntry[]): TocNode[] {
-    const root: TocNode[] = [];
-    const stack: TocNode[] = [];
 
-    for (const entry of entries) {
-      const node: TocNode = {
-        entry,
-        children: [],
-        collapsed: false
-      };
-
-      while (
-        stack.length &&
-        stack[stack.length - 1].entry.level >= entry.level
-      ) {
-        stack.pop();
-      }
-
-      if (stack.length === 0) {
-        root.push(node);
-      } else {
-        stack[stack.length - 1].children.push(node);
-      }
-
-      stack.push(node);
-    }
-
-    return root;
-  }
-
-  isParentOfActive(
-    item: TocEntry,
-    toc: TocEntry[],
-    activeSlug: string | null
-  ): boolean {
-    const activeIndex = toc.findIndex(t => t.slug === activeSlug);
-    if (activeIndex === -1) return false;
-
-    const active = toc[activeIndex];
-
-    return item.level < active.level && toc.indexOf(item) < activeIndex;
-  }
-
-  private isAncestor(node: TocNode, activeSlug: string | null): boolean {
-    for (const child of node.children) {
-      if (child.entry.slug === activeSlug) {
-        return true;
-      }
-      if (this.isAncestor(child, activeSlug)) {
-        return true;
-      }
-    }
-    return false;
-  }
 }
 
 
 
-
-
-
 // OLD VERSION
+// @Component({
+//   selector: 'app-docs-viewer',
+//   standalone: true,
+//   imports: [
+//     ThemeToggle, TocResizerDirective, NgTemplateOutlet
+//   ],
+//   templateUrl: './docs-viewer.html'
+// })
 // export class DocsViewer implements AfterViewInit, OnDestroy {
-
 //   // External readonly inputs
 //   $docId = input<string>('');
 //   $reload = input<boolean>(false);
+
 //   // Internal writable signals
 //   $currentDocId = signal('');
 //   previousDocId: string = '';
@@ -470,13 +502,23 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //   private finalHtml: string | null = null;
 //   private rafPending = false;
 
-//   // Suppress ScrollSpy while TOC click scroll is in progress
-//   private suppressScrollSpy = false;
+//   // scrollspy controller
+//   private scrollSpy = new ScrollSpyController();
 
-//   @ViewChild('hostWrapper', { static: true }) hostWrapperRef!: ElementRef<HTMLElement>;
-//   @ViewChild('hostOverlay', { static: true }) hostOverlayRef!: ElementRef<HTMLElement>;
+//   private scrollSpyDebounce: any = null;
+//   private lastSpyId: string | null = null;
+//   private lastScrollTop = 0;
+//   private scrollDirection: 'up' | 'down' = 'down';
 
-//   @ViewChild('dvToc', { static: false }) dvTocRef!: ElementRef<HTMLElement>;
+//   @ViewChild('hostWrapper', { static: true })
+//   hostWrapperRef!: ElementRef<HTMLElement>;
+
+//   @ViewChild('hostOverlay', { static: true })
+//   hostOverlayRef!: ElementRef<HTMLElement>;
+
+//   @ViewChild('dvToc', { static: false })
+//   dvTocRef!: ElementRef<HTMLElement>;
+
 //   @ViewChild('tocOverlay', { static: false })
 //   tocOverlayRef?: ElementRef<HTMLElement>;
 
@@ -486,9 +528,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //     private theme: ThemeService,
 //     public scrollService: ScrollService,
 //     private overlay: OverlayManager,
-//     @Inject(PLATFORM_ID) private platformId: Object,
+//     @Inject(PLATFORM_ID) private platformId: Object
 //   ) {
-
 //     // Detect browser environment
 //     this.$isBrowser.set(isPlatformBrowser(this.platformId));
 //     if (!this.$isBrowser()) return;
@@ -499,7 +540,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //       if (id) {
 //         this.previousDocId = id;
 //         this.$currentDocId.set(id);
-
 //       }
 //     });
 
@@ -512,7 +552,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
 //     // React to internal docId changes
 //     effect(() => {
-
 //       const id = this.$currentDocId();
 //       if (id && this.$isBrowser()) {
 //         const key = `ulde:scrollpos:${id}`;
@@ -530,17 +569,35 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //       }
 //     });
 
+//     // React to active heading change
+//     effect(() => {
+//       const active = this.$activeHeading();
+//       const tree = this.$tocTree();
+
+//       if (!active) {
+//         // First load → expand everything
+//         tree.forEach(node => node.collapsed = false);
+//         return;
+//       }
+
+//       if (tree.length > 0) {
+//         this.updateTocCollapseState(tree, active);
+//       }
+
+//     });
+
+
 //     // ULDE pipeline subscription
 //     this.ulde.result$.subscribe(result => {
 //       if (!result) return;
 
 //       this.finalHtml = result.finalHtml;
 
-//       // 1. Show overlay immediately
+//       // 1. Show overlays immediately
 //       this.overlay.show(this.tocOverlayRef);
 //       this.overlay.show(this.hostOverlayRef);
 
-//       // 2. Update TOC + debug panel
+//       // 2. Update TOC and debug artifacts
 //       this.$toc.set(result.toc ?? []);
 //       this.$debugOverlay.set(result.debugOverlay);
 //       this.$artifactsPanel.set(result.artifactsPanel);
@@ -557,28 +614,22 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //         docId: this.$currentDocId(),
 //         reload: this.$currentReload(),
 //         html: result.finalHtml,
-//         onScrollSpy: id => {
-//           if (this.suppressScrollSpy) return;
-//           // console.log(`Log: [DocsViewer] ulde:scrollspy id=`, id);
-//           this.$activeHeading.set(id);
-//         },
-//         onScrollPos: e => { this.onScrollPos(e); },
-//         onNavigate: newDocId => {
-//           this.$currentDocId.set(newDocId);
-//         }
+//         onScrollSpy: id => this.handleScrollSpy(id),
+//         onScrollPos: e => this.handleScrollPos(e),
+//         onNavigate: newDocId => this.handleNavigate(newDocId)
 //       });
 
-//       // 5. After rendering → restore scroll + fade overlays
+//       this.scrollSpy.allow();
+
+//       // 5. After rendering: restore scroll + fade out overlays
 //       requestAnimationFrame(() => {
 //         // DOM mounted
 //         requestAnimationFrame(() => {
 //           // layout + paint complete
 //           queueMicrotask(() => {
-//             // scrollTop applied after paint
 //             const pos = this.$savedScrollTop();
 //             this.hostWrapperRef.nativeElement.scrollTop = pos;
 
-//             // Fade out overlay // Fade out overlays via OverlayManager
 //             this.overlay.hide(this.tocOverlayRef);
 //             this.overlay.hide(this.hostOverlayRef);
 //           });
@@ -586,9 +637,25 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //       });
 
 //       this.$dvTocRef.set(this.dvTocRef);
-//       // this.checkMermaidPanelContent()
 //     });
 //   }
+
+//   // Auto-collapse / auto-expand TOC like VS Code
+//   private updateTocCollapseState(tree: TocNode[], activeSlug: string | null) {
+//     const visit = (node: TocNode): boolean => {
+//       const isSelfActive = node.entry.slug === activeSlug;
+//       const hasActiveDescendant = node.children.some(child => visit(child));
+
+//       // VS Code behavior:
+//       // Expand only the active branch; collapse everything else
+//       node.collapsed = !(isSelfActive || hasActiveDescendant);
+
+//       return isSelfActive || hasActiveDescendant;
+//     };
+
+//     tree.forEach(root => visit(root));
+//   }
+
 
 //   ngAfterViewInit() {
 //     if (!this.$isBrowser()) return;
@@ -599,7 +666,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //       this.cleanupFn();
 //       this.cleanupFn = null;
 //     }
-
 //   }
 
 //   // Load markdown and run ULDE
@@ -621,7 +687,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
 //       const markdown = await response.text();
 //       await this.ulde.renderMarkdown(markdown);
-
 //     } catch (err) {
 //       console.error('[DocsViewer] loadAndRender error:', err);
 //     }
@@ -629,9 +694,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
 //   // Navigation
 //   backToIndex() {
-//     this.previousDocId = this.$currentDocId(); //
+//     this.previousDocId = this.$currentDocId();
 //     this.$currentDocId.set('docs/index');
-//     // this.$currentReload.set(true);
 //   }
 
 //   reloadDoc() {
@@ -644,34 +708,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //     this.previousDocId = currentDocId;
 //   }
 
-
-//   private onScrollPos(e: any) {
-//     const pos = e.detail.scrollTop;
-//     const height = e.detail.scrollHeight;
-
-//     // console.log(`Log: [DocsViewer] ulde:scrollpos \npos=`, pos, `\nheight=`, height);
-
-//     // current: scroll position spy
-//     this.$savedScrollTop.set(pos);
-//     // Persist per-doc scroll position
-//     const key = `ulde:scrollpos:${this.$currentDocId()}`;
-//     localStorage.setItem(key, String(pos));
-
-//     //new: scroll position spy
-
-//     if (!this.rafPending) {
-//       this.rafPending = true;
-//     }
-
-//     requestAnimationFrame(() => {
-//       this.scrollService.setPosition(this.$currentDocId(), pos, height);
-//       writeSessionState({ scrollPos: pos }, this.$isBrowser());
-//       this.rafPending = false;
-//     });
-
-//   };
-
-
 //   private activateClickedTocItem(nodes: TocNode[], clickedSlug: string) {
 //     if (nodes.length === 0) return;
 
@@ -683,31 +719,98 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //       }
 
 //       this.activateClickedTocItem(node.children, clickedSlug);
-
 //     }
 //   }
 
-//   // Scroll to heading
+//   // ScrollSpy handler from ULDE
+//   private handleScrollSpy(id: string) {
+//     if (this.scrollSpy.isSuppressed()) return;
+
+//     clearTimeout(this.scrollSpyDebounce);
+
+//     this.scrollSpyDebounce = setTimeout(() => {
+//       // Stabilization: require same ID twice
+//       if (this.lastSpyId !== id) {
+//         this.lastSpyId = id;
+//         return;
+//       }
+
+//       // Direction-aware activation
+//       const toc = this.$toc();
+//       const index = toc.findIndex(t => t.slug === id);
+
+//       if (index === -1) return;
+
+//       let finalId = id;
+
+//       if (this.scrollDirection === 'down') {
+//         // Prefer next heading if available
+//         const next = toc[index + 1];
+//         if (next) finalId = next.slug;
+//       } else {
+//         // Prefer previous heading if available
+//         const prev = toc[index - 1];
+//         if (prev) finalId = prev.slug;
+//       }
+
+//       this.$activeHeading.set(finalId);
+
+//       // Reset stabilization
+//       this.lastSpyId = null;
+//     }, 50);
+
+//   }
+
+//   private handleScrollPos(e: any) {
+//     const pos = e.detail.scrollTop;
+//     this.scrollDirection = pos > this.lastScrollTop ? 'down' : 'up';
+//     this.lastScrollTop = pos;
+//     const height = e.detail.scrollHeight;
+
+//     this.$savedScrollTop.set(pos);
+
+//     const key = `ulde:scrollpos:${this.$currentDocId()}`;
+//     localStorage.setItem(key, String(pos));
+
+//     if (!this.rafPending) {
+//       this.rafPending = true;
+//     }
+
+//     requestAnimationFrame(() => {
+//       this.scrollService.setPosition(this.$currentDocId(), pos, height);
+//       writeSessionState({ scrollPos: pos }, this.$isBrowser());
+//       this.rafPending = false;
+//     });
+//   }
+
+//   private handleNavigate(id: string) {
+//     this.$currentDocId.set(id);
+//   };
+
+//   // Scroll to heading with deterministic scroll completion
 //   scrollTo(slug: string) {
 //     const el = document.getElementById(slug);
-//     // console.log(`Log: [DocsViewer] scrollTo element`, el);
 //     if (!el) return;
 
-//     this.suppressScrollSpy = true;
+//     this.scrollSpy.suppress();
 
-//     el.scrollIntoView({
-//       behavior: 'smooth',
-//       block: 'center'
-//     });
+//     // Start smooth scroll
+//     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+//     // Highlight animation
 //     this.highlightElement(el);
 
-//     document.querySelectorAll('.active-heading').forEach(el => el.classList.remove('active-heading'));
+//     // Remove previous active-heading classes
+//     document
+//       .querySelectorAll('.active-heading')
+//       .forEach(el => el.classList.remove('active-heading'));
 
-//     // // instead, add 'active-heading' calss to the clicked toc-item
-//     setTimeout(() => {
+//     // rAF-based scroll completion detection
+//     const wrapper = this.hostWrapperRef.nativeElement;
+//     this.scrollSpy.detectScrollEnd(wrapper, () => {
 //       this.activateClickedTocItem(this.$tocTree(), slug);
-//       this.suppressScrollSpy = false;
-//     }, 500);
+//     });
+
 //   }
 
 //   private highlightElement(el: HTMLElement) {
@@ -718,11 +821,12 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
 //   // Theme toggle
 //   async onToggleTheme() {
-//     // console.log(`Log: [DocsViewer] theme isDark=`, isDark);
 //     this.theme.toggleTheme();
 //     if (this.finalHtml) {
-//       await this.bridge.host.run(this.hostWrapperRef.nativeElement, this.finalHtml);
-//       // await this.checkMermaidPanelContent()
+//       await this.bridge.host.run(
+//         this.hostWrapperRef.nativeElement,
+//         this.finalHtml
+//       );
 //     }
 //   }
 
@@ -736,7 +840,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //   }
 
 //   toggleDebugMermaid() {
-
 //     this.$showDebugMermaid.update(v => !v);
 //   }
 
@@ -751,7 +854,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //         collapsed: false
 //       };
 
-//       while (stack.length && stack[stack.length - 1].entry.level >= entry.level) {
+//       while (
+//         stack.length &&
+//         stack[stack.length - 1].entry.level >= entry.level
+//       ) {
 //         stack.pop();
 //       }
 
@@ -764,37 +870,32 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 //       stack.push(node);
 //     }
 
-//     // console.log(`Log: buildTocTree() root=`, root);
-
 //     return root;
 //   }
 
-//   isParentOfActive(item: TocEntry, toc: TocEntry[], activeSlug: string | null): boolean {
+//   isParentOfActive(
+//     item: TocEntry,
+//     toc: TocEntry[],
+//     activeSlug: string | null
+//   ): boolean {
 //     const activeIndex = toc.findIndex(t => t.slug === activeSlug);
 //     if (activeIndex === -1) return false;
 
 //     const active = toc[activeIndex];
 
-//     // A parent has a lower level and appears before the active heading
-//     return item.level < active.level &&
-//       toc.indexOf(item) < activeIndex;
+//     return item.level < active.level && toc.indexOf(item) < activeIndex;
 //   }
 
 //   private isAncestor(node: TocNode, activeSlug: string | null): boolean {
-//     // console.log(`Log: [DocsViewer] isAncestor() node`,node);
 //     for (const child of node.children) {
 //       if (child.entry.slug === activeSlug) {
-//         // console.log(`Log: [DocsViewer] isAncestor() child.entry.slug === activeSlug=`, activeSlug);
 //         return true;
 //       }
 //       if (this.isAncestor(child, activeSlug)) {
-//         // console.log(`Log: [DocsViewer] this.isAncestor(child, activeSlug) `, child, activeSlug);
 //         return true;
 //       }
 //     }
 //     return false;
 //   }
-
-
 // }
 

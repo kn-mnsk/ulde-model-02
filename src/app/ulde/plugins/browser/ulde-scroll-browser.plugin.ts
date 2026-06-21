@@ -36,6 +36,8 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
         });
 
         entries.forEach((entry) => {
+          // if (entry.intersectionRect) {
+          // if (entry.isIntersecting) {
           if (entry.intersectionRect && entry.isIntersecting) {
             // Add 'active' class if observation target is inside viewport
             entry.target.classList.add("active-heading");
