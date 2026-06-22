@@ -21,7 +21,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
       container.querySelectorAll('h1, h2, h3, h4, h5, h6')
     );
 
-    // console.log(`Log: [UldeScrollBrowserPlugin] headings=`, headings);
+    console.log(`Log: [UldeScrollBrowserPlugin] headings=`, headings);
 
     // Based on MDN sample
     // https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/observe
@@ -29,7 +29,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
     // Register IntersectionObserver
     const headingObserver = new IntersectionObserver(
       (entries) => {
-        // console.log(`Log: [UldeScrollBrowserPlugin] IntersectionObserver \nentries=`, entries);
+        // console.log(`Log: [UldeScrollBrowserPlugin] IntersectionObserver \nentries length=`, entries.length);
         // Remove previous active states
         entries.forEach(entry => {
           entry.target.classList.remove('active-heading')
@@ -37,16 +37,21 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
 
         entries.forEach((entry) => {
           // if (entry.intersectionRect) {
-          // if (entry.isIntersecting) {
-          if (entry.intersectionRect && entry.isIntersecting) {
+          if (entry.isIntersecting) {
+            // if (entry.intersectionRect && entry.isIntersecting) {
+
             // Add 'active' class if observation target is inside viewport
             entry.target.classList.add("active-heading");
 
             const id = (entry.target as HTMLElement).id;
             if (id) {
+              const index = headings.findIndex(t => t.id === id);
               container.dispatchEvent(
                 new CustomEvent('ulde:scrollspy', {
-                  detail: { id },
+                  detail: {
+                    id: id,
+                    index: index
+                  },
                   bubbles: true
                 })
               );
