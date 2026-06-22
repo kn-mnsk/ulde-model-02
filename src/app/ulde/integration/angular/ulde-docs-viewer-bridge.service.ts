@@ -37,7 +37,7 @@ export class UldeDocsViewerBridge {
     docId: string;
     reload?: boolean;
     html: string;
-    onScrollSpy?: (id: string) => void;
+    onScrollSpy?: (e: any) => void;
     onScrollPos?: (e: any) => void;
     onNavigate?: (docId: string) => void;
   }) {
@@ -62,8 +62,8 @@ export class UldeDocsViewerBridge {
 
     const handleScrollSpy = (e: any) => {
       if (onScrollSpy) {
-        // console.log(`Log: [UldeDocsViewerBridge] handleScrollSpy header id=`, e.detail.id);
-        onScrollSpy(e.detail.id);
+        // console.log(`Log: [UldeDocsViewerBridge] handleScrollSpy header index=`, e.detail.index, `id=`, e.detail.id);
+        onScrollSpy(e);
       }
     };
 
