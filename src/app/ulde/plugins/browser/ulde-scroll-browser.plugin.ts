@@ -17,59 +17,106 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
     // ---------------------------------------------
     // 1. ScrollSpy (existing)- spy which heading is active, i.e. heading visivility tracking
     // ---------------------------------------------
-    const headings = Array.from(
+    const headers = Array.from(
       container.querySelectorAll('h1, h2, h3, h4, h5, h6')
     );
 
-    console.log(`Log: [UldeScrollBrowserPlugin] headings=`, headings);
+    console.log(`Log: [UldeScrollBrowserPlugin] headings=`, headers);
 
     // Based on MDN sample
     // https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/observe
 
-    // Register IntersectionObserver
-    const headingObserver = new IntersectionObserver(
-      (entries) => {
-        // console.log(`Log: [UldeScrollBrowserPlugin] IntersectionObserver \nentries length=`, entries.length);
-        // Remove previous active states
-        entries.forEach(entry => {
-          entry.target.classList.remove('active-heading')
-        });
+    const scrollspy = (entries: any) => {
+      // console.log(`Log: [UldeScrollBrowserPlugin] IntersectionObserver \nentries length=`, entries.length);
+      // Remove previous active states
+      entries.forEach((entry: any) => {
+        entry.target.classList.remove('active-heading')
+      });
 
-        entries.forEach((entry) => {
-          // if (entry.intersectionRect) {
-          if (entry.isIntersecting) {
-            // if (entry.intersectionRect && entry.isIntersecting) {
+      entries.forEach((entry: any) => {
+        // if (entry.intersectionRect) {
+        if (entry.isIntersecting) {
+          // if (entry.intersectionRect && entry.isIntersecting) {
 
-            // Add 'active' class if observation target is inside viewport
-            entry.target.classList.add("active-heading");
+          // Add 'active' class if observation target is inside viewport
+          entry.target.classList.add("active-heading");
 
-            const id = (entry.target as HTMLElement).id;
-            if (id) {
-              const index = headings.findIndex(t => t.id === id);
-              container.dispatchEvent(
-                new CustomEvent('ulde:scrollspy', {
-                  detail: {
-                    id: id,
-                    index: index
-                  },
-                  bubbles: true
-                })
-              );
-            }
+          const id = (entry.target as HTMLElement).id;
+          if (id) {
+            const index = headers.findIndex(t => t.id === id);
+            container.dispatchEvent(
+              new CustomEvent('ulde:scrollspy', {
+                detail: {
+                  id: id,
+                  index: index
+                },
+                bubbles: true
+              })
+            );
           }
-        });
-      },
-      {
-        root: null,
-        rootMargin: '0px 0px -60% 0px', // triggers earlier for better UX
-        threshold: 0.1
-      }
-    );
+        }
+      });
+
+    }
+
+    // Register IntersectionObserver
+    const headersObserver = new IntersectionObserver(
+      scrollspy, {
+      root: null,
+      rootMargin: '0px 0px -60% 0px', // triggers earlier for better UX
+      threshold: 0.1
+    });
 
     // Declares what to observe, and observes its properties.
-    headings.forEach((el) => {
-      headingObserver.observe(el);
+    headers.forEach((el) => {
+      headersObserver.observe(el);
     });
+
+    // OLD VESRION
+    // Register IntersectionObserver
+    // const headingObserver = new IntersectionObserver(
+    //   (entries) => {
+    //     // console.log(`Log: [UldeScrollBrowserPlugin] IntersectionObserver \nentries length=`, entries.length);
+    //     // Remove previous active states
+    //     entries.forEach(entry => {
+    //       entry.target.classList.remove('active-heading')
+    //     });
+
+    //     entries.forEach((entry) => {
+    //       // if (entry.intersectionRect) {
+    //       if (entry.isIntersecting) {
+    //         // if (entry.intersectionRect && entry.isIntersecting) {
+
+    //         // Add 'active' class if observation target is inside viewport
+    //         entry.target.classList.add("active-heading");
+
+    //         const id = (entry.target as HTMLElement).id;
+    //         if (id) {
+    //           const index = headings.findIndex(t => t.id === id);
+    //           container.dispatchEvent(
+    //             new CustomEvent('ulde:scrollspy', {
+    //               detail: {
+    //                 id: id,
+    //                 index: index
+    //               },
+    //               bubbles: true
+    //             })
+    //           );
+    //         }
+    //       }
+    //     });
+    //   },
+    //   {
+    //     root: null,
+    //     rootMargin: '0px 0px -60% 0px', // triggers earlier for better UX
+    //     threshold: 0.1
+    //   }
+    // );
+
+    // // Declares what to observe, and observes its properties.
+    // headings.forEach((el) => {
+    //   headingObserver.observe(el);
+    // });
 
     // ---------------------------------------------
     // 2. Scroll Position Spy (NEW) - scroll position tracking
