@@ -266,111 +266,15 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
     if (this.scrollSpy.isSuppressed()) return;
 
-
-    // const toc = this.$toc();
-    // const currentId = id;
-    // const currentIndex = toc.findIndex(t => t.slug === id);
-    // const lastActivatedId = this.$activeHeading();
-    // const lastActivatedIndex = toc.findIndex(t => t.slug === lastActivatedId);
-
-    // this.$activeHeading.set(currentId);
-
-    // console.log(`Log: [DocsViewer] handleScrollSpy this.scrollSpyDebounce \ncurrent Index=`, currentIndex, currentId, `\nlast index=`, lastActivatedIndex, lastActivatedId);
-
-    clearTimeout(this.scrollSpyDebounce);
-
-
-    this.scrollSpyDebounce = setTimeout(() => {
-
-      const toc = this.$toc();
-
-      const currentId = e.detail.id;
-      const currentIndex = e.detail.index;
-
-      let lastActivatedId = this.$activeHeading();
-      if (!lastActivatedId) {
-        lastActivatedId = currentId;
-      }
-      const lastActivatedIndex = toc.findIndex(t => t.slug === lastActivatedId);
-
-      console.log(`Log: [DocsViewer] handleScrollSpy  event \ncurrent index=`, currentIndex, `\ncurrent id=`, currentId, `\nlastActivatedIndex=`, lastActivatedIndex, `\ntoc length=`, toc.length);
-
-
-      if (currentIndex < 0 || lastActivatedIndex < 0) return;
-
-      // console.log(`Log: [DocsViewer] handleScrollSpy this.scrollSpyDebounce \ncurrent Index=`, currentIndex, index, currentId, `\nlast index=`, lastActivatedIndex, lastActivatedId);
-
-      let finalId = currentId;
-
-      if (this.scrollDirection === 'down') {// down
-
-        const next = toc[currentIndex + 1];
-        if (next) finalId = next.slug;
-      } else {
-        const prev = toc[currentIndex]; // original
-        // const prev = toc[currentIndex - 1]; // original
-        if (prev) finalId = prev.slug;
-      }
-
-      // this.$activeHeading.set(currentId);
-      this.$activeHeading.set(finalId);
-
-      // this.lastSpyId = null;
-
-    }, 0);
-
-    // OLD VERSION
-    // this.scrollSpyDebounce = setTimeout(() => {
-    //   // console.log(`Log: [DocsViewer] handleScrollSpy this.scrollSpyDebounce \nlastSpyId=`, this.lastSpyId);
-
-
-    //   if (this.lastSpyId !== id) {
-    //     this.lastSpyId = id;
-    //     return;
-    //   }
-    //   // console.log(`Log: [DocsViewer] handleScrollSpy this.scrollSpyDebounce \nlastSpyId=`, this.lastSpyId);
-
-    //   const toc = this.$toc();
-    //   let index = toc.findIndex(t => t.slug === id);
-    //   if (index === -1) return;
-
-    //   // // console.log(`Log: [DocsViewer] handleScrollSpy this.scrollSpyDebounce \ncurrent Index=`, index, id, `\nlast index=`, lastIndex, this.lastSpyId, `\nscrollDirection=`, this.scrollDirection);
-
-
-    //   let finalId = id;
-
-    //   if (this.scrollDirection === 'down') {
-    //     const next = toc[index + 1];
-    //     if (next) finalId = next.slug;
-    //   } else if (this.scrollDirection === 'up') {
-    //     const prev = toc[index - 1]; // original
-    //     if (prev) finalId = prev.slug;
-    //   }
-
-    //   // console.log(`Log: [DocsViewer] handleScrollSpy this.scrollSpyDebounce \nlscrollDirection=`, this.scrollDirection, `\ncurrentIndex`, index, id, `\nlastIndex`, lastIndex, this.lastSpyId, `\nfinalId`, finalId,);
-
-
-    //   this.$activeHeading.set(finalId);
-
-    //   this.lastSpyId = null;
-
-    // }, 50);
-
+    this.$activeHeading.set(e.detail.id);
   }
 
   private handleScrollPos(e: any) {
     const pos = e.detail.scrollTop;
-
-    // const lastScrollTop = this.$savedScrollTop();
-    // this.scrollDirection = pos > lastScrollTop ? 'down' : pos < lastScrollTop ? 'up' : null;
-
-    this.lastScrollTop = this.$savedScrollTop();
-    this.scrollDirection = pos > this.lastScrollTop ? 'down' : 'up';
-    this.lastScrollTop = pos;
-
     const height = e.detail.scrollHeight;
 
     this.$savedScrollTop.set(pos);
+    
     const key = `ulde:scrollpos:${this.$currentDocId()}`;
     localStorage.setItem(key, String(pos));
 

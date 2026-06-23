@@ -268,7 +268,7 @@ __src/app/ulde/angular/ulde-debug-overlay/ulde-debug-overlay.scss__
 
 ```
 
-## 4. Wire DOM host + overlay into &lt;ulde-viewer>
+## 4. Wire DOM host + overlay into ulde-viewer
 
 We need:
 

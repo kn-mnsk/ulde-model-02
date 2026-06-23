@@ -78,7 +78,7 @@ app-theme-toggle {
   position: relative;
   width: 100%;
   height: 1.0vh;
-  background: var(--ap-border); //red; //#eee;
+  background:#969292;// var(--ap-border); //red; //#eee;
   // margin-top: 5px;
   // top: 15px;
   // margin: 0;
@@ -505,7 +505,7 @@ app-theme-toggle {
   transition: opacity 180ms ease-out;
   z-index: var(--z-overlay);
 
-  // height: 100%;
+  height: 0;
 
   &.visible {
     opacity: 1;
