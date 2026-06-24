@@ -14,9 +14,9 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
     //---------------------------------------------
     // 1. ScrollSpy (existing)- spy which heading is active, i.e. heading visivility tracking
     // ---------------------------------------------
-    const headers = Array.from(container.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+    const headings = Array.from(container.querySelectorAll('h1, h2, h3, h4, h5, h6'));
 
-    // console.log(`Log: [UldeScrollBrowserPlugin] headers=`, headers, container);
+    // console.log(`Log: [UldeScrollBrowserPlugin] headings=`, headings, container);
 
     const scrollspy = (entries: any) => {
       // console.log(`Log: [UldeScrollBrowserPlugin] IntersectionObserver \nentries length=`, entries.length);
@@ -27,7 +27,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
 
           const id = (entry.target as HTMLElement).id;
           if (!id) return;
-          // const index = headers.findIndex(t => t.id === id);
+          // const index = headings.findIndex(t => t.id === id);
 
           // console.log(`Log: [UldeScrollBrowserPlugin] scroll down id=`, currId, currIndex, entry.intersectionRect.y);
 
@@ -45,7 +45,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
     };
 
     // Register IntersectionObserver
-    const headersObserver = new IntersectionObserver(
+    const headingsObserver = new IntersectionObserver(
       scrollspy, {
       root: container,
       // root: null,
@@ -55,8 +55,8 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
     });
 
     // Declares what to observe, and observes its properties.
-    headers.forEach((el) => {
-      headersObserver.observe(el);
+    headings.forEach((el) => {
+      headingsObserver.observe(el);
     });
 
     // ---------------------------------------------

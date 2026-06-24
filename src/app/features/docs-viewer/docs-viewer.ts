@@ -1,6 +1,6 @@
 // app/feature/docs-viewer/docs-viewer.ts
 
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, Inject, PLATFORM_ID, computed } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, Inject, PLATFORM_ID, computed, Renderer2 } from '@angular/core';
 import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
 
 import { TocResizerDirective } from './toc-resizer.directive';
@@ -12,7 +12,7 @@ import { TocEntry, ArtifactsPanelModel, DebugOverlayModel, TocNode } from '../..
 import { ThemeService } from '../../core/services/theme.service';
 import { ThemeToggle } from './theme-toggle';
 import { ScrollService } from '../../core/services/scroll.service';
-import { writeSessionState } from '../../core/services/session-state.manage';
+import { writeSessionState, readSessionState } from '../../core/services/session-state.manage';
 import { OverlayManager } from '../../core/services/overlay-manager.service';
 import { ScrollSpyController } from '../../core/services/scrollspy-controller';
 
@@ -31,7 +31,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // Internal state
   $currentDocId = signal('');
-  previousDocId = '';
+  $prevDocId = signal('');
   private $currentReload = signal(false);
 
   $isBrowser = signal(false);
@@ -72,6 +72,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   private lastScrollTop = 0;
   private scrollDirection: 'up' | 'down' | null = null;
 
+  private removeBeforeUnloadListener?: () => void;
+
   @ViewChild('hostWrapper', { static: true })
   hostWrapperRef!: ElementRef<HTMLElement>;
 
@@ -90,6 +92,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     private theme: ThemeService,
     public scrollService: ScrollService,
     private overlay: OverlayManager,
+    private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
 
@@ -97,11 +100,16 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     this.$isBrowser.set(isPlatformBrowser(this.platformId));
     if (!this.$isBrowser()) return;
 
+    this.initGlobalListeners();
+    this.ensureInitialSessionState();
+
     // Sync external docId → internal
     effect(() => {
       const id = this.$docId();
       if (id) {
-        this.previousDocId = id;
+        // this.previousDocId = id;
+        writeSessionState({ docId: id, prevDocId: id }, this.$isBrowser());
+        this.$prevDocId.set(id);
         this.$currentDocId.set(id);
       }
     });
@@ -117,9 +125,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     effect(() => {
       const id = this.$currentDocId();
       if (id && this.$isBrowser()) {
-        const key = `ulde:scrollpos:${id}`;
-        const saved = Number(localStorage.getItem(key) ?? 0);
-        this.$savedScrollTop.set(saved);
+        // const key = `ulde:scrollpos:${id}`;
+        // const saved = Number(localStorage.getItem(key) ?? 0);
+        const { scrollPos } = readSessionState(this.$isBrowser())
+        this.$savedScrollTop.set(scrollPos);
         this.loadAndRender(id);
       }
     });
@@ -186,6 +195,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           queueMicrotask(() => {
+
+            this.restoreFromSessionState();
+
             const pos = this.$savedScrollTop();
             this.hostWrapperRef.nativeElement.scrollTop = pos;
 
@@ -213,12 +225,105 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() { }
+
   ngOnDestroy() {
     if (this.cleanupFn) {
       this.cleanupFn();
       this.cleanupFn = null;
     }
+
+    if (this.removeBeforeUnloadListener) {
+      this.removeBeforeUnloadListener = undefined;
+    }
+
   }
+
+  private ensureInitialSessionState(): void {
+    // Ensure there is at least a baseline state
+    const current = readSessionState(this.$isBrowser());
+    writeSessionState(current, this.$isBrowser());
+
+    // ensure initializing doc theme
+    // this.$isDarkMode.set((current.docTheme === 'dark') ? true : false);
+  }
+
+
+  private initGlobalListeners(): void {
+    // this.removeScrollListener = this.renderer.listen(
+    //   document,
+    //   'scroll',
+    //   (event: Event) => this.onScroll(event),
+    // );
+    // Before unload: mark refresh
+    this.removeBeforeUnloadListener = this.renderer.listen(
+      window,
+      'beforeunload',
+      (event: BeforeUnloadEvent) => this.onBeforeUnload(event),
+    );
+  }
+
+
+  private onBeforeUnload(event: BeforeUnloadEvent): void {
+    // Mark that a refresh/unload is happening
+    writeSessionState({ refreshed: true }, this.$isBrowser());
+
+    // Optionally: let ScrollService push last scrollPos into sessionState
+    // before unload, or keep that responsibility entirely on scroll events.
+  }
+
+
+  // -------------------------
+  // Refresh / restore logic
+  // -------------------------
+
+  private async restoreFromSessionState(): Promise<void> {
+    const state = readSessionState(this.$isBrowser());
+
+    // console.log(`Log: ${this.$title()} restoreFromSessionState()` +   `\nstate=${JSON.stringify(state, null, 2)}`);
+
+    if (!state.refreshed) {
+      // Normal start - show DocsViewer template which is main screen
+      return;
+    }
+
+    // Refresh flow
+    if (state.component === 'App') {
+      // Refreshed while on App: just clear refreshed flag
+      writeSessionState({
+        docId: null,
+        prevDocId: null,
+        scrollPos: 0,
+        prevScrollPos: 0,
+        refreshed: false,
+        docTheme: '',
+      },
+        this.$isBrowser()
+      );
+
+      return;
+    }
+
+    if (state.component === 'DocsViewer') {
+      // Refreshed while viewing DocsViewer: restore doc + scroll
+      const docId = state.docId ?? 'docs/index';
+      // const docId = state.docId ?? 'initialdoc';
+      const scrollPos = state.scrollPos ?? 0;
+
+      writeSessionState({ refreshed: false }, this.$isBrowser());
+
+      this.scrollService.setPosition(docId, scrollPos, 0);
+
+      this.$currentDocId.set(docId);
+      // this.$reload.update(n => n + 1);
+      console.log(`Log: [DocsViewer] restoreFromSessionState() DocsViewer Refresh` + `\nRestored docId=${docId}, scrollPos=${scrollPos}`);
+
+      return;
+    }
+
+    // Fallback: no opinion, just clear refresh bit
+    writeSessionState({ refreshed: false }, this.$isBrowser());
+  }
+
 
   // Load markdown
   private async loadAndRender(docId: string) {
@@ -246,7 +351,11 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // Navigation
   backToIndex() {
-    this.previousDocId = this.$currentDocId();
+    // this.previousDocId = this.$currentDocId();
+
+    const { scrollPos } = readSessionState(this.$isBrowser());
+    writeSessionState({ docId: 'docs/Index', prevDocId: this.$currentDocId(), scrollPos: 0, prevScrollPos: scrollPos }, this.$isBrowser());
+    this.$prevDocId.set(this.$currentDocId());
     this.$currentDocId.set('docs/index');
   }
 
@@ -255,14 +364,15 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   backToPrevDoc() {
-    const current = this.$currentDocId();
-    this.$currentDocId.set(this.previousDocId);
-    this.previousDocId = current;
+    const { prevDocId, scrollPos, prevScrollPos } = readSessionState(this.$isBrowser());
+    writeSessionState({ docId: prevDocId, prevDocId: this.$currentDocId(), scrollPos: prevScrollPos, prevScrollPos: scrollPos }, this.$isBrowser());
+    this.$prevDocId.set(this.$currentDocId());
+    this.$currentDocId.set(prevDocId as string);
   }
 
   // ScrollSpy handler
   private handleScrollSpy(e: any) {
-    // console.log(`Log: [DocsViewer] handleScrollSpy \nheader id=`, id, `scrollSpy.isSuppressed()=`, this.scrollSpy.isSuppressed());
+    // console.log(`Log: [DocsViewer] handleScrollSpy \nheading id=`, id, `scrollSpy.isSuppressed()=`, this.scrollSpy.isSuppressed());
 
     if (this.scrollSpy.isSuppressed()) return;
 
@@ -274,20 +384,24 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     const height = e.detail.scrollHeight;
 
     this.$savedScrollTop.set(pos);
-    
-    const key = `ulde:scrollpos:${this.$currentDocId()}`;
-    localStorage.setItem(key, String(pos));
+
+    // const key = `ulde:scrollpos:${this.$currentDocId()}`;
+    // localStorage.setItem(key, String(pos));
 
     if (!this.rafPending) this.rafPending = true;
 
     requestAnimationFrame(() => {
       this.scrollService.setPosition(this.$currentDocId(), pos, height);
       writeSessionState({ scrollPos: pos }, this.$isBrowser());
+      // writeSessionState({ docId: this.$currentDocId(), scrollPos: pos }, this.$isBrowser());
       this.rafPending = false;
     });
   }
 
   private handleNavigate(id: string) {
+    const { scrollPos } = readSessionState(this.$isBrowser());
+    writeSessionState({ docId: id, prevDocId: this.$currentDocId(), scrollPos: 0, prevScrollPos: scrollPos }, this.$isBrowser());
+    this.$prevDocId.set(this.$currentDocId());
     this.$currentDocId.set(id);
   }
 
@@ -301,8 +415,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     this.highlightElement(el);
 
-    document.querySelectorAll('.active-heading')
-      .forEach(el => el.classList.remove('active-heading'));
+    // document.querySelectorAll('.active-heading')
+    //   .forEach(el => el.classList.remove('active-heading'));
 
     const wrapper = this.hostWrapperRef.nativeElement;
     this.scrollSpy.detectScrollEnd(wrapper, () => {
@@ -319,8 +433,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   private activateClickedTocItem(nodes: TocNode[], slug: string) {
     for (const node of nodes) {
       if (node.entry.slug === slug) {
-        const el = document.getElementById(slug);
-        el?.classList.add('active-heading');
+
+        // const el = document.getElementById(slug);
+        // el?.classList.add('active-heading');
+
         this.$activeHeading.set(slug);
       }
       this.activateClickedTocItem(node.children, slug);
@@ -396,452 +512,4 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
 }
 
-
-
-// OLD VERSION
-// @Component({
-//   selector: 'app-docs-viewer',
-//   standalone: true,
-//   imports: [
-//     ThemeToggle, TocResizerDirective, NgTemplateOutlet
-//   ],
-//   templateUrl: './docs-viewer.html'
-// })
-// export class DocsViewer implements AfterViewInit, OnDestroy {
-//   // External readonly inputs
-//   $docId = input<string>('');
-//   $reload = input<boolean>(false);
-
-//   // Internal writable signals
-//   $currentDocId = signal('');
-//   previousDocId: string = '';
-//   private $currentReload = signal(false);
-
-//   // Environment
-//   $isBrowser = signal(false);
-
-//   // ULDE outputs
-//   $toc = signal<TocEntry[]>([]);
-//   readonly $tocTree = computed(() => this.buildTocTree(this.$toc()));
-//   readonly $isParentActive = computed(() => {
-//     const toc = this.$toc();
-//     const active = this.$activeHeading();
-//     return (item: TocEntry) => this.isParentOfActive(item, toc, active);
-//   });
-
-//   readonly isParentActive = (node: TocNode) =>
-//     this.isAncestor(node, this.$activeHeading());
-
-//   $debugOverlay = signal<DebugOverlayModel | null>(null);
-//   $artifactsPanel = signal<ArtifactsPanelModel | null>(null);
-
-//   // UI state
-//   $activeHeading = signal<string | null>(null);
-//   $showDebugOverlay = signal(false);
-//   $showArtifacts = signal(false);
-//   $showDebugMermaid = signal(false);
-//   $isMermaidPanelFilled = signal<boolean>(true);
-//   $dvTocRef = signal<ElementRef<HTMLElement> | undefined>(undefined);
-//   $savedScrollTop = signal(0);
-
-//   private cleanupFn: (() => void) | null = null;
-//   private finalHtml: string | null = null;
-//   private rafPending = false;
-
-//   // scrollspy controller
-//   private scrollSpy = new ScrollSpyController();
-
-//   private scrollSpyDebounce: any = null;
-//   private lastSpyId: string | null = null;
-//   private lastScrollTop = 0;
-//   private scrollDirection: 'up' | 'down' = 'down';
-
-//   @ViewChild('hostWrapper', { static: true })
-//   hostWrapperRef!: ElementRef<HTMLElement>;
-
-//   @ViewChild('hostOverlay', { static: true })
-//   hostOverlayRef!: ElementRef<HTMLElement>;
-
-//   @ViewChild('dvToc', { static: false })
-//   dvTocRef!: ElementRef<HTMLElement>;
-
-//   @ViewChild('tocOverlay', { static: false })
-//   tocOverlayRef?: ElementRef<HTMLElement>;
-
-//   constructor(
-//     private bridge: UldeDocsViewerBridge,
-//     private ulde: UldeAngularService,
-//     private theme: ThemeService,
-//     public scrollService: ScrollService,
-//     private overlay: OverlayManager,
-//     @Inject(PLATFORM_ID) private platformId: Object
-//   ) {
-//     // Detect browser environment
-//     this.$isBrowser.set(isPlatformBrowser(this.platformId));
-//     if (!this.$isBrowser()) return;
-
-//     // Sync external docId → internal writable docId
-//     effect(() => {
-//       const id = this.$docId();
-//       if (id) {
-//         this.previousDocId = id;
-//         this.$currentDocId.set(id);
-//       }
-//     });
-
-//     // Sync external reload → internal reload
-//     effect(() => {
-//       if (this.$reload()) {
-//         this.$currentReload.set(true);
-//       }
-//     });
-
-//     // React to internal docId changes
-//     effect(() => {
-//       const id = this.$currentDocId();
-//       if (id && this.$isBrowser()) {
-//         const key = `ulde:scrollpos:${id}`;
-//         const saved = Number(localStorage.getItem(key) ?? 0);
-//         this.$savedScrollTop.set(saved);
-
-//         this.loadAndRender(id);
-//       }
-//     });
-
-//     // React to internal reload flag
-//     effect(() => {
-//       if (this.$currentReload() && this.$isBrowser()) {
-//         this.loadAndRender(this.$currentDocId());
-//       }
-//     });
-
-//     // React to active heading change
-//     effect(() => {
-//       const active = this.$activeHeading();
-//       const tree = this.$tocTree();
-
-//       if (!active) {
-//         // First load → expand everything
-//         tree.forEach(node => node.collapsed = false);
-//         return;
-//       }
-
-//       if (tree.length > 0) {
-//         this.updateTocCollapseState(tree, active);
-//       }
-
-//     });
-
-
-//     // ULDE pipeline subscription
-//     this.ulde.result$.subscribe(result => {
-//       if (!result) return;
-
-//       this.finalHtml = result.finalHtml;
-
-//       // 1. Show overlays immediately
-//       this.overlay.show(this.tocOverlayRef);
-//       this.overlay.show(this.hostOverlayRef);
-
-//       // 2. Update TOC and debug artifacts
-//       this.$toc.set(result.toc ?? []);
-//       this.$debugOverlay.set(result.debugOverlay);
-//       this.$artifactsPanel.set(result.artifactsPanel);
-
-//       // 3. Cleanup previous ULDE host
-//       if (this.cleanupFn) {
-//         this.cleanupFn();
-//         this.cleanupFn = null;
-//       }
-
-//       // 4. Run ULDE host
-//       this.cleanupFn = this.bridge.run({
-//         host: this.hostWrapperRef.nativeElement,
-//         docId: this.$currentDocId(),
-//         reload: this.$currentReload(),
-//         html: result.finalHtml,
-//         onScrollSpy: id => this.handleScrollSpy(id),
-//         onScrollPos: e => this.handleScrollPos(e),
-//         onNavigate: newDocId => this.handleNavigate(newDocId)
-//       });
-
-//       this.scrollSpy.allow();
-
-//       // 5. After rendering: restore scroll + fade out overlays
-//       requestAnimationFrame(() => {
-//         // DOM mounted
-//         requestAnimationFrame(() => {
-//           // layout + paint complete
-//           queueMicrotask(() => {
-//             const pos = this.$savedScrollTop();
-//             this.hostWrapperRef.nativeElement.scrollTop = pos;
-
-//             this.overlay.hide(this.tocOverlayRef);
-//             this.overlay.hide(this.hostOverlayRef);
-//           });
-//         });
-//       });
-
-//       this.$dvTocRef.set(this.dvTocRef);
-//     });
-//   }
-
-//   // Auto-collapse / auto-expand TOC like VS Code
-//   private updateTocCollapseState(tree: TocNode[], activeSlug: string | null) {
-//     const visit = (node: TocNode): boolean => {
-//       const isSelfActive = node.entry.slug === activeSlug;
-//       const hasActiveDescendant = node.children.some(child => visit(child));
-
-//       // VS Code behavior:
-//       // Expand only the active branch; collapse everything else
-//       node.collapsed = !(isSelfActive || hasActiveDescendant);
-
-//       return isSelfActive || hasActiveDescendant;
-//     };
-
-//     tree.forEach(root => visit(root));
-//   }
-
-
-//   ngAfterViewInit() {
-//     if (!this.$isBrowser()) return;
-//   }
-
-//   ngOnDestroy() {
-//     if (this.cleanupFn) {
-//       this.cleanupFn();
-//       this.cleanupFn = null;
-//     }
-//   }
-
-//   // Load markdown and run ULDE
-//   private async loadAndRender(docId: string) {
-//     const url = `assets/${docId}.md`;
-
-//     try {
-//       const response = await fetch(url);
-
-//       if (response.redirected) {
-//         this.hostWrapperRef.nativeElement.innerHTML = `
-//           <div class="page-not-found">
-//             <h1>Page not found</h1>
-//             <p><strong>Invalid URL: ${url}</strong></p>
-//           </div>
-//         `;
-//         throw new Error(`Invalid URL: ${url}`);
-//       }
-
-//       const markdown = await response.text();
-//       await this.ulde.renderMarkdown(markdown);
-//     } catch (err) {
-//       console.error('[DocsViewer] loadAndRender error:', err);
-//     }
-//   }
-
-//   // Navigation
-//   backToIndex() {
-//     this.previousDocId = this.$currentDocId();
-//     this.$currentDocId.set('docs/index');
-//   }
-
-//   reloadDoc() {
-//     this.$currentReload.set(true);
-//   }
-
-//   backToPrevDoc() {
-//     const currentDocId = this.$currentDocId();
-//     this.$currentDocId.set(this.previousDocId);
-//     this.previousDocId = currentDocId;
-//   }
-
-//   private activateClickedTocItem(nodes: TocNode[], clickedSlug: string) {
-//     if (nodes.length === 0) return;
-
-//     for (const node of nodes) {
-//       if (node.entry.slug === clickedSlug) {
-//         const clickedItem = document.getElementById(clickedSlug);
-//         clickedItem?.classList.add('active-heading');
-//         this.$activeHeading.set(clickedSlug);
-//       }
-
-//       this.activateClickedTocItem(node.children, clickedSlug);
-//     }
-//   }
-
-//   // ScrollSpy handler from ULDE
-//   private handleScrollSpy(id: string) {
-//     if (this.scrollSpy.isSuppressed()) return;
-
-//     clearTimeout(this.scrollSpyDebounce);
-
-//     this.scrollSpyDebounce = setTimeout(() => {
-//       // Stabilization: require same ID twice
-//       if (this.lastSpyId !== id) {
-//         this.lastSpyId = id;
-//         return;
-//       }
-
-//       // Direction-aware activation
-//       const toc = this.$toc();
-//       const index = toc.findIndex(t => t.slug === id);
-
-//       if (index === -1) return;
-
-//       let finalId = id;
-
-//       if (this.scrollDirection === 'down') {
-//         // Prefer next heading if available
-//         const next = toc[index + 1];
-//         if (next) finalId = next.slug;
-//       } else {
-//         // Prefer previous heading if available
-//         const prev = toc[index - 1];
-//         if (prev) finalId = prev.slug;
-//       }
-
-//       this.$activeHeading.set(finalId);
-
-//       // Reset stabilization
-//       this.lastSpyId = null;
-//     }, 50);
-
-//   }
-
-//   private handleScrollPos(e: any) {
-//     const pos = e.detail.scrollTop;
-//     this.scrollDirection = pos > this.lastScrollTop ? 'down' : 'up';
-//     this.lastScrollTop = pos;
-//     const height = e.detail.scrollHeight;
-
-//     this.$savedScrollTop.set(pos);
-
-//     const key = `ulde:scrollpos:${this.$currentDocId()}`;
-//     localStorage.setItem(key, String(pos));
-
-//     if (!this.rafPending) {
-//       this.rafPending = true;
-//     }
-
-//     requestAnimationFrame(() => {
-//       this.scrollService.setPosition(this.$currentDocId(), pos, height);
-//       writeSessionState({ scrollPos: pos }, this.$isBrowser());
-//       this.rafPending = false;
-//     });
-//   }
-
-//   private handleNavigate(id: string) {
-//     this.$currentDocId.set(id);
-//   };
-
-//   // Scroll to heading with deterministic scroll completion
-//   scrollTo(slug: string) {
-//     const el = document.getElementById(slug);
-//     if (!el) return;
-
-//     this.scrollSpy.suppress();
-
-//     // Start smooth scroll
-//     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-//     // Highlight animation
-//     this.highlightElement(el);
-
-//     // Remove previous active-heading classes
-//     document
-//       .querySelectorAll('.active-heading')
-//       .forEach(el => el.classList.remove('active-heading'));
-
-//     // rAF-based scroll completion detection
-//     const wrapper = this.hostWrapperRef.nativeElement;
-//     this.scrollSpy.detectScrollEnd(wrapper, () => {
-//       this.activateClickedTocItem(this.$tocTree(), slug);
-//     });
-
-//   }
-
-//   private highlightElement(el: HTMLElement) {
-//     el.classList.add('inline-highlight');
-//     setTimeout(() => el.classList.remove('inline-highlight'), 700);
-//   }
-
-
-//   // Theme toggle
-//   async onToggleTheme() {
-//     this.theme.toggleTheme();
-//     if (this.finalHtml) {
-//       await this.bridge.host.run(
-//         this.hostWrapperRef.nativeElement,
-//         this.finalHtml
-//       );
-//     }
-//   }
-
-//   // UI toggles
-//   toggleArtifacts() {
-//     this.$showArtifacts.update(v => !v);
-//   }
-
-//   toggleDebugOverlay() {
-//     this.$showDebugOverlay.update(v => !v);
-//   }
-
-//   toggleDebugMermaid() {
-//     this.$showDebugMermaid.update(v => !v);
-//   }
-
-//   private buildTocTree(entries: TocEntry[]): TocNode[] {
-//     const root: TocNode[] = [];
-//     const stack: TocNode[] = [];
-
-//     for (const entry of entries) {
-//       const node: TocNode = {
-//         entry,
-//         children: [],
-//         collapsed: false
-//       };
-
-//       while (
-//         stack.length &&
-//         stack[stack.length - 1].entry.level >= entry.level
-//       ) {
-//         stack.pop();
-//       }
-
-//       if (stack.length === 0) {
-//         root.push(node);
-//       } else {
-//         stack[stack.length - 1].children.push(node);
-//       }
-
-//       stack.push(node);
-//     }
-
-//     return root;
-//   }
-
-//   isParentOfActive(
-//     item: TocEntry,
-//     toc: TocEntry[],
-//     activeSlug: string | null
-//   ): boolean {
-//     const activeIndex = toc.findIndex(t => t.slug === activeSlug);
-//     if (activeIndex === -1) return false;
-
-//     const active = toc[activeIndex];
-
-//     return item.level < active.level && toc.indexOf(item) < activeIndex;
-//   }
-
-//   private isAncestor(node: TocNode, activeSlug: string | null): boolean {
-//     for (const child of node.children) {
-//       if (child.entry.slug === activeSlug) {
-//         return true;
-//       }
-//       if (this.isAncestor(child, activeSlug)) {
-//         return true;
-//       }
-//     }
-//     return false;
-//   }
-// }
 

@@ -4,6 +4,7 @@ import mermaid, { MermaidConfig } from 'mermaid';
 import Panzoom from '@panzoom/panzoom'
 import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
 import { first, interval, switchMap, tap } from 'rxjs';
+import { readSessionState } from '../../../core/services/session-state.manage';
 
 
 /* ---------------------------------------------------------
@@ -232,7 +233,9 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
     // console.log(`Log: [UldeMermaidBrowserPlugin] init, \ncounter(called)=`, counter++, `\ncontainer=`, container, `\npanel=`, panel);
 
 
-    const currentTheme = sessionStorage.getItem('app-theme');
+    // const currentTheme = sessionStorage.getItem('app-theme');
+    const {docTheme} = readSessionState(isBrowser);
+
     let mermaidNodes: NodeListOf<HTMLElement> = container.querySelectorAll<HTMLElement>('code.language-mermaid');
     // console.log(`Log: [UldeMermaidBrowserPlugin] mermaidNodes=`, mermaidNodes);
 
@@ -299,7 +302,7 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
 
       // Initialize Mermaid AFTER nodes exist
       mermaid.initialize({
-        ...(currentTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme),
+        ...(docTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme),
         // suppressErrorRendering: true // avoid red "Syntax error" diagrams
       });
 

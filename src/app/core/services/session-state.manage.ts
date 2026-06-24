@@ -7,6 +7,7 @@ export interface SessionState {
   docId: string | null;
   prevDocId: string | null;
   scrollPos: number;
+  prevScrollPos: number;
   refreshed: boolean;
   docTheme: string;
 }
@@ -16,6 +17,7 @@ const SESSION_STATE_DEFAULT: SessionState = {
   docId: null,
   prevDocId: null,
   scrollPos: 0,
+  prevScrollPos: 0,
   refreshed: false,
   docTheme: 'dark',
 };
@@ -44,6 +46,7 @@ export function readSessionState(isBrowser: boolean): SessionState {
       docId: parsed.docId ?? null,
       prevDocId: parsed.prevDocId ?? null,
       scrollPos: parsed.scrollPos ?? 0,
+      prevScrollPos: parsed.prevScrollPos ?? 0,
       refreshed: parsed.refreshed ?? false,
       docTheme: parsed.docTheme ?? '',
     };
