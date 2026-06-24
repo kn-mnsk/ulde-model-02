@@ -2,6 +2,7 @@
 
 import { Injectable } from '@angular/core';
 import { isBrowser } from '../../global.utils/global.utils';
+import { readSessionState, writeSessionState } from './session-state.manage';
 
 export type ThemeName = 'light' | 'dark';
 
@@ -12,7 +13,9 @@ export class ThemeService {
 
   constructor() {
     if (!isBrowser()) return;
-    const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'light';
+    const {docTheme} = readSessionState(isBrowser());
+    const saved = docTheme as ThemeName || 'light';
+    // const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'light';
     // const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'dark';
     this.applyTheme(saved, { animate: false });
   }
@@ -21,9 +24,11 @@ export class ThemeService {
     if (!isBrowser()) {
       return 'light';// default for SSR
     };
-    let attr:ThemeName | null = null;
+    let attr: ThemeName | null = null;
     try {
-      attr = document.documentElement.getAttribute(this.attrName) as ThemeName | null;
+      const { docTheme } = readSessionState(isBrowser());
+      attr = docTheme as ThemeName | null;
+      // attr = document.documentElement.getAttribute(this.attrName) as ThemeName | null;
     } catch (err) {
       console.error('Error: [ThemeService]:', err);
     }
@@ -34,7 +39,8 @@ export class ThemeService {
   toggleTheme(): void {
     const next: ThemeName = this.currentTheme === 'light' ? 'dark' : 'light';
     this.applyTheme(next, { animate: true });
-    sessionStorage.setItem(this.storageKey, next);
+    writeSessionState({ docTheme: next }, isBrowser());
+    // sessionStorage.setItem(this.storageKey, next);
     // sessionStorage.setItem(this.storageKey, 'dark');
 
     // console.log(`Log: [ThemeService] ToggleTheme new theme=`, next)
@@ -42,7 +48,8 @@ export class ThemeService {
 
   setTheme(theme: ThemeName): void {
     this.applyTheme(theme, { animate: true });
-    sessionStorage.setItem(this.storageKey, theme as string);
+    writeSessionState({ docTheme: theme as string }, isBrowser());
+    // sessionStorage.setItem(this.storageKey, theme as string);
     // console.log(`Log: [ThemeService] setTheme =`, theme);
   }
 

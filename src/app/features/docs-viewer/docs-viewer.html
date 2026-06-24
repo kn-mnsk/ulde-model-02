@@ -60,7 +60,7 @@
 
       <hr>
       <button (click)="backToPrevDoc()">
-        To Previous Doc – {{ this.previousDocId }}
+        To Previous Doc – {{ this.$prevDocId() }}
       </button>
 
     </aside>
@@ -73,10 +73,7 @@
       </div>
     </main>
 
-
   </div>
-
-  <!-- </div> -->
 
   <div class="dv-debug-overlay" [class.visible]="$showDebugOverlay()"></div>
 
