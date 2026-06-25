@@ -1,9 +1,9 @@
 import { signal } from '@angular/core';
 
 // Session State
-export type SessionComponent = 'App' | 'DocsViewer' | 'UldeViewer';
+export type SessionSelector = 'app-root' | 'app-docs-viewer' | 'app-ulde-viewer';
 export interface SessionState {
-  component: SessionComponent;
+  selector: SessionSelector;
   docId: string | null;
   prevDocId: string | null;
   scrollPos: number;
@@ -13,7 +13,7 @@ export interface SessionState {
 }
 const SESSION_STATE_KEY = 'sessionState';
 const SESSION_STATE_DEFAULT: SessionState = {
-  component: 'DocsViewer',
+  selector: 'app-docs-viewer',
   docId: null,
   prevDocId: null,
   scrollPos: 0,
@@ -42,7 +42,7 @@ export function readSessionState(isBrowser: boolean): SessionState {
   try {
     const parsed = JSON.parse(raw) as Partial<SessionState>;
     return {
-      component: parsed.component ?? 'App',
+      selector: parsed.selector ?? 'app-docs-viewer',
       docId: parsed.docId ?? null,
       prevDocId: parsed.prevDocId ?? null,
       scrollPos: parsed.scrollPos ?? 0,

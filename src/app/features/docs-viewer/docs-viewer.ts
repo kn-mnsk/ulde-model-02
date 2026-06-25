@@ -26,7 +26,7 @@ import { ScrollSpyController } from '../../core/services/scrollspy-controller';
 export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // External inputs
-  $docId = input<string>('');
+  $inputDocId = input<string>('');
   $reload = input<boolean>(false);
 
   // Internal state
@@ -105,13 +105,32 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
     // Sync external docId → internal
     effect(() => {
-      const id = this.$docId();
-      if (id) {
-        // this.previousDocId = id;
-        writeSessionState({ docId: id, prevDocId: id }, this.$isBrowser());
-        this.$prevDocId.set(id);
-        this.$currentDocId.set(id);
-      }
+      // check refresh (, reload, too)
+      let id: string | null = null;
+      this.restoreFromSessionState().then(b => {
+        if (b) { // refreshed
+          const { docId, prevDocId } = readSessionState(this.$isBrowser());
+          if (!docId || !prevDocId) return;
+          id = docId;
+          this.$prevDocId.set(prevDocId);
+          this.$currentDocId.set(id);
+        } else {
+          id = this.$inputDocId();
+          if (!id) return;
+          writeSessionState({ docId: id, prevDocId: id }, this.$isBrowser());
+          this.$prevDocId.set(id);
+          this.$currentDocId.set(id);
+        }
+
+      });
+
+      // if (id) {
+      //   // this.previousDocId = id;
+      //   writeSessionState({ docId: id, prevDocId: id }, this.$isBrowser());
+      //   this.$prevDocId.set(id);
+      //   this.$currentDocId.set(id);
+      // }
+
     });
 
     // Sync reload flag
@@ -196,7 +215,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
         requestAnimationFrame(() => {
           queueMicrotask(() => {
 
-            this.restoreFromSessionState();
+            // this.restoreFromSessionState();
 
             const pos = this.$savedScrollTop();
             this.hostWrapperRef.nativeElement.scrollTop = pos;
@@ -224,7 +243,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     tree.forEach(root => visit(root));
   }
 
-  ngAfterViewInit() { }
+  ngAfterViewInit() {
+
+  }
 
   ngOnDestroy() {
     if (this.cleanupFn) {
@@ -233,6 +254,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     }
 
     if (this.removeBeforeUnloadListener) {
+      this.removeBeforeUnloadListener();
       this.removeBeforeUnloadListener = undefined;
     }
 
@@ -240,11 +262,11 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   private ensureInitialSessionState(): void {
     // Ensure there is at least a baseline state
-    const current = readSessionState(this.$isBrowser());
-    writeSessionState(current, this.$isBrowser());
+    const state = readSessionState(this.$isBrowser());
+    console.log(`Log: [DocsViewer] nsureInitialSessionState() \nstate=${JSON.stringify(state, null, 2)}`);
 
-    // ensure initializing doc theme
-    // this.$isDarkMode.set((current.docTheme === 'dark') ? true : false);
+    writeSessionState(state, this.$isBrowser());
+
   }
 
 
@@ -276,37 +298,37 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   // Refresh / restore logic
   // -------------------------
 
-  private async restoreFromSessionState(): Promise<void> {
+  private async restoreFromSessionState(): Promise<boolean> {
     const state = readSessionState(this.$isBrowser());
 
-    // console.log(`Log: ${this.$title()} restoreFromSessionState()` +   `\nstate=${JSON.stringify(state, null, 2)}`);
+    console.log(`Log: [DocsViewer] restoreFromSessionState() \nstate=${JSON.stringify(state, null, 2)}`);
 
     if (!state.refreshed) {
       // Normal start - show DocsViewer template which is main screen
-      return;
+      return state.refreshed;
     }
 
     // Refresh flow
-    if (state.component === 'App') {
+    if (state.selector === 'app-root') {
       // Refreshed while on App: just clear refreshed flag
       writeSessionState({
-        docId: null,
-        prevDocId: null,
+        docId: 'docs/index',
+        prevDocId: 'docs/index',
         scrollPos: 0,
         prevScrollPos: 0,
         refreshed: false,
-        docTheme: '',
+        docTheme: 'dark',
       },
         this.$isBrowser()
       );
 
-      return;
+      return state.refreshed;
     }
 
-    if (state.component === 'DocsViewer') {
+    if (state.selector === 'app-docs-viewer') {
       // Refreshed while viewing DocsViewer: restore doc + scroll
       const docId = state.docId ?? 'docs/index';
-      // const docId = state.docId ?? 'initialdoc';
+
       const scrollPos = state.scrollPos ?? 0;
 
       writeSessionState({ refreshed: false }, this.$isBrowser());
@@ -315,13 +337,14 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
       this.$currentDocId.set(docId);
       // this.$reload.update(n => n + 1);
-      console.log(`Log: [DocsViewer] restoreFromSessionState() DocsViewer Refresh` + `\nRestored docId=${docId}, scrollPos=${scrollPos}`);
+      console.log(`Log: [DocsViewer] restoreFromSessionState() DocsViewer Refresh \nRestored docId=${docId}, scrollPos=${scrollPos}`);
 
-      return;
+      return state.refreshed;
     }
 
     // Fallback: no opinion, just clear refresh bit
     writeSessionState({ refreshed: false }, this.$isBrowser());
+    return false;
   }
 
 

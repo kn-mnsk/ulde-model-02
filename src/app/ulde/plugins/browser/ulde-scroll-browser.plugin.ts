@@ -71,7 +71,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
       if (now - lastSent < 33) return;
       lastSent = now;
 
-      const pos = container.scrollTop;
+      const pos = Number(container.scrollTop.toFixed(2));
       const height = container.scrollHeight - container.clientHeight;
 
       // console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos \npos=`, pos, `\nheight=`, height);
