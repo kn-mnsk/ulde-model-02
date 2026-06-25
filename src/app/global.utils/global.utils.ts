@@ -99,9 +99,13 @@ export async function navigate(router: Router, route: any[]): Promise<boolean | 
   // return results;
 }
 
-// import { inject } from "@angular/core";
-// import { ThemeService, ThemeName } from "../core/services/theme.service";
-// export function currentTheme(): ThemeName {
-//   const themeService = inject(ThemeService);
-//   return themeService.currentTheme;
-// }
+export function setDecimalPlaces(value: number, places: number) : number{
+  // Validate input
+  // if (typeof value !== "number" || typeof places !== "number" || places < 0) {
+  //   throw new Error("Invalid input: value must be a number and places must be a non‑negative number.");
+  // }
+
+  // toFixed returns a string, so convert back to number if needed
+  return Number(value.toFixed(places));
+}
+
