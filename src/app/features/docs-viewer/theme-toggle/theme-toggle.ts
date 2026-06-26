@@ -1,6 +1,7 @@
 // app/features/docs-viewer/theme-toggle/theme-toggle.ts
 
-import { Component, Output, EventEmitter, signal, output } from '@angular/core';
+import { Component, signal, output } from '@angular/core';
+import { ThemeName, defaultThemeName } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-theme-toggle',
@@ -10,15 +11,15 @@ import { Component, Output, EventEmitter, signal, output } from '@angular/core';
 })
 export class ThemeToggle {
 
-  toggleTheme = output();
+  $toggleTheme = output<ThemeName>();
   // @Output() toggleTheme = new EventEmitter<void>();
 
   // Local UI state (optional)
-  isDark = signal(false);
+  $themeName = signal<ThemeName>(defaultThemeName);
 
   toggle() {
-    this.isDark.update(v => !v);
-    this.toggleTheme.emit();
+    this.$themeName.update((v: ThemeName) => (v === 'dark') ? 'light': 'dark');
+    this.$toggleTheme.emit(this.$themeName());
     // console.log(`Log: [ThemeToggle] isDark=`, this.isDark());
   }
 }

@@ -9,7 +9,7 @@ import { UldeAngularService } from '../../ulde/integration/angular/ulde-angular.
 
 import { TocEntry, ArtifactsPanelModel, DebugOverlayModel, TocNode } from '../../ulde/core/artifacts/ulde-artifacts';
 
-import { ThemeService } from '../../core/services/theme.service';
+import { ThemeName, ThemeService } from '../../core/services/theme.service';
 import { ThemeToggle } from './theme-toggle';
 import { ScrollService } from '../../core/services/scroll.service';
 import { writeSessionState, readSessionState } from '../../core/services/session-state.manage';
@@ -20,10 +20,12 @@ import { ScrollSpyController } from '../../core/services/scrollspy-controller';
 @Component({
   selector: 'app-docs-viewer',
   standalone: true,
-  imports: [ThemeToggle, TocResizerDirective, NgTemplateOutlet],
+  imports: [ThemeToggle, TocResizerDirective, NgTemplateOutlet,],
   templateUrl: './docs-viewer.html'
 })
 export class DocsViewer implements AfterViewInit, OnDestroy {
+
+  private readonly component: string = '[DocsViewer]';
 
   // External inputs
   $inputDocId = input<string>('');
@@ -146,8 +148,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       if (id && this.$isBrowser()) {
         // const key = `ulde:scrollpos:${id}`;
         // const saved = Number(localStorage.getItem(key) ?? 0);
-        const { scrollPos } = readSessionState(this.$isBrowser())
-        this.$savedScrollTop.set(scrollPos);
+        // const { scrollPos } = readSessionState(this.$isBrowser())
+        // this.$savedScrollTop.set(scrollPos);
         this.loadAndRender(id);
       }
     });
@@ -208,7 +210,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       });
 
       // Ensure ScrollSpy is active
-      this.scrollSpy.allow();
+      // this.scrollSpy.allow();
 
       // Restore scroll + hide overlays
       requestAnimationFrame(() => {
@@ -217,8 +219,13 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
             // this.restoreFromSessionState();
 
-            const pos = this.$savedScrollTop();
-            this.hostWrapperRef.nativeElement.scrollTop = pos;
+            const { scrollPos } = readSessionState(this.$isBrowser())
+            this.hostWrapperRef.nativeElement.scrollTop = scrollPos;
+
+            // const pos = this.$savedScrollTop();
+            // this.hostWrapperRef.nativeElement.scrollTop = pos;
+
+            this.scrollSpy.allow();
 
             this.overlay.hide(this.tocOverlayRef);
             this.overlay.hide(this.hostOverlayRef);
@@ -263,7 +270,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   private ensureInitialSessionState(): void {
     // Ensure there is at least a baseline state
     const state = readSessionState(this.$isBrowser());
-    console.log(`Log: [DocsViewer] nsureInitialSessionState() \nstate=${JSON.stringify(state, null, 2)}`);
+    // console.log(`Log: ${this.component} nsureInitialSessionState() \nstate=${JSON.stringify(state, null, 2)}`);
 
     writeSessionState(state, this.$isBrowser());
 
@@ -301,7 +308,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   private async restoreFromSessionState(): Promise<boolean> {
     const state = readSessionState(this.$isBrowser());
 
-    console.log(`Log: [DocsViewer] restoreFromSessionState() \nstate=${JSON.stringify(state, null, 2)}`);
+    // console.log(`Log: ${this.component} restoreFromSessionState() \nstate=${JSON.stringify(state, null, 2)}`);
 
     if (!state.refreshed) {
       // Normal start - show DocsViewer template which is main screen
@@ -337,7 +344,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
       this.$currentDocId.set(docId);
       // this.$reload.update(n => n + 1);
-      console.log(`Log: [DocsViewer] restoreFromSessionState() DocsViewer Refresh \nRestored docId=${docId}, scrollPos=${scrollPos}`);
+      console.log(`Log: ${this.component} restoreFromSessionState() DocsViewer \nRefreshed ${state.refreshed}, \nRestored docId=${docId}, \nRestored scrollPos=${scrollPos}`);
 
       return state.refreshed;
     }
@@ -350,6 +357,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // Load markdown
   private async loadAndRender(docId: string) {
+
+    console.log(`Log: ${this.component} loadAndRender \nid=`, docId);
+
     const url = `assets/${docId}.md`;
 
     try {
@@ -368,7 +378,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       const markdown = await response.text();
       await this.ulde.renderMarkdown(markdown);
     } catch (err) {
-      console.error('[DocsViewer] loadAndRender error:', err);
+      console.error('${component} loadAndRender error:', err);
     }
   }
 
@@ -377,7 +387,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     // this.previousDocId = this.$currentDocId();
 
     const { scrollPos } = readSessionState(this.$isBrowser());
-    writeSessionState({ docId: 'docs/Index', prevDocId: this.$currentDocId(), scrollPos: 0, prevScrollPos: scrollPos }, this.$isBrowser());
+    writeSessionState({ docId: 'docs/index', prevDocId: this.$currentDocId(), scrollPos: 0, prevScrollPos: scrollPos }, this.$isBrowser());
     this.$prevDocId.set(this.$currentDocId());
     this.$currentDocId.set('docs/index');
   }
@@ -387,15 +397,20 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   backToPrevDoc() {
-    const { prevDocId, scrollPos, prevScrollPos } = readSessionState(this.$isBrowser());
-    writeSessionState({ docId: prevDocId, prevDocId: this.$currentDocId(), scrollPos: prevScrollPos, prevScrollPos: scrollPos }, this.$isBrowser());
-    this.$prevDocId.set(this.$currentDocId());
+
+    const { docId, prevDocId, scrollPos, prevScrollPos } = readSessionState(this.$isBrowser());
+    writeSessionState({ docId: prevDocId, prevDocId: docId, scrollPos: prevScrollPos, prevScrollPos: scrollPos }, this.$isBrowser());
+
+    this.$prevDocId.set(docId as string);
+    // this.$savedScrollTop.set(prevScrollPos);
     this.$currentDocId.set(prevDocId as string);
+
+
   }
 
   // ScrollSpy handler
   private handleScrollSpy(e: any) {
-    // console.log(`Log: [DocsViewer] handleScrollSpy \nheading id=`, id, `scrollSpy.isSuppressed()=`, this.scrollSpy.isSuppressed());
+    // console.log(`Log: ${component} handleScrollSpy \nheading id=`, id, `scrollSpy.isSuppressed()=`, this.scrollSpy.isSuppressed());
 
     if (this.scrollSpy.isSuppressed()) return;
 
@@ -406,7 +421,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     const pos = e.detail.scrollTop;
     const height = e.detail.scrollHeight;
 
-    this.$savedScrollTop.set(pos);
+    // this.$savedScrollTop.set(pos);
 
     // const key = `ulde:scrollpos:${this.$currentDocId()}`;
     // localStorage.setItem(key, String(pos));
@@ -414,8 +429,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     if (!this.rafPending) this.rafPending = true;
 
     requestAnimationFrame(() => {
+      console.log(`Log: ${this.component} handleScrollPos pos=`, pos);
       this.scrollService.setPosition(this.$currentDocId(), pos, height);
       writeSessionState({ scrollPos: pos }, this.$isBrowser());
+      // this.$savedScrollTop.set(pos);
       // writeSessionState({ docId: this.$currentDocId(), scrollPos: pos }, this.$isBrowser());
       this.rafPending = false;
     });
@@ -438,8 +455,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     this.highlightElement(el);
 
-    // document.querySelectorAll('.active-heading')
-    //   .forEach(el => el.classList.remove('active-heading'));
+    console.log(`Log: ${this.component} scrollTo  final top=`, Number(el.scrollTop.toFixed(2)));
 
     const wrapper = this.hostWrapperRef.nativeElement;
     this.scrollSpy.detectScrollEnd(wrapper, () => {
@@ -509,8 +525,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
 
   // Theme toggle
-  async onToggleTheme() {
-    this.theme.toggleTheme();
+  async onToggleTheme(theme: ThemeName) {
+    this.theme.toggleTheme(theme);
     if (this.finalHtml) {
       await this.bridge.host.run(
         this.hostWrapperRef.nativeElement,

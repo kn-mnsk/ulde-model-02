@@ -3,7 +3,6 @@
 import mermaid, { MermaidConfig } from 'mermaid';
 import Panzoom from '@panzoom/panzoom'
 import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
-import { first, interval, switchMap, tap } from 'rxjs';
 import { readSessionState } from '../../../core/services/session-state.manage';
 
 
@@ -58,66 +57,6 @@ const mermaidConfigLightTheme: MermaidConfig = {
   },
   flowchart: { htmlLabels: true, curve: 'basis' }
 };
-
-/* ---------------------------------------------------------
-   Debug Panel (Hidden by Default)
---------------------------------------------------------- */
-
-// function getMermaidDebugPanel(): HTMLDivElement {
-//   return document.querySelector('.dv-mermaid-debug-panel') as HTMLDivElement;
-
-//   // if (!panel) {
-//   //   panel = document.createElement('div');
-//   //   panel.id = 'mermaid-debug-panel';
-//   //   panel.classList = 'mermaid-debug-panel';
-//   //   // panel.style.position = 'fixed';
-//   //   // panel.style.bottom = '30px';
-//   //   // panel.style.right = '30px';
-//   //   // panel.style.width = '320px';
-//   //   // panel.style.maxHeight = '200px';
-//   //   // panel.style.overflowY = 'auto';
-//   //   // panel.style.background = 'rgba(0,0,0,0.75)';
-//   //   // panel.style.color = '#fff';
-//   //   // panel.style.fontSize = '12px';
-//   //   // panel.style.padding = '8px';
-//   //   // panel.style.borderRadius = '6px';
-//   //   // panel.style.zIndex = '999999';
-//   //   // panel.style.display = 'none'; // hidden by default
-//   //   // panel.style.whiteSpace = 'pre-wrap';
-//   //   // panel.style.fontFamily = 'monospace';
-
-//   //   document.body.appendChild(panel);
-//   // }
-
-//   // return panel;
-// }
-
-// function logMermaidDebug(panel: HTMLElement, message: string) {
-
-//   // const panel = document.querySelector('.dv-mermaid-debug-panel') as HTMLDivElement;
-//   // const panel = getMermaidDebugPanel();
-//   // panel.style.display = 'none';
-//   // panel.style.display = 'block';
-
-//   const entry = document.createElement('div');
-//   entry.textContent = message;
-//   entry.style.marginBottom = '6px';
-
-//   panel.appendChild(entry);
-//   // console.log(`Log: [UldeMermaidBrowserPlugin] ogMermaidDebug, entry=`, panel, entry.textContent);
-// }
-
-
-// // Optional: toggle panel with Ctrl+Shift+M
-// window.addEventListener('keydown', (e) => {
-//   if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'm') {
-//     const panel = document.getElementById('mermaid-debug-panel') as HTMLDivElement | null;
-//     if (panel) {
-//       panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-//     }
-//   }
-// });
-
 
 /* ---------------------------------------------------------
    Panzoom Handler Storage
@@ -232,35 +171,10 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
 
     // console.log(`Log: [UldeMermaidBrowserPlugin] init, \ncounter(called)=`, counter++, `\ncontainer=`, container, `\npanel=`, panel);
 
-
-    // const currentTheme = sessionStorage.getItem('app-theme');
     const {docTheme} = readSessionState(isBrowser);
 
     let mermaidNodes: NodeListOf<HTMLElement> = container.querySelectorAll<HTMLElement>('code.language-mermaid');
     // console.log(`Log: [UldeMermaidBrowserPlugin] mermaidNodes=`, mermaidNodes);
-
-
-    // Wait until mermaid code blocks actually exist
-    const waitForMermaidNodes = () =>
-      new Promise<void>((resolve) => {
-        const check = () => {
-          mermaidNodes = container.querySelectorAll<HTMLElement>('code.language-mermaid');
-          if (mermaidNodes.length > 0) {
-            resolve();
-            return true;
-          }
-          return false;
-        };
-
-        if (check()) return;
-
-        const observer = new MutationObserver(() => {
-          if (check()) observer.disconnect();
-        });
-
-        observer.observe(container, { childList: true, subtree: true });
-      });
-
 
     const logMermaidDebug = (message: string) => {
       const entry = document.createElement('li');
@@ -280,30 +194,25 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
       };
 
       // Also catch global Mermaid-related errors
-      window.addEventListener('error', (event: any) => {
-        const error = event.error;
-        if (error && typeof error.stack === 'string' && error.stack.includes('mermaid')) {
-          logMermaidDebug(`[Window error]\n${error.message}`);
-          // Do not preventDefault globally; just log
-        }
-      });
+      // window.addEventListener('error', (event: any) => {
+      //   const error = event.error;
+      //   if (error && typeof error.stack === 'string' && error.stack.includes('mermaid')) {
+      //     logMermaidDebug(`[Window error]\n${error.message}`);
+      //     // Do not preventDefault globally; just log
+      //   }
+      // });
 
-      window.addEventListener('unhandledrejection', (event: any) => {
-        const reason: any = event.reason;
-        if (reason && typeof reason.stack === 'string' && reason.stack.includes('mermaid')) {
-          logMermaidDebug(`[Unhandled Promise Rejection]\n${reason.message}`);
-        }
-      });
-
-
-
-      // Wait until mermaid code blocks exist
-      // await waitForMermaidNodes();
+      // window.addEventListener('unhandledrejection', (event: any) => {
+      //   const reason: any = event.reason;
+      //   if (reason && typeof reason.stack === 'string' && reason.stack.includes('mermaid')) {
+      //     logMermaidDebug(`[Unhandled Promise Rejection]\n${reason.message}`);
+      //   }
+      // });
 
       // Initialize Mermaid AFTER nodes exist
       mermaid.initialize({
         ...(docTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme),
-        // suppressErrorRendering: true // avoid red "Syntax error" diagrams
+
       });
 
       // Run Mermaid
@@ -322,70 +231,5 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
       );
     }
   },
-
-  // async update(container: HTMLElement) {
-  //   const isBrowser =
-  //     typeof window !== 'undefined' &&
-  //     typeof document !== 'undefined';
-
-  //   if (!isBrowser) return;
-
-
-  //   const currentTheme = sessionStorage.getItem('app-theme');
-  //   let mermaidNodes: NodeListOf<HTMLElement> = container.querySelectorAll<HTMLElement>('code.language-mermaid');
-  //   // console.log(`Log: [UldeMermaidBrowserPlugin] mermaidNodes=`, mermaidNodes);
-
-  //   const postRenderCB = genPostRenderCB(container);
-
-  //   // We do not mermaid psrseError. Purpose is update mermaid theme
-  //   try {
-
-  //     // Patch Mermaid internal async error handler → log to debug panel
-  //     // mermaid.parseError = (err: any, hash: any) => {
-  //     //   logMermaidDebug(
-  //     //     `[Mermaid internal error]\n${err?.message || err}\nHash: ${hash ?? 'n/a'}`
-  //     //   );
-  //     // };
-
-  //     // // Also catch global Mermaid-related errors
-  //     // window.addEventListener('error', (event: any) => {
-  //     //   const error = event.error;
-  //     //   if (error && typeof error.stack === 'string' && error.stack.includes('mermaid')) {
-  //     //     logMermaidDebug(`[Window error]\n${error.message}`);
-  //     //     // Do not preventDefault globally; just log
-  //     //   }
-  //     // });
-
-  //     // window.addEventListener('unhandledrejection', (event: any) => {
-  //     //   const reason: any = event.reason;
-  //     //   if (reason && typeof reason.stack === 'string' && reason.stack.includes('mermaid')) {
-  //     //     logMermaidDebug(`[Unhandled Promise Rejection]\n${reason.message}`);
-  //     //   }
-  //     // });
-
-  //     // Wait until mermaid code blocks exist
-  //     // await waitForMermaidNodes();
-
-  //     // Initialize Mermaid AFTER nodes exist
-  //     mermaid.initialize({
-  //       ...(currentTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme),
-  //       // suppressErrorRendering: true // avoid red "Syntax error" diagrams
-  //     });
-
-  //     // Run Mermaid
-  //     await mermaid.run({
-  //       nodes: mermaidNodes,
-  //       postRenderCallback: postRenderCB
-  //     });
-
-  //   } catch (err: any) {
-  //     // Only log to debug panel, not console
-  //     // logMermaidDebug(
-  //     //   `[ULDE Mermaid Browser Plugin caught error]\n${err?.message || String(err)}`
-  //     // );
-  //   }
-
-
-  // }
 
 };
