@@ -5,24 +5,25 @@ import { isBrowser } from '../../global.utils/global.utils';
 import { readSessionState, writeSessionState } from './session-state.manage';
 
 export type ThemeName = 'light' | 'dark';
+export const defaultThemeName: ThemeName = 'dark';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private readonly storageKey = 'app-theme';
+
+
   private readonly attrName = 'data-theme';
 
   constructor() {
     if (!isBrowser()) return;
-    const {docTheme} = readSessionState(isBrowser());
-    const saved = docTheme as ThemeName || 'light';
+    const { docTheme } = readSessionState(isBrowser());
+    const saved = docTheme as ThemeName || defaultThemeName;
     // const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'light';
-    // const saved = (sessionStorage.getItem(this.storageKey) as ThemeName) || 'dark';
     this.applyTheme(saved, { animate: false });
   }
 
   get currentTheme(): ThemeName {
     if (!isBrowser()) {
-      return 'light';// default for SSR
+      return defaultThemeName;
     };
     let attr: ThemeName | null = null;
     try {
@@ -32,17 +33,14 @@ export class ThemeService {
     } catch (err) {
       console.error('Error: [ThemeService]:', err);
     }
-    return attr ?? 'light';
+    return attr ?? defaultThemeName;;
 
   }
 
-  toggleTheme(): void {
-    const next: ThemeName = this.currentTheme === 'light' ? 'dark' : 'light';
+  toggleTheme(theme: ThemeName): void {
+    const next: ThemeName = theme;
     this.applyTheme(next, { animate: true });
     writeSessionState({ docTheme: next }, isBrowser());
-    // sessionStorage.setItem(this.storageKey, next);
-    // sessionStorage.setItem(this.storageKey, 'dark');
-
     // console.log(`Log: [ThemeService] ToggleTheme new theme=`, next)
   }
 

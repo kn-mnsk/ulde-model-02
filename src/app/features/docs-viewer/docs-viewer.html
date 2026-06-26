@@ -10,7 +10,7 @@
       <div class="dv-actions">
 
         <!-- Theme toggle (should become its own component) -->
-        <app-theme-toggle (toggleTheme)="onToggleTheme()">
+        <app-theme-toggle ($toggleTheme)="onToggleTheme($event)">
         </app-theme-toggle>
         <div class="dv-button">
           <button (click)="backToIndex()">Index</button>

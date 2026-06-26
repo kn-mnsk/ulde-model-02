@@ -68,20 +68,4 @@ export class UldeBrowserHost {
   }
 
 
-  // async update(container: HTMLElement, content: string) {
-
-  //   container.innerHTML = content;
-
-
-  //   // 3. Run browser DOM plugins (real DOM world)
-  //   for (const plugin of this.browserDomPlugins) {
-  //     // if (plugin === undefined) return;
-  //     try {
-  //       plugin.update?.(container);
-  //     } catch (err) {
-  //       console.error(`[ULDE Browser Plugin Error] ${plugin.id}`, err);
-  //     }
-  //   }
-  // }
-
 }

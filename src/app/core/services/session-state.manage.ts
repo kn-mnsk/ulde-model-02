@@ -14,8 +14,8 @@ export interface SessionState {
 const SESSION_STATE_KEY = 'sessionState';
 const SESSION_STATE_DEFAULT: SessionState = {
   selector: 'app-docs-viewer',
-  docId: null,
-  prevDocId: null,
+  docId: 'docs/index',
+  prevDocId: 'docs/index',
   scrollPos: 0,
   prevScrollPos: 0,
   refreshed: false,
@@ -23,7 +23,7 @@ const SESSION_STATE_DEFAULT: SessionState = {
 };
 
 
-const $title = signal<string>('session-state.manage');
+const $title = signal<string>('[session-state.manage]');
 // -------------------------
 // Session state helpers
 // -------------------------
@@ -65,7 +65,8 @@ export function writeSessionState(partial: Partial<SessionState>, isBrowser: boo
   };
   localStorage.setItem(SESSION_STATE_KEY, JSON.stringify(next));
 
-  // console.log(`Log: ${$title()} writeSessionState(): ${JSON.stringify(next, null, 2)}`);
+  // console.log(`Log: ${$title()} writeSessionState called, \ncurrent=${JSON.stringify(current, null, 2)}, \nnext=${JSON.stringify(next, null, 2)}`)
+
 }
 
 export function clearSessionState(isBrowser: boolean): void {

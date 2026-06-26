@@ -1,6 +1,8 @@
 // app/core/services/scrollspy-controller.ts
 
 export class ScrollSpyController {
+  private readonly title = '[ScrollSpyController]';
+
   private suppressed = false;
   private lastScrollTop = -1;
 
@@ -23,8 +25,9 @@ export class ScrollSpyController {
       const now = wrapper.scrollTop;
 
       if (now === last) {
-        this.allow();
+        // this.allow();
         callback();
+        console.log(`Log: ${this.title} detectScrollEnd final end=`, Number(last.toFixed(2)));
         return;
       }
 
