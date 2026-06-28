@@ -150,6 +150,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
         // const saved = Number(localStorage.getItem(key) ?? 0);
         // const { scrollPos } = readSessionState(this.$isBrowser())
         // this.$savedScrollTop.set(scrollPos);
+        console.log(`Log: ${this.component} effect React to docId changes \n docid=`, id,);
+
         this.loadAndRender(id);
       }
     });
@@ -401,8 +403,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     const { docId, prevDocId, scrollPos, prevScrollPos } = readSessionState(this.$isBrowser());
     writeSessionState({ docId: prevDocId, prevDocId: docId, scrollPos: prevScrollPos, prevScrollPos: scrollPos }, this.$isBrowser());
 
+    console.log(`Log: ${this.component} backToPrevDoc() \n prevDocid=`, prevDocId, `\nscrollTop=`, prevScrollPos);
+
     this.$prevDocId.set(docId as string);
-    // this.$savedScrollTop.set(prevScrollPos);
+    this.$savedScrollTop.set(prevScrollPos);
     this.$currentDocId.set(prevDocId as string);
 
 
@@ -438,7 +442,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     });
   }
 
+  // internald docId routing
   private handleNavigate(id: string) {
+    console.log(`Log: ${this.component} handleNavigate new docId=`, id);
     const { scrollPos } = readSessionState(this.$isBrowser());
     writeSessionState({ docId: id, prevDocId: this.$currentDocId(), scrollPos: 0, prevScrollPos: scrollPos }, this.$isBrowser());
     this.$prevDocId.set(this.$currentDocId());
