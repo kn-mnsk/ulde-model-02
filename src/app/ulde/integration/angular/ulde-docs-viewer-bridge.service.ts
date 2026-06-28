@@ -40,7 +40,7 @@ export class UldeDocsViewerBridge {
     onScrollSpy?: (e: any) => void;
     onScrollPos?: (e: any) => void;
     onNavigate?: (docId: string) => void;
-  }) {
+  }): () => void {
 
     const {
       host,
