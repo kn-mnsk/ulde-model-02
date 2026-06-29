@@ -208,7 +208,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
         html: result.finalHtml,
         onScrollSpy: e => this.handleScrollSpy(e),
         onScrollPos: e => this.handleScrollPos(e),
-        onNavigate: newDocId => this.handleNavigate(newDocId)
+        onNavigate: e => this.handleNavigate(e)
+        // onNavigate: newDocId => this.handleNavigate(newDocId)
       });
 
       // Ensure ScrollSpy is active
@@ -443,12 +444,13 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   // internald docId routing
-  private handleNavigate(id: string) {
-    console.log(`Log: ${this.component} handleNavigate new docId=`, id);
-    const { scrollPos } = readSessionState(this.$isBrowser());
-    writeSessionState({ docId: id, prevDocId: this.$currentDocId(), scrollPos: 0, prevScrollPos: scrollPos }, this.$isBrowser());
+  private handleNavigate(e: any) {
+    console.log(`Log: ${this.component} handleNavigate \nnew docId=`, e.detail.id, `\nanchor position=`, e.detail.scrollTop);
+    const  scrollPos  =  e.detail.scrollTop;
+    // const { scrollPos } = readSessionState(this.$isBrowser());
+    writeSessionState({ docId: e.detail.id, prevDocId: this.$currentDocId(), scrollPos: 0, prevScrollPos: scrollPos }, this.$isBrowser());
     this.$prevDocId.set(this.$currentDocId());
-    this.$currentDocId.set(id);
+    this.$currentDocId.set(e.detail.id);
   }
 
   // Scroll to heading

@@ -1,5 +1,6 @@
 // ulde/plugins/browser/ulde-anchors-browser.plugin.ts
 
+import { access } from 'node:fs/promises';
 import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
 
 export const UldeAnchorsBrowserPlugin: BrowserDomPlugin = {
@@ -43,20 +44,28 @@ export const UldeAnchorsBrowserPlugin: BrowserDomPlugin = {
     });
 
     //
-    // 2. NEW: Internal docId routing
+    // 2. Internal docId routing
     //
+
+    
     const internalLinks = container.querySelectorAll('a[href^="#docId:"]');
 
     try {
     internalLinks.forEach(a => {
-      a.addEventListener('click', (e) => {
+      a.addEventListener('click', (e: any) => {
         e.preventDefault();
 
         const href = a.getAttribute('href')!;
         const docId = href.replace('#docId:', '');
 
+        const rect = a.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const anchorPos = Number((rect.top - containerRect.top).toFixed(2));; // anchor position
+
+        console.log(`Log: [UldeAnchotsBrowserPlugin] Internal Doc Routing Click Event ClientY=`, e.clientY);
+
         container.dispatchEvent(new CustomEvent('ulde:navigate', {
-          detail: { docId },
+          detail: { id: docId, scrollTop: e.clientY },
           bubbles: true
         }));
       });
