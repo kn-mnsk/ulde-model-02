@@ -4,7 +4,8 @@ export class ScrollSpyController {
   private readonly title = '[ScrollSpyController]';
 
   private suppressed = false;
-  private lastScrollTop = -1;
+  lastScrollTop = -1;
+
 
   suppress() {
     this.suppressed = true;
@@ -19,19 +20,19 @@ export class ScrollSpyController {
   }
 
   detectScrollEnd(wrapper: HTMLElement, callback: () => void) {
-    let last = -1;
+    this.lastScrollTop = -1;
 
     const check = () => {
       const now = wrapper.scrollTop;
 
-      if (now === last) {
+      if (now === this.lastScrollTop) {
         // this.allow();
         callback();
-        console.log(`Log: ${this.title} detectScrollEnd final end=`, Number(last.toFixed(2)));
+        // console.log(`Log: ${this.title} detectScrollEnd final end=`, Number(this.lastScrollTop.toFixed(2)));
         return;
       }
 
-      last = now;
+      this.lastScrollTop = now;
       requestAnimationFrame(check);
     };
 

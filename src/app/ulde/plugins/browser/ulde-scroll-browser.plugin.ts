@@ -35,6 +35,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
             new CustomEvent('ulde:scrollspy', {
               detail: {
                 id: id,
+                // scrollTop: container.scrollTop,
                 // index: index,
               },
               bubbles: true
@@ -60,27 +61,27 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
     });
 
     // ---------------------------------------------
-    // 2. Scroll Position Spy (NEW) - scroll position tracking
+    // 2. Scroll Position Spy (NEW) - scroll top tracking
     // ---------------------------------------------
     let lastSent = 0;
     // console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos `, container);
-    const onScroll = (e: any) => {
+    const onScrollTop = (e: any) => {
       const now = performance.now();
       // console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos `);
       // throttle to ~30fps
-      if (now - lastSent < 33) return;
-      lastSent = now;
+      // if (now - lastSent < 33) return;
+      // lastSent = now;
 
-      const pos = Number(container.scrollTop.toFixed(2));
+      const scrollTop = Number(container.scrollTop.toFixed(2));
       const height = container.scrollHeight - container.clientHeight;
 
-      console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos \npos=`, pos, `\nheight=`, height);
+      // console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrolltop \nscrollTop=`, scrollTop, `\nheight=`, height);
 
       container.dispatchEvent(
-        new CustomEvent('ulde:scrollpos', {
+        new CustomEvent('ulde:scrolltop', {
           detail: {
             event: e,
-            scrollTop: pos,
+            scrollTop: scrollTop,
             scrollHeight: height
           },
           bubbles: true
@@ -89,7 +90,7 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
     };
 
     // console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos `, document);
-    container.addEventListener('scroll', onScroll);
+    container.addEventListener('scroll', onScrollTop);
 
   }
 };

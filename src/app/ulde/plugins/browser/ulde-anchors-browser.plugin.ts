@@ -47,31 +47,34 @@ export const UldeAnchorsBrowserPlugin: BrowserDomPlugin = {
     // 2. Internal docId routing
     //
 
-    
+
     const internalLinks = container.querySelectorAll('a[href^="#docId:"]');
 
     try {
-    internalLinks.forEach(a => {
-      a.addEventListener('click', (e: any) => {
-        e.preventDefault();
+      internalLinks.forEach(a => {
+        a.addEventListener('click', (e: any) => {
+          e.preventDefault();
 
-        const href = a.getAttribute('href')!;
-        const docId = href.replace('#docId:', '');
+          const href = a.getAttribute('href')!;
+          const docId = href.replace('#docId:', '');
 
-        const rect = a.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        const anchorPos = Number((rect.top - containerRect.top).toFixed(2));; // anchor position
+          const rect = a.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          const anchorPos = Number((rect.top - containerRect.top).toFixed(2));; // anchor position
 
-        console.log(`Log: [UldeAnchotsBrowserPlugin] Internal Doc Routing Click Event ClientY=`, e.clientY);
+          // console.log(`Log: [UldeAnchotsBrowserPlugin] Internal Doc Routing Click Event ClientY=`, e.currentTarget);
 
-        container.dispatchEvent(new CustomEvent('ulde:navigate', {
-          detail: { id: docId, scrollTop: e.clientY },
-          bubbles: true
-        }));
+          container.dispatchEvent(new CustomEvent('ulde:navigate', {
+            detail: {
+              id: docId,
+              // scrollTop: e.clientY
+            },
+            bubbles: true
+          }));
+        });
       });
-    });
-    } catch(err){
-        console.error('Error: [UldeAnchorsBrowserPlugin]:', err);
+    } catch (err) {
+      console.error('Error: [UldeAnchorsBrowserPlugin]:', err);
     }
 
   }
