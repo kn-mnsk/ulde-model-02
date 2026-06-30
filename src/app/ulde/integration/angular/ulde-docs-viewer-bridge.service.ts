@@ -38,7 +38,7 @@ export class UldeDocsViewerBridge {
     reload?: boolean;
     html: string;
     onScrollSpy?: (e: any) => void;
-    onScrollPos?: (e: any) => void;
+    onScrollTop?: (e: any) => void;
     onNavigate?: (docId: string) => void;
   }): () => void {
 
@@ -47,7 +47,7 @@ export class UldeDocsViewerBridge {
       html,
       reload,
       onScrollSpy,
-      onScrollPos,
+      onScrollTop,
       onNavigate
     } = options;
 
@@ -69,14 +69,14 @@ export class UldeDocsViewerBridge {
     host.addEventListener('ulde:scrollspy', handleScrollSpy);
 
     // ulde/plugins/browser/ulde-scroll-browser.plugin.ts
-    const handleScrollPos = (e: any) => {
-      if (onScrollPos) {
+    const handleScrollTop = (e: any) => {
+      if (onScrollTop) {
         // console.log(`Log: [UldeDocsViewerBridge] handleScrollPos scrollTop=`, e.detail.scrollTop);
 
-        onScrollPos(e);
+        onScrollTop(e);
       }
     };
-    host.addEventListener('ulde:scrollpos', handleScrollPos);
+    host.addEventListener('ulde:scrolltop', handleScrollTop);
 
     // src/app/ulde/plugins/browser/ulde-anchors-browser.plugin.ts
     // internal docId routing
@@ -97,7 +97,7 @@ export class UldeDocsViewerBridge {
     // -------------------------------
     return () => {
       host.removeEventListener('ulde:scrollspy', handleScrollSpy);
-      host.removeEventListener('ulde:scrollpos', handleScrollPos);
+      host.removeEventListener('ulde:scrollpos', handleScrollTop);
       host.removeEventListener('ulde:navigate', handleNavigate);
     };
   }

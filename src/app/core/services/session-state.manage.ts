@@ -6,8 +6,8 @@ export interface SessionState {
   selector: SessionSelector;
   docId: string | null;
   prevDocId: string | null;
-  scrollPos: number;
-  prevScrollPos: number;
+  scrollTop: number;
+  prevScrollTop: number;
   refreshed: boolean;
   docTheme: string;
 }
@@ -16,8 +16,8 @@ const SESSION_STATE_DEFAULT: SessionState = {
   selector: 'app-docs-viewer',
   docId: 'docs/index',
   prevDocId: 'docs/index',
-  scrollPos: 0,
-  prevScrollPos: 0,
+  scrollTop: 0,
+  prevScrollTop: 0,
   refreshed: false,
   docTheme: 'dark',
 };
@@ -45,8 +45,8 @@ export function readSessionState(isBrowser: boolean): SessionState {
       selector: parsed.selector ?? 'app-docs-viewer',
       docId: parsed.docId ?? null,
       prevDocId: parsed.prevDocId ?? null,
-      scrollPos: parsed.scrollPos ?? 0,
-      prevScrollPos: parsed.prevScrollPos ?? 0,
+      scrollTop: parsed.scrollTop ?? 0,
+      prevScrollTop: parsed.prevScrollTop ?? 0,
       refreshed: parsed.refreshed ?? false,
       docTheme: parsed.docTheme ?? '',
     };
