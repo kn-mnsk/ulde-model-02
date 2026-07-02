@@ -16,7 +16,8 @@
  */
 export interface BrowserDomPlugin {
   id: string;
-  init(container: HTMLElement): Promise<void> | void;
+  init(container: HTMLElement): Promise<() => void>| Promise<void> | void;
+  // init(container: HTMLElement): Promise<void> | void;
   // update?(container: HTMLElement): Promise<void> | void;
   destroy?(container: HTMLElement): Promise<void> | void;
 }

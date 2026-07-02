@@ -38,15 +38,18 @@ export class ThemeService {
   }
 
   toggleTheme(theme: ThemeName): void {
-    const next: ThemeName = theme;
-    this.applyTheme(next, { animate: true });
-    writeSessionState({ docTheme: next }, isBrowser());
+    // const next: ThemeName = theme;
+    // this.applyTheme(theme, { animate: false });
+    this.applyTheme(theme, { animate: true });
+    writeSessionState({ docTheme: theme }, isBrowser());
     // console.log(`Log: [ThemeService] ToggleTheme new theme=`, next)
   }
 
   setTheme(theme: ThemeName): void {
+    // this.applyTheme(theme, { animate: false });
     this.applyTheme(theme, { animate: true });
-    writeSessionState({ docTheme: theme as string }, isBrowser());
+    writeSessionState({ docTheme: theme }, isBrowser());
+    // writeSessionState({ docTheme: theme as string }, isBrowser());
     // sessionStorage.setItem(this.storageKey, theme as string);
     // console.log(`Log: [ThemeService] setTheme =`, theme);
   }

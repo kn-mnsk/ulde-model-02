@@ -69,10 +69,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // ScrollSpy
   private scrollSpy = new ScrollSpyController();
-  private scrollSpyDebounce: any = null;
-  private lastSpyId: string | null = null;
-  private lastScrollTop = 0;
-  private scrollDirection: 'up' | 'down' | null = null;
 
   private removeBeforeUnloadListener?: () => void;
 
@@ -130,13 +126,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
       });
 
-      // if (id) {
-      //   // this.previousDocId = id;
-      //   writeSessionState({ docId: id, prevDocId: id }, this.$isBrowser());
-      //   this.$prevDocId.set(id);
-      //   this.$currentDocId.set(id);
-      // }
-
     });
 
     // Sync reload flag
@@ -150,10 +139,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     effect(() => {
       const id = this.$currentDocId();
       if (id && this.$isBrowser()) {
-        // const key = `ulde:scrollpos:${id}`;
-        // const saved = Number(localStorage.getItem(key) ?? 0);
-        // const { scrollPos } = readSessionState(this.$isBrowser())
-        // this.$savedScrollTop.set(scrollPos);
+
         console.log(`Log: ${this.component} effect React to docId changes \n docid=`, id,);
 
         this.loadAndRender(id);
@@ -213,26 +199,15 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
         onScrollSpy: e => this.handleScrollSpy(e),
         onScrollTop: e => this.handleScrollTop(e),
         onNavigate: e => this.handleNavigate(e)
-        // onNavigate: newDocId => this.handleNavigate(newDocId)
       });
 
-      // Ensure ScrollSpy is active
-      // this.scrollSpy.allow();
-      // this.scrollSpy.suppress();
       // Restore scroll + hide overlays
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           queueMicrotask(() => {
 
-            // this.restoreFromSessionState();
-            // this.scrollSpy.suppress();
             const { scrollTop } = readSessionState(this.$isBrowser())
             this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
-
-            // const pos = this.$savedScrollTop();
-            // this.hostWrapperRef.nativeElement.scrollTop = pos;
-
-            // this.scrollSpy.allow();
 
             this.overlay.hide(this.tocOverlayRef);
             this.overlay.hide(this.hostOverlayRef);
@@ -285,11 +260,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
 
   private initGlobalListeners(): void {
-    // this.removeScrollListener = this.renderer.listen(
-    //   document,
-    //   'scroll',
-    //   (event: Event) => this.onScroll(event),
-    // );
     // Before unload: mark refresh
     this.removeBeforeUnloadListener = this.renderer.listen(
       window,
@@ -351,8 +321,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
       writeSessionState({ docId: docId, scrollTop: scrollTop, refreshed: false }, this.$isBrowser());
 
-      // this.$currentDocId.set(docId);
-      // this.$reload.update(n => n + 1);
       console.log(`Log: ${this.component} restoreFromSessionState() DocsViewer \nRefreshed ${state.refreshed}, \nRestored docId=${docId}, \nRestored scrollPos=${scrollTop}`);
 
       return state.refreshed;
@@ -393,7 +361,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   // Navigation
   backToIndex() {
-    // this.previousDocId = this.$currentDocId();
 
     const { scrollTop } = readSessionState(this.$isBrowser());
     writeSessionState({ docId: 'docs/index', prevDocId: this.$currentDocId(), scrollTop: 0, prevScrollTop: scrollTop }, this.$isBrowser());
@@ -407,19 +374,13 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   backToPrevDoc() {
 
-    // this.scrollSpy.suppress();
-
     const { docId, prevDocId, scrollTop, prevScrollTop } = readSessionState(this.$isBrowser());
     writeSessionState({ docId: prevDocId, prevDocId: docId, scrollTop: prevScrollTop, prevScrollTop: scrollTop }, this.$isBrowser());
 
     console.log(`Log: ${this.component} backToPrevDoc() \n prevDocid=`, prevDocId, `\nprevScrollTop=`, prevScrollTop);
 
     this.$prevDocId.set(docId as string);
-    // this.$savedScrollTop.set(prevScrollTop);
     this.$currentDocId.set(prevDocId as string);
-
-    // this.scrollSpy.allow();
-
 
   }
 
@@ -435,13 +396,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   private handleScrollTop(e: any) {
+    this.scrollSpy.allow();
+
     const scrollTop = e.detail.scrollTop;
     const height = e.detail.scrollHeight;
-
-    // this.$savedScrollTop.set(pos);
-
-    // const key = `ulde:scrollpos:${this.$currentDocId()}`;
-    // localStorage.setItem(key, String(pos));
 
     if (!this.rafPending) this.rafPending = true;
 
@@ -449,9 +407,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       // console.log(`Log: ${this.component} handleScrollPos scrollTop=`, scrollTop);
       this.scrollService.setPosition(this.$currentDocId(), scrollTop, height);
       writeSessionState({ scrollTop: scrollTop }, this.$isBrowser());
-      // this.$savedScrollTop.set(pos);
-      // writeSessionState({ docId: this.$currentDocId(), scrollPos: pos }, this.$isBrowser());
+
       this.rafPending = false;
+
     });
   }
 
@@ -460,7 +418,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     requestAnimationFrame(() => {
 
       console.log(`Log: ${this.component} handleNavigate \nnew docId=`, e.detail.id, `\nanchor position=`, e.detail.scrollTop);
-      // const scrollPos = e.detail.scrollTop;
+
       const { scrollTop } = readSessionState(this.$isBrowser());
       writeSessionState({ docId: e.detail.id, prevDocId: this.$currentDocId(), scrollTop: 0, prevScrollTop: scrollTop }, this.$isBrowser());
       this.$prevDocId.set(this.$currentDocId());
@@ -475,30 +433,20 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     const el = document.getElementById(slug);
     if (!el) return;
 
-    this.scrollSpy.suppress();
-
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     this.highlightElement(el);
-    // const scrollTop = Number(this.scrollSpy.lastScrollTop.toFixed(2));
-    // console.log(`Log: ${this.component} scrollTo  hightlighted Element ${slug} scrolled to=`, scrollTop);
-    // writeSessionState({ scrollTop: scrollTop }, this.$isBrowser());
-    // this.scrollSpy.suppress();
 
     const wrapper = this.hostWrapperRef.nativeElement;
 
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this.scrollSpy.detectScrollEnd(wrapper, () => {
+          this.activateClickedTocItem(this.$tocTree(), slug);
 
-    this.scrollSpy.detectScrollEnd(wrapper, () => {
-      this.activateClickedTocItem(this.$tocTree(), slug);
-
-      const scrollTop = Number(wrapper.scrollTop.toFixed(2));
-      console.log(`Log: ${this.component} scrollTo  hightlighted Element ${slug} scrolled to=`, scrollTop);
-
-      writeSessionState({ scrollTop: scrollTop }, this.$isBrowser());
-
-      // writeSessionState({ scrollTop: Number(this.scrollSpy.lastScrollTop.toFixed(2)) }, this.$isBrowser());
-
-      this.scrollSpy.allow();
+        });
+      });
     });
+
   }
 
   private highlightElement(el: HTMLElement) {
@@ -509,9 +457,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   private activateClickedTocItem(nodes: TocNode[], slug: string) {
     for (const node of nodes) {
       if (node.entry.slug === slug) {
-
-        // const el = document.getElementById(slug);
-        // el?.classList.add('active-heading');
 
         this.$activeHeading.set(slug);
       }

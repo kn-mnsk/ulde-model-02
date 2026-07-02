@@ -158,12 +158,15 @@ let counter: number = 0;
 export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
   id: 'browser.mermaid',
 
-  async init(container: HTMLElement) {
+  async init(container: HTMLElement): Promise<() => void> {
     const isBrowser =
       typeof window !== 'undefined' &&
       typeof document !== 'undefined';
 
-    if (!isBrowser) return;
+    let handleEventError: (e: any) => void;
+    let handleEventUnhandle: (e: any) => void;
+
+    if (!isBrowser) return () => { };
 
     // clear the contents as initializing to prevent duplication in case of re-run;
     const panel = document.querySelector('.dv-mermaid-debug-panel-content') as HTMLDivElement;
@@ -171,7 +174,7 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
 
     // console.log(`Log: [UldeMermaidBrowserPlugin] init, \ncounter(called)=`, counter++, `\ncontainer=`, container, `\npanel=`, panel);
 
-    const {docTheme} = readSessionState(isBrowser);
+    const { docTheme } = readSessionState(isBrowser);
 
     let mermaidNodes: NodeListOf<HTMLElement> = container.querySelectorAll<HTMLElement>('code.language-mermaid');
     // console.log(`Log: [UldeMermaidBrowserPlugin] mermaidNodes=`, mermaidNodes);
@@ -194,22 +197,25 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
       };
 
       // Also catch global Mermaid-related errors
-      // window.addEventListener('error', (event: any) => {
-      //   const error = event.error;
-      //   if (error && typeof error.stack === 'string' && error.stack.includes('mermaid')) {
-      //     logMermaidDebug(`[Window error]\n${error.message}`);
-      //     // Do not preventDefault globally; just log
-      //   }
-      // });
+      handleEventError = (event: any) => {
+        const error = event.error;
+        if (error && typeof error.stack === 'string' && error.stack.includes('mermaid')) {
+          logMermaidDebug(`[Window error]\n${error.message}`);
+          // Do not preventDefault globally; just log
+        }
+      };
+      window.addEventListener('error', handleEventError);
 
-      // window.addEventListener('unhandledrejection', (event: any) => {
-      //   const reason: any = event.reason;
-      //   if (reason && typeof reason.stack === 'string' && reason.stack.includes('mermaid')) {
-      //     logMermaidDebug(`[Unhandled Promise Rejection]\n${reason.message}`);
-      //   }
-      // });
+      handleEventUnhandle = (event: any) => {
+        const reason: any = event.reason;
+        if (reason && typeof reason.stack === 'string' && reason.stack.includes('mermaid')) {
+          logMermaidDebug(`[Unhandled Promise Rejection]\n${reason.message}`);
+        }
+      };
+      window.addEventListener('unhandledrejection', handleEventUnhandle);
 
       // Initialize Mermaid AFTER nodes exist
+
       mermaid.initialize({
         ...(docTheme === 'dark' ? mermaidConfigDarkTheme : mermaidConfigLightTheme),
 
@@ -230,6 +236,15 @@ export const UldeMermaidBrowserPlugin: BrowserDomPlugin = {
       logMermaidDebug(`[ULDE Mermaid Browser Plugin caught error]\n${err?.message || String(err)}`
       );
     }
+
+    return () => {
+      zoomInHandlers.forEach(zoomIn => zoomIn.button.removeEventListener('click', zoomIn.handler));
+      zoomOutHandlers.forEach(zoomOut => zoomOut.button.removeEventListener('click', zoomOut.handler));
+      resetHandlers.forEach(reset => reset.button.removeEventListener('click', reset.handler));
+
+      window.removeEventListener('error', handleEventError);
+      window.removeEventListener('unhandledrejection', handleEventUnhandle);
+    };
   },
 
 };

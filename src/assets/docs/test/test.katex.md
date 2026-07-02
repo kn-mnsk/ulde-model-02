@@ -121,7 +121,9 @@ stateDiagram-v2
 ```
 
 ---
+
 ## Mermaid Diagram 4
+
 ```mermaid
 ---
 title: Sequence Diagram
