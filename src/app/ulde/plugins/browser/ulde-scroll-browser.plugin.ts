@@ -69,10 +69,10 @@ export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
       const now = performance.now();
       // console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrollpos `);
       // throttle to ~30fps
-      if (now - lastSent < 33) return;
-      lastSent = now;
+      // if (now - lastSent < 33) return;
+      // lastSent = now;
 
-      const scrollTop = Number(container.scrollTop.toFixed(2));
+      const scrollTop = Number(container.scrollTop.toFixed(2) ?? '0');
       const height = container.scrollHeight - container.clientHeight;
 
       // console.log(`Log: [UldeScrollBrowserPlugin] ulde:scrolltop \nscrollTop=`, scrollTop, `\nheight=`, height);
