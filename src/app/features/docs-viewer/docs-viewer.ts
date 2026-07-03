@@ -206,16 +206,24 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
         requestAnimationFrame(() => {
           queueMicrotask(() => {
 
+            // this.overlay.hide(this.tocOverlayRef);
+            // this.overlay.hide(this.hostOverlayRef);
+
             const { scrollTop } = readSessionState(this.$isBrowser())
             this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
+            console.log(`Log: ${this.component} Restore scroll final \nscrolled=`, scrollTop);
 
             this.overlay.hide(this.tocOverlayRef);
             this.overlay.hide(this.hostOverlayRef);
+
+            // this.scrollSpy.allow();
           });
         });
       });
 
       this.$dvTocRef.set(this.dvTocRef);
+      // this.scrollSpy.allow();
+
     });
   }
 
@@ -319,7 +327,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
       this.scrollService.setPosition(docId, scrollTop, 0);
 
-      writeSessionState({ docId: docId, scrollTop: scrollTop, refreshed: false }, this.$isBrowser());
+      writeSessionState({ refreshed: false }, this.$isBrowser());
+      // writeSessionState({ docId: docId, scrollTop: scrollTop, refreshed: false }, this.$isBrowser());
 
       console.log(`Log: ${this.component} restoreFromSessionState() DocsViewer \nRefreshed ${state.refreshed}, \nRestored docId=${docId}, \nRestored scrollPos=${scrollTop}`);
 
@@ -380,6 +389,8 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     console.log(`Log: ${this.component} backToPrevDoc() \n prevDocid=`, prevDocId, `\nprevScrollTop=`, prevScrollTop);
 
     this.$prevDocId.set(docId as string);
+
+    // this.scrollSpy.suppress();
     this.$currentDocId.set(prevDocId as string);
 
   }
@@ -396,7 +407,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   private handleScrollTop(e: any) {
-    this.scrollSpy.allow();
+    // this.scrollSpy.allow();
 
     const scrollTop = e.detail.scrollTop;
     const height = e.detail.scrollHeight;
@@ -404,24 +415,28 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     if (!this.rafPending) this.rafPending = true;
 
     requestAnimationFrame(() => {
-      // console.log(`Log: ${this.component} handleScrollPos scrollTop=`, scrollTop);
+      console.log(`Log: ${this.component} handleScrollPos scrollTop=`, scrollTop);
       this.scrollService.setPosition(this.$currentDocId(), scrollTop, height);
       writeSessionState({ scrollTop: scrollTop }, this.$isBrowser());
 
       this.rafPending = false;
+      // this.scrollSpy.suppress();
 
     });
+
+
   }
 
   // internald docId routing
   private handleNavigate(e: any) {
     requestAnimationFrame(() => {
 
-      console.log(`Log: ${this.component} handleNavigate \nnew docId=`, e.detail.id, `\nanchor position=`, e.detail.scrollTop);
+      const { docId, scrollTop } = readSessionState(this.$isBrowser());
 
-      const { scrollTop } = readSessionState(this.$isBrowser());
-      writeSessionState({ docId: e.detail.id, prevDocId: this.$currentDocId(), scrollTop: 0, prevScrollTop: scrollTop }, this.$isBrowser());
-      this.$prevDocId.set(this.$currentDocId());
+      console.log(`Log: ${this.component} handleNavigate \ncurrent docid=`, docId, this.$currentDocId(), `\nnew docId=`, e.detail.id, `\nnew scrollTop=`, 0, `\ncurrent scrollTop`, scrollTop);
+
+      writeSessionState({ docId: e.detail.id, prevDocId: docId, scrollTop: 0, prevScrollTop: scrollTop }, this.$isBrowser());
+      this.$prevDocId.set(docId as string);
       this.$currentDocId.set(e.detail.id);
 
     });
@@ -433,6 +448,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     const el = document.getElementById(slug);
     if (!el) return;
 
+    this.scrollSpy.suppress();
+
+    // el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     this.highlightElement(el);
 
@@ -444,8 +462,13 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
           this.activateClickedTocItem(this.$tocTree(), slug);
 
         });
+        // this.scrollSpy.allow();
+
       });
     });
+
+    this.scrollSpy.allow();
+
 
   }
 

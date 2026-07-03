@@ -1,12 +1,10 @@
 // app/core/services/scrollspy-controller.ts
 
-import { isBrowser } from "../../global.utils/global.utils";
-import { writeSessionState } from "./session-state.manage";
-
 export class ScrollSpyController {
   private readonly title = '[ScrollSpyController]';
 
-  private suppressed = true; // default
+  private suppressed = false; // default
+  // private suppressed = true; // default
   lastScrollTop = -1;
 
 
@@ -33,10 +31,9 @@ export class ScrollSpyController {
 
         callback();
         const lastScrollTop = Number(this.lastScrollTop.toFixed(2));
-        
-        console.log(`Log: ${this.title} detectScrollEnd final \nend=`, lastScrollTop, `\counter=`, counter);
 
-        writeSessionState({ scrollTop: lastScrollTop }, isBrowser());
+        // console.log(`Log: ${this.title} detectScrollEnd final \nend=`, lastScrollTop, `\counter=`, counter);
+
         return;
       }
 

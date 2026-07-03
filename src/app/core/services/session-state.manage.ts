@@ -48,7 +48,7 @@ export function readSessionState(isBrowser: boolean): SessionState {
       scrollTop: parsed.scrollTop ?? 0,
       prevScrollTop: parsed.prevScrollTop ?? 0,
       refreshed: parsed.refreshed ?? false,
-      docTheme: parsed.docTheme ?? '',
+      docTheme: parsed.docTheme ?? 'dark',
     };
   } catch {
     return SESSION_STATE_DEFAULT;
