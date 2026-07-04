@@ -411,7 +411,7 @@ body[data-theme="light"] {
 //   overflow-y: auto;
 // }
 
-.dv-debug-overlay {
+.dv-debugoverlay-panel {
   position: fixed;
   top: 120px;
   left: 40%; //20px;
@@ -430,6 +430,18 @@ body[data-theme="light"] {
   z-index: 1000;
   transition: opacity 0.25s ease;
 
+  &.theme-enter {
+    transition:
+      opacity 0.25s ease;
+  }
+
+  &.collapsed {
+
+    width: 50px;
+    left: 100px;
+    transform: translateX(-100%);
+  }
+  
   &.visible {
     opacity: 1;
     pointer-events: auto;

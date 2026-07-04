@@ -30,12 +30,12 @@ export const UldeDebugOverlayHtmlPlugin: UldePlugin = {
     // Unified Devtools HTML
     // -----------------------------------------------------
     const html = `
-      <div class="dt-panel-content">
+      <div class="dt-debugoverlay-panel-content">
 
         <!-- Header -->
         <header class="dt-header">
           <div class="dt-title">Debug Overlay</div>
-          <input class="dt-search" placeholder="Search…" />
+          <input name="debugoverlay" type="text" class="dt-search" placeholder="Search…" />
           <div class="dt-drag-handle">⣿</div>
         </header>
 

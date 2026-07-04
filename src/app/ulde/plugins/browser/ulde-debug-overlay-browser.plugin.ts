@@ -11,14 +11,16 @@ export const UldeDebugOverlayBrowserPlugin: BrowserDomPlugin = {
     // -----------------------------------------------------
     // Move ULDE-generated HTML into Angular host container
     // -----------------------------------------------------
-    const embedded = container.querySelector('.dt-panel-content');
+    const embedded = container.querySelector('.dt-debugoverlay-panel-content');
     if (!embedded) return;
 
-    const host = document.querySelector('.dv-debug-overlay') as HTMLElement | null;
+    const panelHeader = embedded.querySelector('.dt-header');
+
+    const host = document.querySelector('.dv-debugoverlay-panel') as HTMLElement | null;
     if (!host) return;
 
     // to prevent duplication in case of re-run;
-    const panelContent = host.querySelector('.dt-panel-content') as HTMLElement;
+    const panelContent = host.querySelector('.dt-debugoverlay-panel-content') as HTMLElement;
     if (panelContent!==null) {
       host.removeChild<HTMLElement>(panelContent);
     }
@@ -38,6 +40,8 @@ export const UldeDebugOverlayBrowserPlugin: BrowserDomPlugin = {
     // SEARCH + FUZZY HIGHLIGHT
     // -----------------------------------------------------
     const searchInput = host.querySelector('.dt-search') as HTMLInputElement | null;
+
+    console.log(`Log: [UldeDebugOverlayBrowserPlugin] searchInput`, searchInput);
 
     if (searchInput) {
       searchInput.addEventListener('input', () => {

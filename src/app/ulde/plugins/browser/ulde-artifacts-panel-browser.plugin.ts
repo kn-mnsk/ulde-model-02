@@ -11,7 +11,7 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
     // -----------------------------------------------------
     // Move ULDE-generated HTML into Angular host container
     // -----------------------------------------------------
-    const embedded = container.querySelector('.dt-panel-content');
+    const embedded = container.querySelector('.dt-artifacts-panel-content');
     if (!embedded) return;
 
     const panelHeader = embedded.querySelector('.dt-header');
@@ -20,7 +20,7 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
     if (!host) return;
 
     // to prevent duplication in case of re-run;
-    const panelContent = host.querySelector('.dt-panel-content') as HTMLElement;
+    const panelContent = host.querySelector('.dt-artifacts-panel-content') as HTMLElement;
     if (panelContent !== null) {
       host.removeChild<HTMLElement>(panelContent);
     }
@@ -39,7 +39,7 @@ export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
     // -----------------------------------------------------
     // SEARCH + FUZZY HIGHLIGHT
     // -----------------------------------------------------
-    const searchInput = host.querySelector('.dt-search') as HTMLInputElement | null;
+    const searchInput = host.querySelector(".dt-search") as HTMLInputElement | null;
 
     if (searchInput) {
       searchInput.addEventListener('input', () => {
