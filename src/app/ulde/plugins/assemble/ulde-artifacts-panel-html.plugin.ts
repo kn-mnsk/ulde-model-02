@@ -28,12 +28,12 @@ export const UldeArtifactsPanelHtmlPlugin: UldePlugin = {
     // Render unified devtools HTML
     // -----------------------------------------------------
     const html = `
-      <div class="dt-panel-content">
+      <div class="dt-artifacts-panel-content">
 
         <!-- Header -->
         <header class="dt-header">
           <div class="dt-title">Artifacts</div>
-          <input class="dt-search" placeholder="Search artifacts…" />
+          <input name="artifacts" type="text" class="dt-search" placeholder="Search artifacts…" />
           <div class="dt-drag-handle">⣿</div>
         </header>
 
