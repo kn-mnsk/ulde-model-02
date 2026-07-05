@@ -19,12 +19,16 @@ export class UldeDocsViewerBridge {
 
   constructor() {
     // Register browser DOM plugins
-    this.host.registerBrowserDomPlugin(UldeMermaidBrowserPlugin);
-    this.host.registerBrowserDomPlugin(UldeKatexBrowserPlugin);
-    this.host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
-    this.host.registerBrowserDomPlugin(UldeScrollBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeDebugOverlayBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeArtifactsPanelBrowserPlugin);
+    this.host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
+    this.host.registerBrowserDomPlugin(UldeScrollBrowserPlugin);
+    this.host.registerBrowserDomPlugin(UldeMermaidBrowserPlugin);
+    this.host.registerBrowserDomPlugin(UldeKatexBrowserPlugin);
+    // this.host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
+    // this.host.registerBrowserDomPlugin(UldeScrollBrowserPlugin);
+    // this.host.registerBrowserDomPlugin(UldeDebugOverlayBrowserPlugin);
+    // this.host.registerBrowserDomPlugin(UldeArtifactsPanelBrowserPlugin);
   }
 
   // new version
@@ -92,6 +96,7 @@ export class UldeDocsViewerBridge {
     // -------------------------------
     this.host.run(host, html);
 
+    console.log(`Log: [UldeDocsViewerBridge] host.run finished`);
     // -------------------------------
     // Cleanup function
     // -------------------------------

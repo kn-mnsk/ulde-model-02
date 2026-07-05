@@ -201,28 +201,100 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
         onNavigate: e => this.handleNavigate(e)
       });
 
+      console.log(`Log: ${this.component} ULDE host finished`, this.cleanupFn);
+
       // Restore scroll + hide overlays
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          queueMicrotask(() => {
+      // requestAnimationFrame(() => {
+      //   requestAnimationFrame(() => {
+      //     queueMicrotask(() => {
 
-            // this.overlay.hide(this.tocOverlayRef);
-            // this.overlay.hide(this.hostOverlayRef);
+      //       // this.overlay.hide(this.tocOverlayRef);
+      //       // this.overlay.hide(this.hostOverlayRef);
 
-            const { scrollTop } = readSessionState(this.$isBrowser())
-            this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
-            console.log(`Log: ${this.component} Restore scroll final \nscrolled=`, scrollTop);
+      //       const { scrollTop } = readSessionState(this.$isBrowser())
+      //       this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
+      //       console.log(`Log: ${this.component} Restore scroll final \nscrolled=`, scrollTop);
 
-            this.overlay.hide(this.tocOverlayRef);
-            this.overlay.hide(this.hostOverlayRef);
+      //       this.overlay.hide(this.tocOverlayRef);
+      //       this.overlay.hide(this.hostOverlayRef);
 
-            // this.scrollSpy.allow();
-          });
-        });
+      //       // this.scrollSpy.allow();
+      //     });
+      //   });
+      // });
+      // this.$dvTocRef.set(this.dvTocRef);
+      // this.scrollSpy.allow();
+
+      // another way
+
+      // queueMicrotask(() => {
+      //   console.log(`Log: [DocsViewer] Third queueMicrotask`);
+
+      //   if (this.scrollSpy.isSuppressed()) {
+      //     this.scrollSpy.allow();
+      //   }
+      // });
+
+      // queueMicrotask(() => {
+      //   console.log(`Log: [DocsViewer] First queueMicrotask`);
+      //   this.$dvTocRef.set(this.dvTocRef);
+      // });
+
+      queueMicrotask(() => {
+        console.log(`Log: [DocsViewer] Second queueMicrotask`);
+        this.$dvTocRef.set(this.dvTocRef);
+
+        this.overlay.hide(this.tocOverlayRef);
+        this.overlay.hide(this.hostOverlayRef);
+
+        if (this.scrollSpy.isSuppressed()) {
+          console.log(`Log: [DocsViewer] this.scrollSpy.allow()`);
+          this.scrollSpy.allow();
+        }
+
       });
 
-      this.$dvTocRef.set(this.dvTocRef);
-      // this.scrollSpy.allow();
+
+      // if (this.scrollSpy.isSuppressed()) {
+      //   console.log(`Log: [DocsViewer] this.scrollSpy.allow()`);
+
+      //   this.scrollSpy.allow();
+      // }
+
+      requestAnimationFrame(() => {
+        console.log(`Log: [DocsViewer] raf`);
+        queueMicrotask(() => {
+          console.log(`Log: [DocsViewer] Third queueMicrotask`);
+
+          // if (this.scrollSpy.isSuppressed()) {
+          //   this.scrollSpy.allow();
+          // }
+
+
+          const { scrollTop } = readSessionState(this.$isBrowser())
+          this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
+          console.log(`Log: ${this.component} Restore scroll final \nscrolled=`, scrollTop);
+        });
+      });
+      // requestAnimationFrame(() => {
+      //   requestAnimationFrame(() => {
+      //     // const { scrollTop } = readSessionState(this.$isBrowser())
+      //     // this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
+      //     // console.log(`Log: ${this.component} Restore scroll final \nscrolled=`, scrollTop);
+      //     console.log(`Log: [DocsViewer] raf`);
+
+      //     // if (this.scrollSpy.isSuppressed()) {
+      //     //   this.scrollSpy.allow();
+      //     // }
+
+
+      //     const { scrollTop } = readSessionState(this.$isBrowser())
+      //     this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
+      //     console.log(`Log: ${this.component} Restore scroll final \nscrolled=`, scrollTop);
+      //   });
+      // });
+
+
 
     });
   }
@@ -383,6 +455,12 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
   backToPrevDoc() {
 
+    if (!this.scrollSpy.isSuppressed()) {
+      console.log(`Log: ${this.component} backToPrevDoc() \this.scrollSpy.suppress()`);
+
+      this.scrollSpy.suppress();
+    }
+
     const { docId, prevDocId, scrollTop, prevScrollTop } = readSessionState(this.$isBrowser());
     writeSessionState({ docId: prevDocId, prevDocId: docId, scrollTop: prevScrollTop, prevScrollTop: scrollTop }, this.$isBrowser());
 
@@ -456,18 +534,40 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
     const wrapper = this.hostWrapperRef.nativeElement;
 
+    // this.scrollSpy.allow();
+
+    // queueMicrotask(() => {
+
+    //   this.scrollSpy.detectScrollEnd(wrapper, () => {
+    //     this.activateClickedTocItem(this.$tocTree(), slug);
+
+    //   });
+
+
+    //   // this.activateClickedTocItem(this.$tocTree(), slug);
+    //   this.scrollSpy.allow();
+    // });
+    queueMicrotask(() => {
+      this.scrollSpy.detectScrollEnd(wrapper, () => {
+        this.activateClickedTocItem(this.$tocTree(), slug);
+
+      });
+    });
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        this.scrollSpy.detectScrollEnd(wrapper, () => {
-          this.activateClickedTocItem(this.$tocTree(), slug);
 
-        });
-        // this.scrollSpy.allow();
+        // this.activateClickedTocItem(this.$tocTree(), slug);
+
+        // this.scrollSpy.detectScrollEnd(wrapper, () => {
+        //   this.activateClickedTocItem(this.$tocTree(), slug);
+
+        // });
+        this.scrollSpy.allow();
 
       });
     });
 
-    this.scrollSpy.allow();
+    // this.scrollSpy.allow();
 
 
   }
