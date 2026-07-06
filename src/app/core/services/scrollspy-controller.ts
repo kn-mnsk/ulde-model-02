@@ -10,10 +10,12 @@ export class ScrollSpyController {
 
   suppress() {
     this.suppressed = true;
+    console.log(`Log: [ScrollSpyController] suppress()`);
   }
 
   allow() {
     this.suppressed = false;
+    console.log(`Log: [ScrollSpyController] allow()`);
   }
 
   isSuppressed() {
@@ -29,10 +31,11 @@ export class ScrollSpyController {
 
       if (now === this.lastScrollTop) {
 
-        callback();
         const lastScrollTop = Number(this.lastScrollTop.toFixed(2));
 
-        // console.log(`Log: ${this.title} detectScrollEnd final \nend=`, lastScrollTop, `\counter=`, counter);
+        console.log(`Log: ${this.title} detectScrollEnd final \nend=`, lastScrollTop, `\counter=`, counter);
+
+        callback();
 
         return;
       }

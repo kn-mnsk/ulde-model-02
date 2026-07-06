@@ -41,7 +41,7 @@ export const UldeDebugOverlayBrowserPlugin: BrowserDomPlugin = {
     // -----------------------------------------------------
     const searchInput = host.querySelector('.dt-search') as HTMLInputElement | null;
 
-    console.log(`Log: [UldeDebugOverlayBrowserPlugin] searchInput`, searchInput);
+    // console.log(`Log: [UldeDebugOverlayBrowserPlugin] searchInput`, searchInput);
 
     if (searchInput) {
       searchInput.addEventListener('input', () => {
