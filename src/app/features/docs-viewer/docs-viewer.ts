@@ -62,6 +62,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   $isMermaidPanelFilled = signal(true);
   $dvTocRef = signal<ElementRef<HTMLElement> | undefined>(undefined);
   $savedScrollTop = signal(0);
+  $isBrowserRefreshed = signal<boolean | null>(null);
 
   private cleanupFn: (() => void) | null = null;
   private finalHtml: string | null = null;
@@ -103,28 +104,25 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
     // Sync external docId → internal
     effect(() => {
+      if (!this.$isBrowserRefreshed()) return; // avoid to react to initial value
       // check refresh (, reload, too)
       let id: string | null = null;
-      this.restoreFromSessionState().then(b => {
-        if (b) { // refreshed
-
-          const { docId, prevDocId } = readSessionState(this.$isBrowser());
-          if (!docId || !prevDocId) return;
-          id = docId;
-          console.log(`Log: ${this.component} effect refresh \n docid=`, id,);
-          this.$prevDocId.set(prevDocId);
-          this.$currentDocId.set(id);
-        } else {
-
-          id = this.$inputDocId();
-          if (!id) return;
-          console.log(`Log: ${this.component} effect first load \n docid=`, id,);
-          writeSessionState({ docId: id, prevDocId: id }, this.$isBrowser());
-          this.$prevDocId.set(id);
-          this.$currentDocId.set(id);
-        }
-
-      });
+      // this.restoreFromSessionState().then(b => {
+      if (this.$isBrowserRefreshed()) { // refreshed
+        const { docId, prevDocId } = readSessionState(this.$isBrowser());
+        if (!docId || !prevDocId) return;
+        id = docId;
+        console.log(`Log: ${this.component} effect refresh \n docid=`, id,);
+        this.$prevDocId.set(prevDocId);
+        this.$currentDocId.set(id);
+      } else {
+        id = this.$inputDocId();
+        if (!id) return;
+        console.log(`Log: ${this.component} effect first load \n docid=`, id,);
+        writeSessionState({ docId: id, prevDocId: id }, this.$isBrowser());
+        this.$prevDocId.set(id);
+        this.$currentDocId.set(id);
+      }
 
     });
 
@@ -203,82 +201,31 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
       const { scrollTop } = readSessionState(this.$isBrowser());
       const wrapper = this.hostWrapperRef.nativeElement;
+
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           console.log(`Log: ${this.component}constructor raf 2`, `should-be scrollTop=`, scrollTop);
 
-          queueMicrotask(() => {
+          // queueMicrotask(() => {
             // const { scrollTop } = readSessionState(this.$isBrowser());
             // wrapper.scrollTop = scrollTop;
             this.$dvTocRef.set(this.dvTocRef);
 
             this.overlay.hide(this.tocOverlayRef);
-            this.overlay.hide(this.hostOverlayRef);
+            this.overlay.hide(this.hostOverlayRef)
+
+            wrapper.scrollTop = scrollTop;
 
             this.scrollSpy.allow();
 
-            console.log(`Log: ${this.component} constructor queueMicrotask`);
-
             // wrapper.scrollTop = scrollTop;
 
-            //   this.scrollSpy.detectScrollEnd(wrapper, () => {
-            //     this.$dvTocRef.set(this.dvTocRef);
+            console.log(`Log: ${this.component} constructor requestAnimationFrame`);
 
-            //     this.overlay.hide(this.tocOverlayRef);
-            //     this.overlay.hide(this.hostOverlayRef);
-
-            //     this.scrollSpy.allow();
-
-            //     wrapper.scrollTop = scrollTop;
-
-            //   });
-
-          });
+          // });
 
         });
       });
-
-
-      setTimeout(() => {
-        wrapper.scrollTop = scrollTop;
-        console.log(`Log: setTimeout`);
-      }, 500)
-      // queueMicrotask(() => {
-      //   console.log(`Log: [DocsViewer] Second queueMicrotask`);
-      //   this.$dvTocRef.set(this.dvTocRef);
-
-      //   this.overlay.hide(this.tocOverlayRef);
-      //   this.overlay.hide(this.hostOverlayRef);
-
-      //   if (this.scrollSpy.isSuppressed()) {
-      //     console.log(`Log: [DocsViewer] this.scrollSpy.allow()`);
-      //     this.scrollSpy.allow();
-      //   }
-
-      // });
-
-
-      // if (this.scrollSpy.isSuppressed()) {
-      //   console.log(`Log: [DocsViewer] this.scrollSpy.allow()`);
-
-      //   this.scrollSpy.allow();
-      // }
-
-      // requestAnimationFrame(() => {
-      //   console.log(`Log: [DocsViewer] raf`);
-      //   queueMicrotask(() => {
-      //     console.log(`Log: [DocsViewer] Third queueMicrotask`);
-
-      //     // if (this.scrollSpy.isSuppressed()) {
-      //     //   this.scrollSpy.allow();
-      //     // }
-
-
-      //     const { scrollTop } = readSessionState(this.$isBrowser())
-      //     this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
-      //     console.log(`Log: ${this.component} Restore scroll final \nscrolled=`, scrollTop);
-      //   });
-      // });
 
     });
   }
@@ -297,6 +244,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
+    if (!this.$isBrowser()) return;
+
+    this.$isBrowserRefreshed.set(this.restoreFromSessionState());
 
   }
 
@@ -346,7 +296,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   // Refresh / restore logic
   // -------------------------
 
-  private async restoreFromSessionState(): Promise<boolean> {
+  private restoreFromSessionState(): boolean {
 
     const state = readSessionState(this.$isBrowser());
 
