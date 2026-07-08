@@ -325,9 +325,9 @@ Well, we don't really know when user wants to allow. But that's not a problem. S
 
 When, finally user clicks to allow, our API receives the data from browser, and uses the success callback to handle this result.
 
-But, it can't just push that success function into the call stack. We don't know what's really happening in the call stack at this moment. It might interrupt some other process that are happening and it might cause some weird bugs. That's where other players come into play. Let's introduce __Task Queue__, also known as __Callback queue__. This queue holds web api callbacks and event handlers to be able to get executed at some point in the future. When is this future? Whenever call stack is available!
+But, it can't just push that success function into the call stack. We don't know what's really happening in the call stack at this moment. It might interrupt some other process that are happening and it might cause some weird bugs. That's where other players come into play. Let's introduce __Task Queue__, also known as __Callback queue__. __This queue holds web api callbacks and event handlers to be able to get executed at some point in the future__. When is this future? Whenever call stack is available!
 
-But how can we know when will call stack will be available? And now, to solve this problem, even another player comes into screen. And it's __Event Loop__. As the name says, it's a loop that checks the call stack continuously to see if it's available. If call stack is available, event loop will take the first available task from the task queue and moves it to the call stack. See below image;
+But how can we know when will call stack will be available? And now, to solve this problem, even another player comes into screen. And it's __Event Loop__([see ref01](https://www.javascripttutorial.net/javascript-event-loop/), [see ref02](https://javascript.info/event-loop)). As the name says, it's a loop that checks the call stack continuously to see if it's available. If call stack is available, event loop will take the first available task from the task queue and moves it to the call stack. See below image;
 
 ![](https://www.deepintodev.com/_next/image?url=%2Fimages%2Feventloop.png&w=1080&q=75)
 
