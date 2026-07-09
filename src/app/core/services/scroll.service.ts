@@ -60,6 +60,8 @@ scrollToElementInViewer(
 
   let targetScroll = offsetTop;
 
+  console.log(`Log: [ScrollService] scrollToElementInViewer() \nviewer rect`, viewerRect, `\nelement ret`, elementRect, `\ncurrentScroll=`, currentScroll, `\noffsetTop`, offsetTop, `\ntargetScroll=`, targetScroll);
+
   if (align === "center") {
     const elementHeight = elementRect.height;
     const viewerHeight = viewerRect.height;

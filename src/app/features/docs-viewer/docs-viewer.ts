@@ -200,27 +200,39 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       });
 
       const { scrollTop } = readSessionState(this.$isBrowser());
-      const wrapper = this.hostWrapperRef.nativeElement;
+      // this.$savedScrollTop.set(scrollTop);
+
+      this.$dvTocRef.set(this.dvTocRef);
+
+      this.overlay.hide(this.tocOverlayRef);
+      this.overlay.hide(this.hostOverlayRef);
+
+
+      // this.overlay.hide(this.tocOverlayRef);
+      // this.overlay.hide(this.hostOverlayRef)
+
+      // this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
 
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          console.log(`Log: ${this.component}constructor raf 2`, `should-be scrollTop=`, scrollTop);
+          console.log(`Log: ${this.component}constructor raf Begin`, `\ncurrentDocId=`, this.$currentDocId(), `\nshould-be scrollTop=`, scrollTop);
 
           // queueMicrotask(() => {
-            // const { scrollTop } = readSessionState(this.$isBrowser());
-            // wrapper.scrollTop = scrollTop;
-            this.$dvTocRef.set(this.dvTocRef);
+          // const { scrollTop } = readSessionState(this.$isBrowser());
+          // wrapper.scrollTop = scrollTop;
+          // this.$dvTocRef.set(this.dvTocRef);
 
-            this.overlay.hide(this.tocOverlayRef);
-            this.overlay.hide(this.hostOverlayRef)
+          // this.overlay.hide(this.tocOverlayRef);
+          // this.overlay.hide(this.hostOverlayRef)
 
-            wrapper.scrollTop = scrollTop;
+          this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
 
-            this.scrollSpy.allow();
+          this.scrollSpy.allow();
 
-            // wrapper.scrollTop = scrollTop;
+          // this.hostWrapperRef.nativeElement.scrollTop = this.$savedScrollTop();
+          // wrapper.scrollTop = scrollTop;
 
-            console.log(`Log: ${this.component} constructor requestAnimationFrame`);
+          console.log(`Log: ${this.component} constructor raf End`, `\nactual scrollTop`, this.hostWrapperRef.nativeElement.scrollTop);
 
           // });
 
@@ -427,7 +439,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     if (!this.rafPending) this.rafPending = true;
 
     requestAnimationFrame(() => {
-      console.log(`Log: ${this.component} handleScrollPos scrollTop=`, scrollTop);
+      console.log(`Log: ${this.component} handleScrollTop() \nscrollTop=`, scrollTop, `\ndocId`, this.$currentDocId());
       this.scrollService.setPosition(this.$currentDocId(), scrollTop, height);
       writeSessionState({ scrollTop: scrollTop }, this.$isBrowser());
 
@@ -462,24 +474,42 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
     this.scrollSpy.suppress();
 
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    this.highlightElement(el);
-
-    const wrapper = this.hostWrapperRef.nativeElement;
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        queueMicrotask(() => {
-
-          this.scrollSpy.detectScrollEnd(wrapper, () => {
-            this.activateClickedTocItem(this.$tocTree(), slug);
-            // console.log(`Log: [DocsViewer] scrollTo queusMicroTask`);
-            this.scrollSpy.allow();
-          });
-        });
-      });
+    // this.scrollService.scrollToElementInViewer(this.hostWrapperRef.nativeElement, el, "smooth", "top");
+    // el.scrollIntoView();
+    queueMicrotask(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.highlightElement(el);
     });
+
+    // const wrapper = this.hostWrapperRef.nativeElement;
+
+
+    this.scrollSpy.detectScrollEnd(this.hostWrapperRef.nativeElement, () => {
+      this.activateClickedTocItem(this.$tocTree(), slug);
+
+      // this.$savedScrollTop.set(this.scrollSpy.lastScrollTop);
+      // console.log(`Log: [DocsViewer] scrollTo queusMicroTask`);
+      this.scrollSpy.allow();
+
+      // requestAnimationFrame(() => {
+      //   this.hostWrapperRef.nativeElement.scrollTop = this.scrollSpy.lastScrollTop;
+      // });
+
+
+    });
+
+    // requestAnimationFrame(() => {
+    //   requestAnimationFrame(() => {
+    //     // queueMicrotask(() => {
+
+    //     this.scrollSpy.detectScrollEnd(this.hostWrapperRef.nativeElement, () => {
+    //       this.activateClickedTocItem(this.$tocTree(), slug);
+    //       // console.log(`Log: [DocsViewer] scrollTo queusMicroTask`);
+    //       this.scrollSpy.allow();
+    //       // });
+    //     });
+    //   });
+    // });
 
 
     // this.highlightElement(el);
