@@ -1,13 +1,8 @@
 // app/ulde-viewer/ulde-renderer.service.ts
 
 import { Injectable, ElementRef } from '@angular/core';
-import {
-  createUldeRenderer,
-  UldeRendererHandle,
-  UldeRendererConfig,
-  UldeRendererEvents,
-  UldeRendererState
-} from './ulde-renderer-api';
+import { createUldeRenderer } from './ulde-renderer-api';
+import type {UldeRendererHandle, UldeRendererConfig, UldeRendererEvents, UldeRendererState } from './ulde-renderer-api';
 
 @Injectable({ providedIn: 'root' })
 export class UldeRendererService {

@@ -15,7 +15,7 @@
  */
 
 import { UldePhase } from '../lifecycle/ulde-phases';
-import { UldePhaseContext } from '../lifecycle/ulde-phase-context';
+import type { UldePhaseContext } from '../lifecycle/ulde-phase-context';
 /**
  * Plugin metadata describes WHAT the plugin is.
  *

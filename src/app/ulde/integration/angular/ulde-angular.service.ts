@@ -3,12 +3,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { runUldeStringPluginPipeline } from '../../core/lifecycle/ulde-orchestrator';
-import { TocEntry } from '../../core/artifacts/ulde-artifacts';
+import type { TocEntry } from '../../core/artifacts/ulde-artifacts';
 
-import {
-  DebugOverlayModel,
-  ArtifactsPanelModel,
-} from '../../core/artifacts/ulde-artifacts';
+import type { DebugOverlayModel, ArtifactsPanelModel, } from '../../core/artifacts/ulde-artifacts';
 
 export interface UldeRunResult {
   finalHtml: string;

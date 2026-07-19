@@ -1,6 +1,6 @@
 // app/ulde/plugins/browser/ulde-debug-overlay-browser.plugin.ts
 
-import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
+import type { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
 
 export const UldeDebugOverlayBrowserPlugin: BrowserDomPlugin = {
   id: 'browser.debug-overlay',

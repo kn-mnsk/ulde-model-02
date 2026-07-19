@@ -1,7 +1,7 @@
 import type { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
 import type { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
-import { LinkEntry } from '../../core/artifacts/ulde-artifacts';
+import type { LinkEntry } from '../../core/artifacts/ulde-artifacts';
 
 
 export const UldeLinksPlugin: UldePlugin = {

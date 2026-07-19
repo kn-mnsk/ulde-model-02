@@ -1,10 +1,10 @@
 // ulde/core/lifecycle/ulde-orchestrator.ts
 
 import { UldePhase } from './ulde-phases';
-import { UldePhaseContext } from './ulde-phase-context';
+import type { UldePhaseContext } from './ulde-phase-context';
 import { createUldeStringPluginRegistry } from '../registry/ulde-plugin-registry';
 import { UldeRegistry } from '../registry/ulde-registry';
-import { UldeConfig } from '../config/ulde-config';
+import type { UldeConfig } from '../config/ulde-config';
 
 /**
  * ULDE Pipeline Input

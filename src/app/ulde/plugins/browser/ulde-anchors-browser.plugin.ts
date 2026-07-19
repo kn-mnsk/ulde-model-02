@@ -1,7 +1,7 @@
 // ulde/plugins/browser/ulde-anchors-browser.plugin.ts
 
 import { access } from 'node:fs/promises';
-import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
+import type { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
 
 export const UldeAnchorsBrowserPlugin: BrowserDomPlugin = {
   id: 'browser.anchors',

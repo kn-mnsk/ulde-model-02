@@ -1,5 +1,5 @@
 // ulde/plugins/browser/ulde-scroll-browser.plugin.ts
-import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
+import type { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
 
 export const UldeScrollBrowserPlugin: BrowserDomPlugin = {
   id: 'browser.scrollspy',

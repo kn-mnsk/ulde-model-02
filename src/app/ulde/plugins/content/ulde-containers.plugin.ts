@@ -28,9 +28,9 @@
  * not to implement a full container system.
  */
 
-import { UldePlugin } from '../../core/registry/ulde-plugin-api';
+import type { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
-import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
+import type { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
 
 
 export const UldeContainersPlugin: UldePlugin = {

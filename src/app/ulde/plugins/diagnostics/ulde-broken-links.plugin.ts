@@ -1,9 +1,9 @@
 // ulde/plugins/diagnostics/ulde-broken-links.plugin.ts
 
-import { UldePlugin } from '../../core/registry/ulde-plugin-api';
+import type { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
-import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
-import { DiagnosticEntry } from '../../core/artifacts/ulde-artifacts';
+import type { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
+import type { DiagnosticEntry } from '../../core/artifacts/ulde-artifacts';
 
 export const UldeBrokenLinksPlugin: UldePlugin = {
   meta: {

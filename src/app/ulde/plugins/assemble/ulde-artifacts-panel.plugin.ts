@@ -18,9 +18,9 @@
  * not to implement a full UI.
  */
 
-import { UldePlugin } from '../../core/registry/ulde-plugin-api';
+import type { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
-import { UldeArtifacts, ArtifactsPanelSection, ArtifactsPanelGroup } from '../../core/artifacts/ulde-artifacts';
+import type { UldeArtifacts, ArtifactsPanelSection, ArtifactsPanelGroup } from '../../core/artifacts/ulde-artifacts';
 
 
 function buildGroupedSections(artifacts: UldeArtifacts): ArtifactsPanelGroup[] {

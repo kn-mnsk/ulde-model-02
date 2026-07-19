@@ -1,8 +1,8 @@
 // app/ulde/plugins/assemble/ulde-artifacts-panel-html.plugin.ts
 
-import { UldePlugin } from '../../core/registry/ulde-plugin-api';
+import type { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
-import { ArtifactsPanelGroup } from '../../core/artifacts/ulde-artifacts';
+import type { ArtifactsPanelGroup } from '../../core/artifacts/ulde-artifacts';
 
 export const UldeArtifactsPanelHtmlPlugin: UldePlugin = {
   meta: {

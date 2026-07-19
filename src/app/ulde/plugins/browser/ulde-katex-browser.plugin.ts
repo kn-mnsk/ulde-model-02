@@ -1,6 +1,6 @@
 // ulde/plugins/browser/ulde-katex-browser.plugin.ts
 
-import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
+import type { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
 import renderMathInElement from 'katex/contrib/auto-render';
 // import 'katex/dist/katex.min.css';
 

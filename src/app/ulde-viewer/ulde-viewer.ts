@@ -1,19 +1,11 @@
 // ulde-viewer/ulde-viewer.ts
 
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  Output,
-  ViewChild
-} from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import type { AfterViewInit, OnDestroy, } from '@angular/core';
 import {
   UldeRendererService
 } from './ulde-renderer.service';
-import { UldeRendererState } from './ulde-renderer-api';
+import type { UldeRendererState } from './ulde-renderer-api';
 
 @Component({
   selector: 'ulde-viewer',
@@ -39,7 +31,7 @@ export class UldeViewer implements AfterViewInit, OnDestroy {
   @Output() error = new EventEmitter<Error>();
   @Output() stateChange = new EventEmitter<UldeRendererState>();
 
-  constructor(private rendererService: UldeRendererService) {}
+  constructor(private rendererService: UldeRendererService) { }
 
   ngAfterViewInit(): void {
     this.rendererService.init(

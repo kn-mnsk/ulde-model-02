@@ -1,8 +1,8 @@
 // app/ulde/plugins/assemble/ulde-debug-overlay-html.plugin.ts
 
-import { UldePlugin } from '../../core/registry/ulde-plugin-api';
+import type { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
-import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
+import type { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
 
 export const UldeDebugOverlayHtmlPlugin: UldePlugin = {
   meta: {

@@ -1,6 +1,6 @@
 // app/ulde/plugins/browser/ulde-artifacts-panel-browser.plugin.ts
 
-import { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
+import type { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
 
 export const UldeArtifactsPanelBrowserPlugin: BrowserDomPlugin = {
   id: 'browser.artifacts-panel',

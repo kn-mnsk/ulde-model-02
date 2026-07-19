@@ -1,15 +1,17 @@
 // app/feature/docs-viewer/docs-viewer.ts
 
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, effect, input, signal, Inject, PLATFORM_ID, computed, Renderer2 } from '@angular/core';
+import { Component, ElementRef, ViewChild,  effect, input, signal, Inject, PLATFORM_ID, computed, Renderer2 } from '@angular/core';
+import type {AfterViewInit, OnDestroy} from '@angular/core';
 import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
 
 import { TocResizerDirective } from './toc-resizer.directive';
 import { UldeDocsViewerBridge } from '../../ulde/integration/angular/ulde-docs-viewer-bridge.service';
 import { UldeAngularService } from '../../ulde/integration/angular/ulde-angular.service';
 
-import { TocEntry, ArtifactsPanelModel, DebugOverlayModel, TocNode } from '../../ulde/core/artifacts/ulde-artifacts';
+import type { TocEntry, ArtifactsPanelModel, DebugOverlayModel, TocNode } from '../../ulde/core/artifacts/ulde-artifacts';
 
-import { ThemeName, ThemeService } from '../../core/services/theme.service';
+import { ThemeService } from '../../core/services/theme.service';
+import type { ThemeName } from '../../core/services/theme.service';
 import { ThemeToggle } from './theme-toggle';
 import { ScrollService } from '../../core/services/scroll.service';
 import { writeSessionState, readSessionState } from '../../core/services/session-state.manage';

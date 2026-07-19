@@ -1,7 +1,7 @@
 // ulde/core/registry/ulde-registry.ts
 
 import { UldePhase } from '../lifecycle/ulde-phases';
-import { UldePlugin } from './ulde-plugin-api';
+import type { UldePlugin } from './ulde-plugin-api';
 
 // export interface UldePlugin {
 //   name: string;

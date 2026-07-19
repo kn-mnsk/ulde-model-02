@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';;
+import type { Routes } from '@angular/router';;
 // import { PageNotFound } from './page-not-found/page-not-found';
 // import { Error } from './page-error/error';
 

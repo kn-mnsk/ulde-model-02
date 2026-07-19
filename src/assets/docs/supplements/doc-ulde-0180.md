@@ -68,7 +68,7 @@ src/app/ulde/plugin-system/plugins/mermaid/mermaid.plugin.ts
 ```
 __mermaid.plugin.ts__
 ```ts
-import { UldePlugin } from '../../registry/plugin-registry';
+import type { UldePlugin } from '../../registry/plugin-registry';
 
 export const MermaidPlugin: UldePlugin = {
   name: 'mermaid',

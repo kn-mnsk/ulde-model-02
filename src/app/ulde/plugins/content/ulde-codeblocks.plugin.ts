@@ -20,10 +20,10 @@
  * not to implement a full markdown parser.
  */
 
-import { UldePlugin } from '../../core/registry/ulde-plugin-api';
+import type { UldePlugin } from '../../core/registry/ulde-plugin-api';
 import { UldePhase } from '../../core/lifecycle/ulde-phases';
-import { CodeblockEntry } from '../../core/artifacts/ulde-artifacts';
-import { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
+import type { CodeblockEntry } from '../../core/artifacts/ulde-artifacts';
+import type { UldePhaseContext } from '../../core/lifecycle/ulde-phase-context';
 
 export const UldeCodeblocksPlugin: UldePlugin = {
   // ---------------------------------------------------------

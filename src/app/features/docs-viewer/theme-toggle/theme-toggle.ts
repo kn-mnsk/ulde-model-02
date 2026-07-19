@@ -1,7 +1,8 @@
 // app/features/docs-viewer/theme-toggle/theme-toggle.ts
 
 import { Component, signal, output } from '@angular/core';
-import { ThemeName, defaultThemeName } from '../../../core/services/theme.service';
+import { defaultThemeName } from '../../../core/services/theme.service';
+import type { ThemeName } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-theme-toggle',
