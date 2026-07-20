@@ -1,55 +1,33 @@
 /* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
 /* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
-  "compileOnSave": false,
+  "compileOnSave": false,                 // ✔ TS7-safe
   "compilerOptions": {
-    /* Modern Output*/
-    "target": "ES2022",
-    "module": "esnext",
-    "moduleResolution": "bundler",
-
-    /* TS7 defaults & correctness*/
-    "strict": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "skipLibCheck": true,
-
-    /* Performance (TS7 Go compiler) */
-  /*  "checkers": 4,   // parallel type-checking
-    "builders": 4,   // parallel emit */
-
-    /* Project hygiene */
-    "resolvePackageJsonExports": true,
-    "resolvePackageJsonImports": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-
-    /* Source maps */
-    "sourceMap": true,
-    "inlineSources": true,
-
-    "rootDir": "./src",
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "experimentalDecorators": true,
-    "importHelpers": true
+    "rootDir": "./src",                   // ✔ TS7-safe (required when using outDir)
+    "strict": true,                       // ✔ TS7 default
+    "verbatimModuleSyntax": false,        // true for TS7
+    "noImplicitOverride": true,           // ✔ TS7-safe
+    "noPropertyAccessFromIndexSignature": true, // ✔ TS7-safe
+    "noImplicitReturns": true,            // ✔ TS7-safe
+    "noFallthroughCasesInSwitch": true,   // ✔ TS7-safe
+    "skipLibCheck": true,                 // ✔ TS7-safe
+    "isolatedModules": true,              // ✔ TS7-safe (recommended)
+    "experimentalDecorators": true,       // ✔ TS7-safe
+    "importHelpers": true,                // ✔ TS7-safe
+    "target": "ES2022",                   // ✔ TS7-safe (TS7 requires ES2015+)
+    // "module": "esnext",                  // ✔ TS7-safe if using Angular CLI
+    "module": "preserve",                  // ✔ TS7-safe if using Angular CLI
+    // "moduleResolution": "node"           // "bundler" for TS7
   },
   "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false,
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true,
-    "strictTemplates": true
+    "enableI18nLegacyMessageIdFormat": false, // ✔ TS7-safe
+    "strictInjectionParameters": true,        // ✔ TS7-safe
+    "strictInputAccessModifiers": true,       // ✔ TS7-safe
+    "strictTemplates": true                   // ✔ TS7-safe
   },
   "files": [],
   "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ],
-
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.spec.json" }
+  ]
 }

@@ -202,7 +202,6 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       });
 
       const { scrollTop } = readSessionState(this.$isBrowser());
-      // this.$savedScrollTop.set(scrollTop);
 
       this.$dvTocRef.set(this.dvTocRef);
 
@@ -210,31 +209,15 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       this.overlay.hide(this.hostOverlayRef);
 
 
-      // this.overlay.hide(this.tocOverlayRef);
-      // this.overlay.hide(this.hostOverlayRef)
-
-      // this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
-
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          console.log(`Log: ${this.component}constructor raf Begin`, `\ncurrentDocId=`, this.$currentDocId(), `\nshould-be scrollTop=`, scrollTop);
-
-          // queueMicrotask(() => {
-          // const { scrollTop } = readSessionState(this.$isBrowser());
-          // wrapper.scrollTop = scrollTop;
-          // this.$dvTocRef.set(this.dvTocRef);
-
-          // this.overlay.hide(this.tocOverlayRef);
-          // this.overlay.hide(this.hostOverlayRef)
+          // console.log(`Log: ${this.component}constructor raf Begin`, `\ncurrentDocId=`, this.$currentDocId(), `\nshould-be scrollTop=`, scrollTop);
 
           this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
 
           this.scrollSpy.allow();
 
-          // this.hostWrapperRef.nativeElement.scrollTop = this.$savedScrollTop();
-          // wrapper.scrollTop = scrollTop;
-
-          console.log(`Log: ${this.component} constructor raf End`, `\nactual scrollTop`, this.hostWrapperRef.nativeElement.scrollTop);
+          // console.log(`Log: ${this.component} constructor raf End`, `\nactual scrollTop`, this.hostWrapperRef.nativeElement.scrollTop);
 
           // });
 
@@ -427,7 +410,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
     if (this.scrollSpy.isSuppressed()) return;
 
-    console.log(`Log: ${this.component} handleScrollSpy \nheading id=`, e.detail.id);
+    // console.log(`Log: ${this.component} handleScrollSpy \nheading id=`, e.detail.id);
     // console.log(`Log: ${this.component} handleScrollSpy \nheading id=`, e.detail.id, e.detail.scrollTop);
     this.$activeHeading.set(e.detail.id);
   }
@@ -441,7 +424,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     if (!this.rafPending) this.rafPending = true;
 
     requestAnimationFrame(() => {
-      console.log(`Log: ${this.component} handleScrollTop() \nscrollTop=`, scrollTop, `\ndocId`, this.$currentDocId());
+      // console.log(`Log: ${this.component} handleScrollTop() \nscrollTop=`, scrollTop, `\ndocId`, this.$currentDocId());
       this.scrollService.setPosition(this.$currentDocId(), scrollTop, height);
       writeSessionState({ scrollTop: scrollTop }, this.$isBrowser());
 
@@ -459,7 +442,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
       const { docId, scrollTop } = readSessionState(this.$isBrowser());
 
-      console.log(`Log: ${this.component} handleNavigate \ncurrent docid=`, docId, this.$currentDocId(), `\nnew docId=`, e.detail.id, `\nnew scrollTop=`, 0, `\ncurrent scrollTop`, scrollTop);
+      // console.log(`Log: ${this.component} handleNavigate \ncurrent docid=`, docId, this.$currentDocId(), `\nnew docId=`, e.detail.id, `\nnew scrollTop=`, 0, `\ncurrent scrollTop`, scrollTop);
 
       writeSessionState({ docId: e.detail.id, prevDocId: docId, scrollTop: 0, prevScrollTop: scrollTop }, this.$isBrowser());
       this.$prevDocId.set(docId as string);
