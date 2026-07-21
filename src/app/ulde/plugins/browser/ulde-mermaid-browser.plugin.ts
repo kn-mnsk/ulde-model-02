@@ -4,7 +4,7 @@ import mermaid   from 'mermaid';
 import type { MermaidConfig } from 'mermaid';
 import Panzoom from '@panzoom/panzoom'
 import type { BrowserDomPlugin } from '../../core/host/ulde-browser-host';
-import { readSessionState } from '../../../core/services/session-state.manage';
+import { readSessionState } from '../../../docs-viewer/services/session-state.manage';
 
 
 /* ---------------------------------------------------------
