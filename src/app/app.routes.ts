@@ -32,7 +32,7 @@ export const routes: Routes = [
   {
     path: 'docs',
     loadChildren: () =>
-      import('./features/docs-viewer/docs-viewer.routes')
+      import('./docs-viewer/docs-viewer.routes')
         .then(m => m.DOCS_VIEWER_ROUTES)
   },
 

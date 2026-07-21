@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { DocsViewer } from './features/docs-viewer/docs-viewer';
+import { DocsViewer } from './docs-viewer/docs-viewer';
 
 @Component({
   selector: 'app-root',

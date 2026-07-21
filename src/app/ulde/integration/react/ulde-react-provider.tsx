@@ -7,7 +7,7 @@ import { UldeBrowserHost } from '../../core/host/ulde-browser-host';
 import { UldeMermaidBrowserPlugin } from '../../plugins/browser/ulde-mermaid-browser.plugin';
 import { UldeKatexBrowserPlugin } from '../../plugins/browser/ulde-katex-browser.plugin';
 import { UldeAnchorsBrowserPlugin } from '../../plugins/browser/ulde-anchors-browser.plugin';
-import { UldeScrollSpyBrowserPlugin } from '../../plugins/browser/ulde-scrollspy-browser.plugin';
+import { UldeScrollBrowserPlugin } from '../../plugins/browser/ulde-scroll-browser.plugin';
 
 export const UldeContext = createContext<UldeBrowserHost | null>(null);
 
@@ -17,7 +17,7 @@ export const UldeProvider = ({ children }: {children: ReactNode}) => {
   host.registerBrowserDomPlugin(UldeMermaidBrowserPlugin);
   host.registerBrowserDomPlugin(UldeKatexBrowserPlugin);
   host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
-  host.registerBrowserDomPlugin(UldeScrollSpyBrowserPlugin);
+  host.registerBrowserDomPlugin(UldeScrollBrowserPlugin);
 
   return (
     <UldeContext.Provider value={host}>

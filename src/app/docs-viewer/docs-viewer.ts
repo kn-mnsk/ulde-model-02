@@ -5,18 +5,18 @@ import type {AfterViewInit, OnDestroy} from '@angular/core';
 import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
 
 import { TocResizerDirective } from './toc-resizer.directive';
-import { UldeDocsViewerBridge } from '../../ulde/integration/angular/ulde-docs-viewer-bridge.service';
-import { UldeAngularService } from '../../ulde/integration/angular/ulde-angular.service';
+import { UldeDocsViewerBridge } from '../ulde/integration/angular/ulde-docs-viewer-bridge.service';
+import { UldeAngularService } from '../ulde/integration/angular/ulde-angular.service';
 
-import type { TocEntry, ArtifactsPanelModel, DebugOverlayModel, TocNode } from '../../ulde/core/artifacts/ulde-artifacts';
+import type { TocEntry, ArtifactsPanelModel, DebugOverlayModel, TocNode } from '../ulde/core/artifacts/ulde-artifacts';
 
-import { ThemeService } from '../../core/services/theme.service';
-import type { ThemeName } from '../../core/services/theme.service';
+import { ThemeService } from './services/theme.service';
+import type { ThemeName } from './services/theme.service';
 import { ThemeToggle } from './theme-toggle';
-import { ScrollService } from '../../core/services/scroll.service';
-import { writeSessionState, readSessionState } from '../../core/services/session-state.manage';
-import { OverlayManager } from '../../core/services/overlay-manager.service';
-import { ScrollSpyController } from '../../core/services/scrollspy-controller';
+import { ScrollService } from './services/scroll.service';
+import { writeSessionState, readSessionState } from './services/session-state.manage';
+import { OverlayManager } from './services/overlay-manager.service';
+import { ScrollSpyController } from './services/scrollspy-controller';
 
 
 @Component({
