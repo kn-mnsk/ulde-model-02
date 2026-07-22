@@ -473,7 +473,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       this.activateClickedTocItem(this.$tocTree(), slug);
 
       // this.$savedScrollTop.set(this.scrollSpy.lastScrollTop);
-      // console.log(`Log: [DocsViewer] scrollTo queusMicroTask`);
+      // console.log(`Log: [DocsViewer] scrollTo queuesMicroTask`);
       this.scrollSpy.allow();
 
       // requestAnimationFrame(() => {
@@ -489,7 +489,7 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
     //     this.scrollSpy.detectScrollEnd(this.hostWrapperRef.nativeElement, () => {
     //       this.activateClickedTocItem(this.$tocTree(), slug);
-    //       // console.log(`Log: [DocsViewer] scrollTo queusMicroTask`);
+    //       // console.log(`Log: [DocsViewer] scrollTo queuesMicroTask`);
     //       this.scrollSpy.allow();
     //       // });
     //     });
