@@ -1,0 +1,16 @@
+{
+    "files.autoSaveWhenNoErrors": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveWorkspaceFilesOnly": true,
+    "editor.formatOnSave": true,
+    "cSpell.words": [
+        "babylonjs",
+        "havok",
+        "internald",
+        "katex",
+        "nsure",
+        "panzoom",
+        "Resizer",
+        "ulde"
+    ]
+}
