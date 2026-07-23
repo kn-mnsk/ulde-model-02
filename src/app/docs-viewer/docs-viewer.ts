@@ -1,7 +1,7 @@
 // app/feature/docs-viewer/docs-viewer.ts
 
-import { Component, ElementRef, ViewChild,  effect, input, signal, Inject, PLATFORM_ID, computed, Renderer2 } from '@angular/core';
-import type {AfterViewInit, OnDestroy} from '@angular/core';
+import { Component, ElementRef, ViewChild, effect, input, signal, Inject, PLATFORM_ID, computed, Renderer2 } from '@angular/core';
+import type { AfterViewInit, OnDestroy } from '@angular/core';
 import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
 
 import { TocResizerDirective } from './toc-resizer.directive';
@@ -193,12 +193,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       // Run ULDE host
       this.cleanupFn = this.bridge.run({
         host: this.hostWrapperRef.nativeElement,
-        docId: this.$currentDocId(),
-        reload: this.$currentReload(),
         html: result.finalHtml,
-        onScrollSpy: e => this.handleScrollSpy(e),
+        onScrollSpy: id => this.handleScrollSpy(id),
         onScrollTop: e => this.handleScrollTop(e),
-        onNavigate: e => this.handleNavigate(e)
+        onNavigate: docId => this.handleNavigate(docId)
       });
 
       const { scrollTop } = readSessionState(this.$isBrowser());
@@ -211,15 +209,10 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          // console.log(`Log: ${this.component}constructor raf Begin`, `\ncurrentDocId=`, this.$currentDocId(), `\nshould-be scrollTop=`, scrollTop);
 
           this.hostWrapperRef.nativeElement.scrollTop = scrollTop;
 
           this.scrollSpy.allow();
-
-          // console.log(`Log: ${this.component} constructor raf End`, `\nactual scrollTop`, this.hostWrapperRef.nativeElement.scrollTop);
-
-          // });
 
         });
       });
@@ -405,18 +398,15 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   // ScrollSpy handler
-  private handleScrollSpy(e: any) {
-    // console.log(`Log: ${component} handleScrollSpy \nheading id=`, id, `scrollSpy.isSuppressed()=`, this.scrollSpy.isSuppressed());
+  private handleScrollSpy(id: string) {
 
     if (this.scrollSpy.isSuppressed()) return;
 
-    // console.log(`Log: ${this.component} handleScrollSpy \nheading id=`, e.detail.id);
-    // console.log(`Log: ${this.component} handleScrollSpy \nheading id=`, e.detail.id, e.detail.scrollTop);
-    this.$activeHeading.set(e.detail.id);
+    this.$activeHeading.set(id);
+
   }
 
   private handleScrollTop(e: any) {
-    // this.scrollSpy.allow();
 
     const scrollTop = e.detail.scrollTop;
     const height = e.detail.scrollHeight;
@@ -424,12 +414,11 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
     if (!this.rafPending) this.rafPending = true;
 
     requestAnimationFrame(() => {
-      // console.log(`Log: ${this.component} handleScrollTop() \nscrollTop=`, scrollTop, `\ndocId`, this.$currentDocId());
+
       this.scrollService.setPosition(this.$currentDocId(), scrollTop, height);
       writeSessionState({ scrollTop: scrollTop }, this.$isBrowser());
 
       this.rafPending = false;
-      // this.scrollSpy.suppress();
 
     });
 
@@ -437,16 +426,16 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
   }
 
   // internald docId routing
-  private handleNavigate(e: any) {
+  private handleNavigate(docId: string) {
+
     requestAnimationFrame(() => {
 
-      const { docId, scrollTop } = readSessionState(this.$isBrowser());
+      const { scrollTop } = readSessionState(this.$isBrowser());
 
-      // console.log(`Log: ${this.component} handleNavigate \ncurrent docid=`, docId, this.$currentDocId(), `\nnew docId=`, e.detail.id, `\nnew scrollTop=`, 0, `\ncurrent scrollTop`, scrollTop);
+      writeSessionState({ docId: docId, prevDocId: this.$currentDocId(), scrollTop: 0, prevScrollTop: scrollTop }, this.$isBrowser());
 
-      writeSessionState({ docId: e.detail.id, prevDocId: docId, scrollTop: 0, prevScrollTop: scrollTop }, this.$isBrowser());
-      this.$prevDocId.set(docId as string);
-      this.$currentDocId.set(e.detail.id);
+      this.$prevDocId.set(this.$currentDocId());
+      this.$currentDocId.set(docId);
 
     });
 
@@ -459,45 +448,19 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
 
     this.scrollSpy.suppress();
 
-    // this.scrollService.scrollToElementInViewer(this.hostWrapperRef.nativeElement, el, "smooth", "top");
-    // el.scrollIntoView();
     queueMicrotask(() => {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       this.highlightElement(el);
     });
 
-    // const wrapper = this.hostWrapperRef.nativeElement;
-
-
     this.scrollSpy.detectScrollEnd(this.hostWrapperRef.nativeElement, () => {
       this.activateClickedTocItem(this.$tocTree(), slug);
 
-      // this.$savedScrollTop.set(this.scrollSpy.lastScrollTop);
-      // console.log(`Log: [DocsViewer] scrollTo queusMicroTask`);
       this.scrollSpy.allow();
-
-      // requestAnimationFrame(() => {
-      //   this.hostWrapperRef.nativeElement.scrollTop = this.scrollSpy.lastScrollTop;
-      // });
 
 
     });
 
-    // requestAnimationFrame(() => {
-    //   requestAnimationFrame(() => {
-    //     // queueMicrotask(() => {
-
-    //     this.scrollSpy.detectScrollEnd(this.hostWrapperRef.nativeElement, () => {
-    //       this.activateClickedTocItem(this.$tocTree(), slug);
-    //       // console.log(`Log: [DocsViewer] scrollTo queusMicroTask`);
-    //       this.scrollSpy.allow();
-    //       // });
-    //     });
-    //   });
-    // });
-
-
-    // this.highlightElement(el);
 
   }
 

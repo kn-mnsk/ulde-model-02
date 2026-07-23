@@ -11,107 +11,162 @@ import { UldeScrollBrowserPlugin } from '../../plugins/browser/ulde-scroll-brows
 import { UldeDebugOverlayBrowserPlugin } from '../../plugins/browser/ulde-debug-overlay-browser.plugin';
 import { UldeArtifactsPanelBrowserPlugin } from '../../plugins/browser/ulde-artifacts-panel-browser.plugin';
 
+// new version
+;
 
 @Injectable({ providedIn: 'root' })
 export class UldeDocsViewerBridge {
 
-  host = new UldeBrowserHost();
+  readonly host = new UldeBrowserHost();
 
   constructor() {
-    // Register browser DOM plugins
     this.host.registerBrowserDomPlugin(UldeDebugOverlayBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeArtifactsPanelBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeScrollBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeMermaidBrowserPlugin);
     this.host.registerBrowserDomPlugin(UldeKatexBrowserPlugin);
-    // this.host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
-    // this.host.registerBrowserDomPlugin(UldeScrollBrowserPlugin);
-    // this.host.registerBrowserDomPlugin(UldeDebugOverlayBrowserPlugin);
-    // this.host.registerBrowserDomPlugin(UldeArtifactsPanelBrowserPlugin);
   }
 
-  // new version
   /**
-     * Runs ULDE on the given host-wrapper element.
-     * Wires scrollspy, scrollpos, and navigation events.
-     */
+   * Run ULDE on the given host element and wire DOM events.
+   * Returns a cleanup function.
+   */
   run(options: {
-    host: HTMLElement;                     // host-wrapper (scroll container)
-    docId: string;
-    reload?: boolean;
+    host: HTMLElement;
     html: string;
-    onScrollSpy?: (e: any) => void;
+    onScrollSpy?: (id: string) => void;
     onScrollTop?: (e: any) => void;
     onNavigate?: (docId: string) => void;
   }): () => void {
 
-    const {
-      host,
-      html,
-      reload,
-      onScrollSpy,
-      onScrollTop,
-      onNavigate
-    } = options;
+    const { host, html, onScrollSpy, onScrollTop, onNavigate } = options;
 
-    // Clear host-wrapper if reload requested
-    if (reload) {
-      host.innerHTML = '';
-    }
-
-    // -------------------------------
-    // Event wiring
-    // -------------------------------
-    // ulde/plugins/browser/ulde-scroll-browser.plugin.ts
-    const handleScrollSpy = (e: any) => {
-      if (onScrollSpy) {
-        // console.log(`Log: [UldeDocsViewerBridge] handleScrollSpy header index=`, e.detail.index, `id=`, e.detail.id);
-        onScrollSpy(e);
-      }
-    };
-    host.addEventListener('ulde:scrollspy', handleScrollSpy);
-
-    // ulde/plugins/browser/ulde-scroll-browser.plugin.ts
-    const handleScrollTop = (e: any) => {
-      if (onScrollTop) {
-        // console.log(`Log: [UldeDocsViewerBridge] handleScrollPos scrollTop=`, e.detail.scrollTop);
-
-        onScrollTop(e);
-      }
-    };
-    host.addEventListener('ulde:scrolltop', handleScrollTop);
-
-    // src/app/ulde/plugins/browser/ulde-anchors-browser.plugin.ts
-    // internal docId routing
-    const handleNavigate = (e: any) => {
-      if (onNavigate) {
-        onNavigate(e);
-      }
-    };
-    host.addEventListener('ulde:navigate', handleNavigate);
-
-    // -------------------------------
-    // Run ULDE pipeline
-    // -------------------------------
+    // Inject HTML + run ULDE BrowserHost
     this.host.run(host, html);
 
-    console.log(`Log: [UldeDocsViewerBridge] host.run finished`);
-    // -------------------------------
-    // Cleanup function
-    // -------------------------------
+    // Event handlers
+    const handleScrollSpy = (e: any) => { onScrollSpy?.(e.detail.id); };
+    const handleScrollTop = (e: any) => { onScrollTop?.(e); };
+    const handleNavigate = (e: any) => { onNavigate?.(e.detail.id); };
+
+    // Wire events
+    host.addEventListener('ulde:scrollspy', handleScrollSpy);
+    host.addEventListener('ulde:scrolltop', handleScrollTop);
+    host.addEventListener('ulde:navigate', handleNavigate);
+
+    // Cleanup
     return () => {
       host.removeEventListener('ulde:scrollspy', handleScrollSpy);
-      host.removeEventListener('ulde:scrollpos', handleScrollTop);
+      host.removeEventListener('ulde:scrolltop', handleScrollTop);
       host.removeEventListener('ulde:navigate', handleNavigate);
     };
   }
-
-  /**
-   * Optional helper for theme re-run:
-   * DocsViewer calls: bridge.host.run(hostWrapper, html)
-   */
-  private resolveHtml(docId: string): string {
-    return `<h1>${docId}</h1>`;
-  }
 }
+
+
+// old version
+// @Injectable({ providedIn: 'root' })
+// export class UldeDocsViewerBridge {
+
+//   host = new UldeBrowserHost();
+
+//   constructor() {
+//     // Register browser DOM plugins
+//     this.host.registerBrowserDomPlugin(UldeDebugOverlayBrowserPlugin);
+//     this.host.registerBrowserDomPlugin(UldeArtifactsPanelBrowserPlugin);
+//     this.host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
+//     this.host.registerBrowserDomPlugin(UldeScrollBrowserPlugin);
+//     this.host.registerBrowserDomPlugin(UldeMermaidBrowserPlugin);
+//     this.host.registerBrowserDomPlugin(UldeKatexBrowserPlugin);
+//     // this.host.registerBrowserDomPlugin(UldeAnchorsBrowserPlugin);
+//     // this.host.registerBrowserDomPlugin(UldeScrollBrowserPlugin);
+//     // this.host.registerBrowserDomPlugin(UldeDebugOverlayBrowserPlugin);
+//     // this.host.registerBrowserDomPlugin(UldeArtifactsPanelBrowserPlugin);
+//   }
+
+//   // new version
+//   /**
+//      * Runs ULDE on the given host-wrapper element.
+//      * Wires scrollspy, scrollpos, and navigation events.
+//      */
+//   run(options: {
+//     host: HTMLElement;                     // host-wrapper (scroll container)
+//     docId: string;
+//     reload?: boolean;
+//     html: string;
+//     onScrollSpy?: (e: any) => void;
+//     onScrollTop?: (e: any) => void;
+//     onNavigate?: (docId: string) => void;
+//   }): () => void {
+
+//     const {
+//       host,
+//       html,
+//       reload,
+//       onScrollSpy,
+//       onScrollTop,
+//       onNavigate
+//     } = options;
+
+//     // Clear host-wrapper if reload requested
+//     if (reload) {
+//       host.innerHTML = '';
+//     }
+
+//     // -------------------------------
+//     // Event wiring
+//     // -------------------------------
+//     // ulde/plugins/browser/ulde-scroll-browser.plugin.ts
+//     const handleScrollSpy = (e: any) => {
+//       if (onScrollSpy) {
+//         // console.log(`Log: [UldeDocsViewerBridge] handleScrollSpy header index=`, e.detail.index, `id=`, e.detail.id);
+//         onScrollSpy(e);
+//       }
+//     };
+//     host.addEventListener('ulde:scrollspy', handleScrollSpy);
+
+//     // ulde/plugins/browser/ulde-scroll-browser.plugin.ts
+//     const handleScrollTop = (e: any) => {
+//       if (onScrollTop) {
+//         // console.log(`Log: [UldeDocsViewerBridge] handleScrollPos scrollTop=`, e.detail.scrollTop);
+
+//         onScrollTop(e);
+//       }
+//     };
+//     host.addEventListener('ulde:scrolltop', handleScrollTop);
+
+//     // src/app/ulde/plugins/browser/ulde-anchors-browser.plugin.ts
+//     // internal docId routing
+//     const handleNavigate = (e: any) => {
+//       if (onNavigate) {
+//         onNavigate(e);
+//       }
+//     };
+//     host.addEventListener('ulde:navigate', handleNavigate);
+
+//     // -------------------------------
+//     // Run ULDE pipeline
+//     // -------------------------------
+//     this.host.run(host, html);
+
+//     console.log(`Log: [UldeDocsViewerBridge] host.run finished`);
+//     // -------------------------------
+//     // Cleanup function
+//     // -------------------------------
+//     return () => {
+//       host.removeEventListener('ulde:scrollspy', handleScrollSpy);
+//       host.removeEventListener('ulde:scrollpos', handleScrollTop);
+//       host.removeEventListener('ulde:navigate', handleNavigate);
+//     };
+//   }
+
+//   /**
+//    * Optional helper for theme re-run:
+//    * DocsViewer calls: bridge.host.run(hostWrapper, html)
+//    */
+//   private resolveHtml(docId: string): string {
+//     return `<h1>${docId}</h1>`;
+//   }
+
+// }
