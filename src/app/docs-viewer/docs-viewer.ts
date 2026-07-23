@@ -324,9 +324,9 @@ export class DocsViewer implements AfterViewInit, OnDestroy {
       this.scrollService.setPosition(docId, scrollTop, 0);
 
       writeSessionState({ refreshed: false }, this.$isBrowser());
-      // writeSessionState({ docId: docId, scrollTop: scrollTop, refreshed: false }, this.$isBrowser());
 
-      console.log(`Log: ${this.component} restoreFromSessionState() DocsViewer \nRefreshed ${state.refreshed}, \nRestored docId=${docId}, \nRestored scrollPos=${scrollTop}`);
+
+      // console.log(`Log: ${this.component} restoreFromSessionState() DocsViewer \nRefreshed ${state.refreshed}, \nRestored docId=${docId}, \nRestored scrollPos=${scrollTop}`);
 
       return state.refreshed;
     }
